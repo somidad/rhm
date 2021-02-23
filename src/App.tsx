@@ -3,6 +3,7 @@ import 'semantic-ui-css/semantic.min.css';
 import { Container, Form, Header, Menu, Segment } from 'semantic-ui-react';
 import EnumTable from './components/EnumTable';
 import PkgTable from './components/PkgTable';
+import VersionEditor from './components/VersionEditor';
 import { Enum, Pkg } from './types';
 
 const PANE_VERSION = 'version';
@@ -64,6 +65,7 @@ function App() {
         pane === PANE_VERSION ? (
           <Container as={Segment}>
             <Header as='h1'>Versions</Header>
+            <VersionEditor />
           </Container>
         ) : <></>
       }
