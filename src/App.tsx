@@ -3,6 +3,7 @@ import 'semantic-ui-css/semantic.min.css';
 import { Container, Form, Header, Menu, Segment } from 'semantic-ui-react';
 import Customer from './components/Customer';
 import Lineup from './components/Lineup';
+import { TypeLineup } from './types';
 
 const PANE_VERSION = 'version';
 const PANE_LINEUP = 'lineup';
@@ -11,6 +12,10 @@ const PANE_CUSTOMER = 'customer';
 
 function App() {
   const [featureName, setFeatureName] = useState('Untitled');
+  const [lineupList, setLineupList] = useState<TypeLineup[]>([
+    { index: 0, name: '4G' },
+    { index: 1, name: '5G' },
+  ]);
   const [pane, setPane] = useState(PANE_LINEUP);
 
   return (
@@ -64,7 +69,7 @@ function App() {
         pane === PANE_LINEUP ? (
           <Container as={Segment}>
             <Header as='h1'>Lineups</Header>
-            <Lineup />
+            <Lineup lineupList={lineupList} onChange={(lineupList) => setLineupList(lineupList)} />
           </Container>
         ) : <></>
       }

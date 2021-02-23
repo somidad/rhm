@@ -2,12 +2,13 @@ import { useState } from "react";
 import { Button, Form, Table } from "semantic-ui-react";
 import { TypeLineup } from "../types";
 
-export default function Lineup() {
+type Props = {
+  lineupList: TypeLineup[];
+  onChange: (lineupList: TypeLineup[]) => void;
+};
+
+export default function Lineup({ lineupList, onChange }: Props) {
   const [name, setName] = useState('');
-  const [lineupList, setLineupList] = useState<TypeLineup[]>([
-    { index: 0, name: '4G' },
-    { index: 1, name: '5G' },
-  ]);
 
   function addLineup() {
     if (!name) {
@@ -27,7 +28,7 @@ export default function Lineup() {
       ...lineupList,
       { index, name },
     ].sort((a, b) => a.index - b.index);
-    setLineupList(lineupListNew);
+    onChange(lineupListNew);
     setName('');
   }
 
