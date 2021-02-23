@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Accordion, Breadcrumb, Icon, Item } from "semantic-ui-react";
+import { Accordion, Breadcrumb, Icon } from "semantic-ui-react";
 import { Version } from "../types";
+import ChangeTable from "./ChangeTable";
+import ReleaseTable from "./ReleaseTable";
 
 type Props = {
   index: number;
@@ -9,6 +11,9 @@ type Props = {
 
 export default function VersionComponent({ index, versionList }: Props) {
   const [active, setActive] = useState(false);
+  const [activeChange, setActiveChange] = useState(false);
+  const [activeRelease, setActiveRelease] = useState(false);
+
   const versionFound = versionList.find((version) => version.index === index);
   if (!versionFound) {
     return (
@@ -43,53 +48,19 @@ export default function VersionComponent({ index, versionList }: Props) {
       </Accordion.Title>
       <Accordion.Content active={active}>
         <Accordion>
-          <Accordion.Title active>
+          <Accordion.Title active={activeChange} onClick={() => setActiveChange(!activeChange)}>
             <Icon name='dropdown' />
             Changes
           </Accordion.Title>
-          <Accordion.Content active>
-            <Item.Group divided>
-              {
-                changeList.map((change) => {
-                  const { index, description, beforeChange, afterChange, customerIndexList } = change;
-                  return (
-                    <Item key={index}>
-                      <Item.Content>
-                        <Item.Meta>{description}</Item.Meta>
-                        <Item.Description>
-                          <div>Before change</div>
-                          <div dangerouslySetInnerHTML={{ __html: beforeChange.replace('\n', '<br />')}}></div>
-                          <div>After change</div>
-                          <div dangerouslySetInnerHTML={{ __html: afterChange.replace('\n', '<br />')}}></div>
-                        </Item.Description>
-                        <Item.Extra>{customerIndexList.join(', ')}</Item.Extra>
-                      </Item.Content>
-                    </Item>
-                  )
-                })
-              }
-            </Item.Group>
+          <Accordion.Content active={activeChange}>
+            <ChangeTable changeList={changeList} />
           </Accordion.Content>
-          <Accordion.Title active>
+          <Accordion.Title active={activeRelease} onClick={() => setActiveRelease(!activeRelease)}>
             <Icon name='dropdown' />
             Releases
           </Accordion.Title>
-          <Accordion.Content active>
-            <Item.Group divided>
-              {
-                releaseList.map((release) => {
-                  const { index, pkgIndex, customerIndexList } = release;
-                  return (
-                    <Item key={index}>
-                      <Item.Content>
-                        <Item.Header>{pkgIndex}</Item.Header>
-                        <Item.Meta>{customerIndexList.join(', ')}</Item.Meta>
-                      </Item.Content>
-                    </Item>
-                  );
-                })
-              }
-            </Item.Group>
+          <Accordion.Content active={activeRelease}>
+            <ReleaseTable releaseList={releaseList} />
           </Accordion.Content>
         </Accordion>
       </Accordion.Content>
