@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Accordion, Breadcrumb, Icon } from "semantic-ui-react";
+import { Accordion, Breadcrumb, Icon, Item } from "semantic-ui-react";
 import { Version } from "../types";
 
 type Props = {
@@ -35,7 +35,56 @@ export default function VersionComponent({ name, indexPrev, versionList }: Props
           }
         </Breadcrumb>
       </Accordion.Title>
-      <Accordion.Content active={active}></Accordion.Content>
+      <Accordion.Content active={active}>
+        <Accordion>
+          <Accordion.Title active>
+            <Icon name='dropdown' />
+            Changes
+          </Accordion.Title>
+          <Accordion.Content active>
+            <Item.Group divided>
+              <Item>
+                <Item.Content>
+                  <Item.Meta>Description</Item.Meta>
+                  <Item.Description>
+                    Before change<br />
+                    After change
+                  </Item.Description>
+                </Item.Content>
+              </Item>
+              <Item>
+                <Item.Content>
+                  <Item.Meta>Description</Item.Meta>
+                  <Item.Description>
+                    Before change<br />
+                    After change
+                  </Item.Description>
+                </Item.Content>
+              </Item>
+            </Item.Group>
+          </Accordion.Content>
+          <Accordion.Title active>
+            <Icon name='dropdown' />
+            Releases
+          </Accordion.Title>
+          <Accordion.Content active>
+            <Item.Group divided>
+              <Item>
+                <Item.Content>
+                  <Item.Header>PKG</Item.Header>
+                  <Item.Meta>Customer</Item.Meta>
+                </Item.Content>
+              </Item>
+              <Item>
+                <Item.Content>
+                  <Item.Header>PKG</Item.Header>
+                  <Item.Meta>Customer</Item.Meta>
+                </Item.Content>
+              </Item>
+            </Item.Group>
+          </Accordion.Content>
+        </Accordion>
+      </Accordion.Content>
     </>
   );
 }
