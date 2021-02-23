@@ -4,6 +4,7 @@ export type Change = {
   beforeChange: string;
   afterChange: string;
   customerIndexList: number[];
+  lineupIndex: number;
 }
 
 export type Enum = {
