@@ -13,12 +13,12 @@ export default function EnumTable({ title, enumList, onChange }: Props) {
   const [name, setName] = useState('');
   const [nameNew, setNameNew] = useState('');
 
-  function addLineup() {
+  function addEnumItem() {
     if (!name) {
       return;
     }
-    const lineupFound = enumList.find((enumItem) => enumItem.name === name);
-    if (lineupFound) {
+    const enumItemFound = enumList.find((enumItem) => enumItem.name === name);
+    if (enumItemFound) {
       return;
     }
     const index = enumList.reduce((indexPrev, enumItem) => {
@@ -27,11 +27,11 @@ export default function EnumTable({ title, enumList, onChange }: Props) {
       }
       return indexPrev;
     }, 0);
-    const lineupListNew = [
+    const enumListNew = [
       ...enumList,
       { index, name },
     ].sort((a, b) => a.index - b.index);
-    onChange(lineupListNew);
+    onChange(enumListNew);
     setName('');
   }
 
@@ -49,12 +49,12 @@ export default function EnumTable({ title, enumList, onChange }: Props) {
     if (indexFound === -1) {
       return;
     }
-    const lineupListNew = [
+    const enumListNew = [
       ...enumList.slice(0, indexFound),
       { index, name: nameNew },
       ...enumList.slice(indexFound + 1),
     ];
-    onChange(lineupListNew);
+    onChange(enumListNew);
     setEditIndex(-1);
   }
 
@@ -69,7 +69,7 @@ export default function EnumTable({ title, enumList, onChange }: Props) {
       <Table.Body>
         <Table.Row>
           <Table.Cell>
-            <Form onSubmit={addLineup}>
+            <Form onSubmit={addEnumItem}>
               <Form.Field disabled={editIndex !== -1}>
                 <input value={name} onChange={(e) => setName(e.target.value)} />
               </Form.Field>
@@ -78,7 +78,7 @@ export default function EnumTable({ title, enumList, onChange }: Props) {
           <Table.Cell>
             <Button
               icon='plus' size='tiny'
-              onClick={addLineup}
+              onClick={addEnumItem}
               disabled={editIndex !== -1}
             />
           </Table.Cell>
