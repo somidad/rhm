@@ -44,7 +44,7 @@ export default function EnumTable({ title, enumList, onChange }: Props) {
     setEditIndex(index);
   }
 
-  function onClickRename(index: number) {
+  function onSubmitRename(index: number) {
     const indexFound = enumList.findIndex((enumItem) => enumItem.index === index);
     if (indexFound === -1) {
       return;
@@ -89,14 +89,14 @@ export default function EnumTable({ title, enumList, onChange }: Props) {
             return index === editIndex ? (
               <Table.Row key={index}>
                 <Table.Cell>
-                  <Form>
+                  <Form onSubmit={() => onSubmitRename(index)}>
                     <Form.Field>
                       <input value={nameNew} onChange={(e) => setNameNew(e.target.value)} />
                     </Form.Field>
                   </Form>
                 </Table.Cell>
                 <Table.Cell>
-                  <Button icon='check' size='tiny' onClick={() => onClickRename(index)} />
+                  <Button icon='check' size='tiny' onClick={() => onSubmitRename(index)} />
                   <Button icon='cancel' size='tiny' onClick={() => setEditIndex(-1)} />
                 </Table.Cell>
               </Table.Row>
