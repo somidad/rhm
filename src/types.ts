@@ -1,9 +1,10 @@
-export type TypeCustomer = {
+export type Enum = {
   index: number;
   name: string;
 };
 
-export type Enum = {
+export type Pkg = {
   index: number;
   name: string;
+  lineupIndex: number;
 };

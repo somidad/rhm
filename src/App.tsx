@@ -2,7 +2,8 @@ import { useState } from 'react';
 import 'semantic-ui-css/semantic.min.css';
 import { Container, Form, Header, Menu, Segment } from 'semantic-ui-react';
 import EnumTable from './components/EnumTable';
-import { Enum } from './types';
+import PkgTable from './components/PkgTable';
+import { Enum, Pkg } from './types';
 
 const PANE_VERSION = 'version';
 const PANE_LINEUP = 'lineup';
@@ -15,6 +16,7 @@ function App() {
     { index: 0, name: '4G' },
     { index: 1, name: '5G' },
   ]);
+  const [pkgList, setPkgList] = useState<Pkg[]>([]);
   const [customerList, setCustomerList] = useState<Enum[]>([]);
   const [pane, setPane] = useState(PANE_LINEUP);
 
@@ -77,6 +79,7 @@ function App() {
         pane === PANE_PACKAGE ? (
           <Container as={Segment}>
             <Header as='h1'>Packages</Header>
+            <PkgTable pkgList={pkgList} lineupList={lineupList} onChange={setPkgList} />
           </Container>
         ) : <></>
       }
