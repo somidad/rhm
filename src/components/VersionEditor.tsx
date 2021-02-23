@@ -41,9 +41,9 @@ export default function VersionEditor({ versionList }: Props) {
       <Accordion fluid styled>
         {
           versionList.map((version) => {
-            const { index, name, indexPrev } = version;
+            const { index } = version;
             return (
-              <VersionComponent key={index} name={name} indexPrev={indexPrev} versionList={versionList} />
+              <VersionComponent key={index} index={index} versionList={versionList} />
             )
           })
         }

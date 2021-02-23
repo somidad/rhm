@@ -3,13 +3,19 @@ import { Accordion, Breadcrumb, Icon, Item } from "semantic-ui-react";
 import { Version } from "../types";
 
 type Props = {
-  name: string;
-  indexPrev: number;
+  index: number;
   versionList: Version[];
 };
 
-export default function VersionComponent({ name, indexPrev, versionList }: Props) {
+export default function VersionComponent({ index, versionList }: Props) {
   const [active, setActive] = useState(false);
+  const versionFound = versionList.find((version) => version.index === index);
+  if (!versionFound) {
+    return (
+      <></>
+    );
+  }
+  const { name, indexPrev, changeList, releaseList } = versionFound;
   const versionPrevFound = versionList.find((version) => version.index === indexPrev);
 
   return (
@@ -43,24 +49,25 @@ export default function VersionComponent({ name, indexPrev, versionList }: Props
           </Accordion.Title>
           <Accordion.Content active>
             <Item.Group divided>
-              <Item>
-                <Item.Content>
-                  <Item.Meta>Description</Item.Meta>
-                  <Item.Description>
-                    Before change<br />
-                    After change
-                  </Item.Description>
-                </Item.Content>
-              </Item>
-              <Item>
-                <Item.Content>
-                  <Item.Meta>Description</Item.Meta>
-                  <Item.Description>
-                    Before change<br />
-                    After change
-                  </Item.Description>
-                </Item.Content>
-              </Item>
+              {
+                changeList.map((change) => {
+                  const { index, description, beforeChange, afterChange, customerIndexList } = change;
+                  return (
+                    <Item key={index}>
+                      <Item.Content>
+                        <Item.Meta>{description}</Item.Meta>
+                        <Item.Description>
+                          <div>Before change</div>
+                          <div dangerouslySetInnerHTML={{ __html: beforeChange.replace('\n', '<br />')}}></div>
+                          <div>After change</div>
+                          <div dangerouslySetInnerHTML={{ __html: afterChange.replace('\n', '<br />')}}></div>
+                        </Item.Description>
+                        <Item.Extra>{customerIndexList.join(', ')}</Item.Extra>
+                      </Item.Content>
+                    </Item>
+                  )
+                })
+              }
             </Item.Group>
           </Accordion.Content>
           <Accordion.Title active>
@@ -69,18 +76,19 @@ export default function VersionComponent({ name, indexPrev, versionList }: Props
           </Accordion.Title>
           <Accordion.Content active>
             <Item.Group divided>
-              <Item>
-                <Item.Content>
-                  <Item.Header>PKG</Item.Header>
-                  <Item.Meta>Customer</Item.Meta>
-                </Item.Content>
-              </Item>
-              <Item>
-                <Item.Content>
-                  <Item.Header>PKG</Item.Header>
-                  <Item.Meta>Customer</Item.Meta>
-                </Item.Content>
-              </Item>
+              {
+                releaseList.map((release) => {
+                  const { index, pkgIndex, customerIndexList } = release;
+                  return (
+                    <Item key={index}>
+                      <Item.Content>
+                        <Item.Header>{pkgIndex}</Item.Header>
+                        <Item.Meta>{customerIndexList.join(', ')}</Item.Meta>
+                      </Item.Content>
+                    </Item>
+                  );
+                })
+              }
             </Item.Group>
           </Accordion.Content>
         </Accordion>

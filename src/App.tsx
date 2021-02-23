@@ -14,9 +14,9 @@ const PANE_CUSTOMER = 'customer';
 function App() {
   const [featureName, setFeatureName] = useState('Untitled');
   const [versionList, setVersionList] = useState<Version[]>([
-    { index: 0, name: 'V1', indexPrev: -1 },
-    { index: 1, name: 'V2', indexPrev: 0 },
-    { index: 2, name: 'V3', indexPrev: 1 },
+    { index: 0, name: 'V1', indexPrev: -1, changeList: [], releaseList: [] },
+    { index: 1, name: 'V2', indexPrev: 0, changeList: [], releaseList: [] },
+    { index: 2, name: 'V3', indexPrev: 1, changeList: [], releaseList: [] },
   ]);
   const [lineupList, setLineupList] = useState<Enum[]>([
     { index: 0, name: '4G' },
