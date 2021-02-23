@@ -3,7 +3,7 @@ export type TypeCustomer = {
   name: string;
 };
 
-export type TypeLineup = {
+export type Enum = {
   index: number;
   name: string;
 };

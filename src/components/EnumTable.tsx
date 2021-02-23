@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Button, Form, Table } from "semantic-ui-react";
-import { TypeLineup } from "../types";
+import { Enum } from "../types";
 
 type Props = {
-  lineupList: TypeLineup[];
-  onChange: (lineupList: TypeLineup[]) => void;
+  title: string;
+  enumList: Enum[];
+  onChange: (enumList: Enum[]) => void;
 };
 
-export default function Lineup({ lineupList, onChange }: Props) {
+export default function EnumTable({ title, enumList, onChange }: Props) {
   const [editIndex, setEditIndex] = useState(-1);
   const [name, setName] = useState('');
   const [nameNew, setNameNew] = useState('');
@@ -16,18 +17,18 @@ export default function Lineup({ lineupList, onChange }: Props) {
     if (!name) {
       return;
     }
-    const lineupFound = lineupList.find((lineup) => lineup.name === name);
+    const lineupFound = enumList.find((enumItem) => enumItem.name === name);
     if (lineupFound) {
       return;
     }
-    const index = lineupList.reduce((indexPrev, lineup) => {
-      if (lineup.index === indexPrev) {
+    const index = enumList.reduce((indexPrev, enumItem) => {
+      if (enumItem.index === indexPrev) {
         return indexPrev + 1;
       }
       return indexPrev;
     }, 0);
     const lineupListNew = [
-      ...lineupList,
+      ...enumList,
       { index, name },
     ].sort((a, b) => a.index - b.index);
     onChange(lineupListNew);
@@ -35,23 +36,23 @@ export default function Lineup({ lineupList, onChange }: Props) {
   }
 
   function onClickEdit(index: number) {
-    const lineup = lineupList.find((lineup) => lineup.index === index);
-    if (!lineup) {
+    const enumItem = enumList.find((enumItem) => enumItem.index === index);
+    if (!enumItem) {
       return;
     }
-    setNameNew(lineup.name);
+    setNameNew(enumItem.name);
     setEditIndex(index);
   }
 
   function onClickRename(index: number) {
-    const indexFound = lineupList.findIndex((lineup) => lineup.index === index);
+    const indexFound = enumList.findIndex((enumItem) => enumItem.index === index);
     if (indexFound === -1) {
       return;
     }
     const lineupListNew = [
-      ...lineupList.slice(0, indexFound),
+      ...enumList.slice(0, indexFound),
       { index, name: nameNew },
-      ...lineupList.slice(indexFound + 1),
+      ...enumList.slice(indexFound + 1),
     ];
     onChange(lineupListNew);
     setEditIndex(-1);
@@ -61,7 +62,7 @@ export default function Lineup({ lineupList, onChange }: Props) {
     <Table celled compact selectable>
       <Table.Header>
         <Table.Row>
-          <Table.HeaderCell>Lineup</Table.HeaderCell>
+          <Table.HeaderCell>{title}</Table.HeaderCell>
           <Table.HeaderCell>Actions</Table.HeaderCell>
         </Table.Row>
       </Table.Header>
@@ -83,8 +84,8 @@ export default function Lineup({ lineupList, onChange }: Props) {
           </Table.Cell>
         </Table.Row>
         {
-          lineupList.map((lineup) => {
-            const { index, name } = lineup;
+          enumList.map((enumItem) => {
+            const { index, name } = enumItem;
             return index === editIndex ? (
               <Table.Row key={index}>
                 <Table.Cell>

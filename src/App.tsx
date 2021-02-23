@@ -2,8 +2,8 @@ import { useState } from 'react';
 import 'semantic-ui-css/semantic.min.css';
 import { Container, Form, Header, Menu, Segment } from 'semantic-ui-react';
 import Customer from './components/Customer';
-import Lineup from './components/Lineup';
-import { TypeLineup } from './types';
+import EnumTable from './components/EnumTable';
+import { Enum } from './types';
 
 const PANE_VERSION = 'version';
 const PANE_LINEUP = 'lineup';
@@ -12,7 +12,7 @@ const PANE_CUSTOMER = 'customer';
 
 function App() {
   const [featureName, setFeatureName] = useState('Untitled');
-  const [lineupList, setLineupList] = useState<TypeLineup[]>([
+  const [lineupList, setLineupList] = useState<Enum[]>([
     { index: 0, name: '4G' },
     { index: 1, name: '5G' },
   ]);
@@ -69,7 +69,7 @@ function App() {
         pane === PANE_LINEUP ? (
           <Container as={Segment}>
             <Header as='h1'>Lineups</Header>
-            <Lineup lineupList={lineupList} onChange={(lineupList) => setLineupList(lineupList)} />
+            <EnumTable title='Lineup' enumList={lineupList} onChange={(lineupList) => setLineupList(lineupList)} />
           </Container>
         ) : <></>
       }
