@@ -4,7 +4,7 @@ import { Container, Form, Header, Menu, Segment } from 'semantic-ui-react';
 import EnumTable from './components/EnumTable';
 import PkgTable from './components/PkgTable';
 import VersionEditor from './components/VersionEditor';
-import { Enum, Pkg } from './types';
+import { Enum, Pkg, Version } from './types';
 
 const PANE_VERSION = 'version';
 const PANE_LINEUP = 'lineup';
@@ -13,6 +13,11 @@ const PANE_CUSTOMER = 'customer';
 
 function App() {
   const [featureName, setFeatureName] = useState('Untitled');
+  const [versionList, setVersionList] = useState<Version[]>([
+    { index: 0, name: 'V1', indexPrev: -1 },
+    { index: 1, name: 'V2', indexPrev: 0 },
+    { index: 2, name: 'V3', indexPrev: 1 },
+  ]);
   const [lineupList, setLineupList] = useState<Enum[]>([
     { index: 0, name: '4G' },
     { index: 1, name: '5G' },
@@ -65,7 +70,7 @@ function App() {
         pane === PANE_VERSION ? (
           <Container as={Segment}>
             <Header as='h1'>Versions</Header>
-            <VersionEditor />
+            <VersionEditor versionList={versionList} />
           </Container>
         ) : <></>
       }
