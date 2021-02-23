@@ -69,7 +69,7 @@ function App() {
         pane === PANE_LINEUP ? (
           <Container as={Segment}>
             <Header as='h1'>Lineups</Header>
-            <EnumTable title='Lineup' enumList={lineupList} onChange={(lineupList) => setLineupList(lineupList)} />
+            <EnumTable title='Lineup' enumList={lineupList} onChange={setLineupList} />
           </Container>
         ) : <></>
       }
@@ -84,7 +84,7 @@ function App() {
         pane === PANE_CUSTOMER ? (
           <Container as={Segment}>
             <Header as='h1'>Customers</Header>
-            <EnumTable title='Customer' enumList={customerList} onChange={(customerList) => setCustomerList(customerList)} />
+            <EnumTable title='Customer' enumList={customerList} onChange={setCustomerList} />
           </Container>
         ) : <></>
       }
