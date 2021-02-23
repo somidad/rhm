@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import 'semantic-ui-css/semantic.min.css';
 import { Container, Form, Header, Menu, Segment } from 'semantic-ui-react';
-import Customer from './components/Customer';
 import EnumTable from './components/EnumTable';
 import { Enum } from './types';
 
@@ -16,6 +15,7 @@ function App() {
     { index: 0, name: '4G' },
     { index: 1, name: '5G' },
   ]);
+  const [customerList, setCustomerList] = useState<Enum[]>([]);
   const [pane, setPane] = useState(PANE_LINEUP);
 
   return (
@@ -84,7 +84,7 @@ function App() {
         pane === PANE_CUSTOMER ? (
           <Container as={Segment}>
             <Header as='h1'>Customers</Header>
-            <Customer />
+            <EnumTable title='Customer' enumList={customerList} onChange={(customerList) => setCustomerList(customerList)} />
           </Container>
         ) : <></>
       }
