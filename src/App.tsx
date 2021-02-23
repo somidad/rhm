@@ -70,7 +70,7 @@ function App() {
         pane === PANE_VERSION ? (
           <Container as={Segment}>
             <Header as='h1'>Versions</Header>
-            <VersionEditor versionList={versionList} />
+            <VersionEditor versionList={versionList} onChange={setVersionList} />
           </Container>
         ) : <></>
       }

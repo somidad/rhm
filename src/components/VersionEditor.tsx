@@ -5,11 +5,34 @@ import VersionComponent from "./VersionComponent";
 
 type Props = {
   versionList: Version[];
+  onChange: (versionList: Version[]) => void;
 };
 
-export default function VersionEditor({ versionList }: Props) {
+export default function VersionEditor({ versionList, onChange }: Props) {
   const [name, setName] = useState('');
   const [indexPrev, setIndexPrev] = useState(-1);
+
+  function addVersion() {
+    if (!name) {
+      return;
+    }
+    const versionFound = versionList.find((version) => version.name === name);
+    if (versionFound) {
+      return;
+    }
+    const index = versionList.reduce((indexPrev, version) => {
+      if (version.index === indexPrev) {
+        return indexPrev + 1;
+      }
+      return indexPrev;
+    }, 0);
+    const versionListNew = [
+      ...versionList,
+      { index, name, indexPrev, changeList: [], releaseList: [] },
+    ];
+    onChange(versionListNew);
+    setName('');
+  }
 
   return (
     <>
@@ -34,7 +57,7 @@ export default function VersionEditor({ versionList }: Props) {
                 }
               </select>
             </Form.Field>
-            <Button icon='plus' size='tiny' />
+            <Button icon='plus' size='tiny' onClick={addVersion} />
           </Form.Group>
         </Form>
       </Segment>
