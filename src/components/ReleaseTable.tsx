@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Form, Icon, Label, Popup, Segment, Table } from "semantic-ui-react";
+import { Button, Form, Icon, Item, Label } from "semantic-ui-react";
 import { Enum, Pkg, Release } from "../types";
 
 type Props ={ 
@@ -10,7 +10,6 @@ type Props ={
 }
 
 export default function ReleaseTable({ releaseList, lineupList, pkgList, customerList }: Props) {
-  const [openCustomer, setOpenCustomer] = useState(false);
   const [selectedCustomerIndexList, setSelectedCustomerIndexList] = useState<number[]>([]);
 
   function onClickCustomer(index: number) {
@@ -28,29 +27,14 @@ export default function ReleaseTable({ releaseList, lineupList, pkgList, custome
     }
   }
 
-  function onCloseCustomer() {
-    setOpenCustomer(false);
-  }
-
-  function onOpenCustomer() {
-    setOpenCustomer(true);
-  }
-
   return (
-    <Table celled selectable>
-      <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell>Package</Table.HeaderCell>
-          <Table.HeaderCell>Lineup</Table.HeaderCell>
-          <Table.HeaderCell colSpan={2}>Customer</Table.HeaderCell>
-          <Table.HeaderCell collapsing>Actions</Table.HeaderCell>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        <Table.Row>
-          <Table.Cell>
-            <Form>
-              <Form.Field>
+    <Item.Group divided>
+      <Item>
+        <Item.Content>
+          <Form>
+            <Form.Group>
+              <Form.Field inline>
+                <label>Package</label>
                 <select>
                   <option value={-1}>Select a package</option>
                   {
@@ -63,11 +47,8 @@ export default function ReleaseTable({ releaseList, lineupList, pkgList, custome
                   }
                 </select>
               </Form.Field>
-            </Form>
-          </Table.Cell>
-          <Table.Cell>
-            <Form>
-              <Form.Field>
+              <Form.Field inline>
+                <label>Lineup</label>
                 <select>
                   <option value={-1}>(None)</option>
                   {
@@ -80,61 +61,32 @@ export default function ReleaseTable({ releaseList, lineupList, pkgList, custome
                   }
                 </select>
               </Form.Field>
-            </Form>
-          </Table.Cell>
-          <Table.Cell>
-            {
-              customerList
-                .filter((customer) => {
-                  return selectedCustomerIndexList.includes(customer.index)
+            </Form.Group>
+            <Form.Field>
+              <label>Customers</label>
+              {
+                customerList.map((customer) => {
+                  const { index, name } = customer;
+                  const selected = selectedCustomerIndexList.find((selectedCUstomerIndex) => selectedCUstomerIndex === index) !== undefined;
+                  const color = selected ? 'blue' : undefined;
+                  const icon = selected ? 'check' : 'minus';
+                  return (
+                    <Label key={index} as='a' className='customer-label' color={color}
+                      onClick={() => onClickCustomer(index)}
+                    >
+                      <Icon name={icon} />
+                      {name}
+                    </Label>
+                  )
                 })
-                .map((customer) => customer.name)
-                .join(', ')
-            }
-            </Table.Cell>
-            <Table.Cell collapsing>
-            <Popup
-              wide
-              position='top center'
-              trigger={<Button icon='edit' size='tiny' />}
-              open={openCustomer}
-              onClose={onCloseCustomer}
-              onOpen={onOpenCustomer}
-              content={
-                <>
-                  {
-                    customerList.map((customer) => {
-                      const { index, name } = customer;
-                      const selected = selectedCustomerIndexList.find((selectedCUstomerIndex) => selectedCUstomerIndex === index) !== undefined;
-                      const color = selected ? 'blue' : undefined;
-                      const icon = selected ? 'check' : 'minus';
-                      return (
-                        <Label key={index} as='a' className='customer-label' color={color}
-                          onClick={() => onClickCustomer(index)}
-                        >
-                          <Icon name={icon} />
-                          {name}
-                        </Label>
-                      )
-                    })
-                  }
-                  {/* <Segment basic textAlign='right'>
-                    <Button icon='check' size='tiny' />
-                    <Button icon='cancel' size='tiny' onClick={onCloseCustomer} />
-                  </Segment> */}
-                </>
               }
-              on='click'
-            />
-          </Table.Cell>
-          <Table.Cell>
-            <Button icon='plus' size='tiny' />
-          </Table.Cell>
-        </Table.Row>
-        {
-          releaseList.map((release) => <></>)
-        }
-      </Table.Body>
-    </Table>
+            </Form.Field>
+          </Form>
+          <Item.Extra>
+            <Button icon='plus' size='tiny' floated='right' />
+          </Item.Extra>
+        </Item.Content>
+      </Item>
+    </Item.Group>
   )
 }
