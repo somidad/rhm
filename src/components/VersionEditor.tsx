@@ -33,6 +33,20 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
     setName('');
   }
 
+  function onChangeVersion(version: Version) {
+    const { index } = version;
+    const indexFound = versionList.findIndex((version) => version.index === index);
+    if (indexFound === -1) {
+      return;
+    }
+    const versionListNew = [
+      ...versionList.slice(0, indexFound),
+      version,
+      ...versionList.slice(indexFound + 1),
+    ];
+    onChange(versionListNew);
+  }
+
   return (
     <>
       <Segment>
@@ -65,7 +79,10 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
           versionList.map((version) => {
             const { index } = version;
             return (
-              <VersionComponent key={index} index={index} versionList={versionList} lineupList={lineupList} pkgList={pkgList} customerList={customerList} />
+              <VersionComponent key={index} version={version}
+                versionList={versionList} lineupList={lineupList} pkgList={pkgList} customerList={customerList}
+                onChange={onChangeVersion}
+              />
             )
           })
         }

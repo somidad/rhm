@@ -5,25 +5,23 @@ import ChangeTable from "./ChangeTable";
 import ReleaseTable from "./ReleaseTable";
 
 type Props = {
-  index: number;
+  version: Version;
   versionList: Version[];
   lineupList: Enum[];
   pkgList: Pkg[];
   customerList: Enum[];
+  onChange: (version: Version) => void;
 };
 
-export default function VersionComponent({ index, versionList, lineupList, pkgList, customerList }: Props) {
+export default function VersionComponent({
+  version, versionList, lineupList, pkgList, customerList,
+  onChange,
+}: Props) {
   const [active, setActive] = useState(true);
   const [activeChange, setActiveChange] = useState(true);
   const [activeRelease, setActiveRelease] = useState(true);
 
-  const versionFound = versionList.find((version) => version.index === index);
-  if (!versionFound) {
-    return (
-      <></>
-    );
-  }
-  const { name, indexPrev, changeList, releaseList } = versionFound;
+  const { name, indexPrev, changeList, releaseList } = version;
   const versionPrevFound = versionList.find((version) => version.index === indexPrev);
 
   return (
