@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { Accordion, Breadcrumb, Icon } from "semantic-ui-react";
-import { Version } from "../types";
+import { Enum, Pkg, Version } from "../types";
 import ChangeTable from "./ChangeTable";
 import ReleaseTable from "./ReleaseTable";
 
 type Props = {
   index: number;
   versionList: Version[];
+  pkgList: Pkg[];
+  customerList: Enum[];
 };
 
-export default function VersionComponent({ index, versionList }: Props) {
+export default function VersionComponent({ index, versionList, pkgList, customerList }: Props) {
   const [active, setActive] = useState(false);
   const [activeChange, setActiveChange] = useState(false);
   const [activeRelease, setActiveRelease] = useState(false);
@@ -60,7 +62,7 @@ export default function VersionComponent({ index, versionList }: Props) {
             Releases
           </Accordion.Title>
           <Accordion.Content active={activeRelease}>
-            <ReleaseTable releaseList={releaseList} />
+            <ReleaseTable releaseList={releaseList} pkgList={pkgList} customerList={customerList} />
           </Accordion.Content>
         </Accordion>
       </Accordion.Content>
