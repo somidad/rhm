@@ -1,11 +1,13 @@
 import { Table } from "semantic-ui-react";
-import { Change } from "../types";
+import { Change, Enum } from "../types";
 
 type Props = {
   changeList: Change[];
+  lineupList: Enum[];
+  customerList: Enum[];
 };
 
-export default function ChangeTable({ changeList }: Props) {
+export default function ChangeTable({ changeList, lineupList, customerList }: Props) {
   return (
     <Table celled selectable>
       {

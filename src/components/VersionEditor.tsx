@@ -7,11 +7,12 @@ import VersionComponent from "./VersionComponent";
 type Props = {
   versionList: Version[];
   onChange: (versionList: Version[]) => void;
+  lineupList: Enum[];
   pkgList: Pkg[];
   customerList: Enum[];
 };
 
-export default function VersionEditor({ versionList, onChange, pkgList, customerList }: Props) {
+export default function VersionEditor({ versionList, onChange, lineupList, pkgList, customerList }: Props) {
   const [name, setName] = useState('');
   const [indexPrev, setIndexPrev] = useState(-1);
 
@@ -64,7 +65,7 @@ export default function VersionEditor({ versionList, onChange, pkgList, customer
           versionList.map((version) => {
             const { index } = version;
             return (
-              <VersionComponent key={index} index={index} versionList={versionList} pkgList={pkgList} customerList={customerList} />
+              <VersionComponent key={index} index={index} versionList={versionList} lineupList={lineupList} pkgList={pkgList} customerList={customerList} />
             )
           })
         }

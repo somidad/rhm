@@ -7,11 +7,12 @@ import ReleaseTable from "./ReleaseTable";
 type Props = {
   index: number;
   versionList: Version[];
+  lineupList: Enum[];
   pkgList: Pkg[];
   customerList: Enum[];
 };
 
-export default function VersionComponent({ index, versionList, pkgList, customerList }: Props) {
+export default function VersionComponent({ index, versionList, lineupList, pkgList, customerList }: Props) {
   const [active, setActive] = useState(true);
   const [activeChange, setActiveChange] = useState(true);
   const [activeRelease, setActiveRelease] = useState(true);
@@ -55,14 +56,14 @@ export default function VersionComponent({ index, versionList, pkgList, customer
             Changes
           </Accordion.Title>
           <Accordion.Content active={activeChange}>
-            <ChangeTable changeList={changeList} />
+            <ChangeTable changeList={changeList} lineupList={lineupList} customerList={customerList} />
           </Accordion.Content>
           <Accordion.Title active={activeRelease} onClick={() => setActiveRelease(!activeRelease)}>
             <Icon name='dropdown' />
             Releases
           </Accordion.Title>
           <Accordion.Content active={activeRelease}>
-            <ReleaseTable releaseList={releaseList} pkgList={pkgList} customerList={customerList} />
+            <ReleaseTable releaseList={releaseList} lineupList={lineupList} pkgList={pkgList} customerList={customerList} />
           </Accordion.Content>
         </Accordion>
       </Accordion.Content>

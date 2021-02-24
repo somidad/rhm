@@ -4,11 +4,12 @@ import { Enum, Pkg, Release } from "../types";
 
 type Props ={ 
   releaseList: Release[];
+  lineupList: Enum[];
   pkgList: Pkg[];
   customerList: Enum[];
 }
 
-export default function ReleaseTable({ releaseList, pkgList, customerList }: Props) {
+export default function ReleaseTable({ releaseList, lineupList, pkgList, customerList }: Props) {
   const [openCustomer, setOpenCustomer] = useState(false);
   const [selectedCustomerIndexList, setSelectedCustomerIndexList] = useState<number[]>([]);
 
@@ -41,8 +42,8 @@ export default function ReleaseTable({ releaseList, pkgList, customerList }: Pro
         <Table.Row>
           <Table.HeaderCell>Package</Table.HeaderCell>
           <Table.HeaderCell>Lineup</Table.HeaderCell>
-          <Table.HeaderCell>Customer</Table.HeaderCell>
-          <Table.HeaderCell>Actions</Table.HeaderCell>
+          <Table.HeaderCell colSpan={2}>Customer</Table.HeaderCell>
+          <Table.HeaderCell collapsing>Actions</Table.HeaderCell>
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -69,12 +70,29 @@ export default function ReleaseTable({ releaseList, pkgList, customerList }: Pro
               <Form.Field>
                 <select>
                   <option value={-1}>(None)</option>
+                  {
+                    lineupList.map((lineup) => {
+                      const { index, name } = lineup;
+                      return (
+                        <option key={index} value={index}>{name}</option>
+                      )
+                    })
+                  }
                 </select>
               </Form.Field>
             </Form>
           </Table.Cell>
           <Table.Cell>
-            Alice, Bob, Charlie
+            {
+              customerList
+                .filter((customer) => {
+                  return selectedCustomerIndexList.includes(customer.index)
+                })
+                .map((customer) => customer.name)
+                .join(', ')
+            }
+            </Table.Cell>
+            <Table.Cell collapsing>
             <Popup
               wide
               position='top center'
@@ -100,17 +118,17 @@ export default function ReleaseTable({ releaseList, pkgList, customerList }: Pro
                       )
                     })
                   }
-                  <Segment basic textAlign='right'>
+                  {/* <Segment basic textAlign='right'>
                     <Button icon='check' size='tiny' />
                     <Button icon='cancel' size='tiny' onClick={onCloseCustomer} />
-                  </Segment>
+                  </Segment> */}
                 </>
               }
               on='click'
             />
           </Table.Cell>
           <Table.Cell>
-            <Button icon='plus' />
+            <Button icon='plus' size='tiny' />
           </Table.Cell>
         </Table.Row>
         {
