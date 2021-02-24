@@ -5,9 +5,13 @@ type Props = {
   changeList: Change[];
   lineupList: Enum[];
   customerList: Enum[];
+  onChange: (changeList: Change[]) => void;
 };
 
-export default function ChangeTable({ changeList, lineupList, customerList }: Props) {
+export default function ChangeTable({
+  changeList, lineupList, customerList,
+  onChange,
+}: Props) {
   return (
     <Table celled selectable>
       {

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Accordion, Breadcrumb, Icon } from "semantic-ui-react";
-import { Enum, Pkg, Version } from "../types";
+import { Change, Enum, Pkg, Release, Version } from "../types";
 import ChangeTable from "./ChangeTable";
 import ReleaseTable from "./ReleaseTable";
 
@@ -23,6 +23,18 @@ export default function VersionComponent({
 
   const { name, indexPrev, changeList, releaseList } = version;
   const versionPrevFound = versionList.find((version) => version.index === indexPrev);
+
+  function onChangeChangeList(changeList: Change[]) {
+    const { changeList: changeListOld, ...versionRest } = version;
+    const versionNew = { ...versionRest, changeList };
+    onChange(versionNew);
+  }
+
+  function onChangeReleaseList(releaseList: Release[]) {
+    const { releaseList: releaseListOld, ...versionRest } = version;
+    const versionNew = { ...versionRest, releaseList };
+    onChange(versionNew);
+  }
 
   return (
     <>
@@ -54,14 +66,20 @@ export default function VersionComponent({
             Changes
           </Accordion.Title>
           <Accordion.Content active={activeChange}>
-            <ChangeTable changeList={changeList} lineupList={lineupList} customerList={customerList} />
+            <ChangeTable
+              changeList={changeList} lineupList={lineupList} customerList={customerList}
+              onChange={onChangeChangeList}
+            />
           </Accordion.Content>
           <Accordion.Title active={activeRelease} onClick={() => setActiveRelease(!activeRelease)}>
             <Icon name='dropdown' />
             Releases
           </Accordion.Title>
           <Accordion.Content active={activeRelease}>
-            <ReleaseTable releaseList={releaseList} lineupList={lineupList} pkgList={pkgList} customerList={customerList} />
+            <ReleaseTable
+              releaseList={releaseList} lineupList={lineupList} pkgList={pkgList} customerList={customerList}
+              onChange={onChangeReleaseList}
+            />
           </Accordion.Content>
         </Accordion>
       </Accordion.Content>

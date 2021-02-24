@@ -7,9 +7,13 @@ type Props ={
   lineupList: Enum[];
   pkgList: Pkg[];
   customerList: Enum[];
+  onChange: (releaseList: Release[]) => void;
 }
 
-export default function ReleaseTable({ releaseList, lineupList, pkgList, customerList }: Props) {
+export default function ReleaseTable({
+  releaseList, lineupList, pkgList, customerList,
+  onChange,
+}: Props) {
   const [selectedCustomerIndexList, setSelectedCustomerIndexList] = useState<number[]>([]);
 
   function onClickCustomer(index: number) {
