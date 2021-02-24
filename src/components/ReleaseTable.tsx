@@ -1,4 +1,4 @@
-import { Button, Form, Table } from "semantic-ui-react";
+import { Button, Form, Icon, Label, Popup, Segment, Table } from "semantic-ui-react";
 import { Enum, Pkg, Release } from "../types";
 
 type Props ={ 
@@ -48,7 +48,31 @@ export default function ReleaseTable({ releaseList, pkgList, customerList }: Pro
           </Table.Cell>
           <Table.Cell>
             Alice, Bob, Charlie
-            <Button icon='edit' size='tiny' />
+            <Popup
+              wide
+              position='top center'
+              trigger={<Button icon='edit' size='tiny' />}
+              content={
+                <>
+                  {
+                    customerList.map((customer) => {
+                      const { index, name } = customer;
+                      return (
+                        <Label key={index} as='a' className='customer-label'>
+                          <Icon name='minus' />
+                          {name}
+                        </Label>
+                      )
+                    })
+                  }
+                  <Segment basic textAlign='right'>
+                    <Button icon='check' size='tiny' />
+                    <Button icon='cancel' size='tiny' />
+                  </Segment>
+                </>
+              }
+              on='click'
+            />
           </Table.Cell>
           <Table.Cell>
             <Button icon='plus' />

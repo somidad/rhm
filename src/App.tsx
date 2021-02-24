@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import 'semantic-ui-css/semantic.min.css';
+import './App.css';
 import { Container, Form, Header, Menu, Segment } from 'semantic-ui-react';
 import EnumTable from './components/EnumTable';
 import PkgTable from './components/PkgTable';
@@ -23,7 +24,15 @@ function App() {
     { index: 1, name: '5G' },
   ]);
   const [pkgList, setPkgList] = useState<Pkg[]>([]);
-  const [customerList, setCustomerList] = useState<Enum[]>([]);
+  const [customerList, setCustomerList] = useState<Enum[]>([
+    { index: 0, name: 'AT&T Mobility' },
+    { index: 1, name: 'KDDI' },
+    { index: 2, name: 'KT' },
+    { index: 3, name: 'LGU+' },
+    { index: 4, name: 'SK Telecom' },
+    { index: 5, name: 'TELUS' },
+    { index: 6, name: 'Verizon Wireless' },
+  ]);
   const [pane, setPane] = useState(PANE_LINEUP);
 
   return (
