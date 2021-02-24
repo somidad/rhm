@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Accordion, Button, Form, Segment } from "semantic-ui-react";
 import { Enum, Pkg, Version } from "../types";
+import { findEmptyIndex } from "../utils";
 import VersionComponent from "./VersionComponent";
 
 type Props = {
@@ -22,12 +23,7 @@ export default function VersionEditor({ versionList, onChange, pkgList, customer
     if (versionFound) {
       return;
     }
-    const index = versionList.reduce((indexPrev, version) => {
-      if (version.index === indexPrev) {
-        return indexPrev + 1;
-      }
-      return indexPrev;
-    }, 0);
+    const index = findEmptyIndex(versionList.map((version) => version.index));
     const versionListNew = [
       ...versionList,
       { index, name, indexPrev, changeList: [], releaseList: [] },

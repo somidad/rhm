@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button, Form, Table } from "semantic-ui-react";
 import { Enum } from "../types";
+import { findEmptyIndex } from "../utils";
 
 type Props = {
   title: string;
@@ -21,12 +22,7 @@ export default function EnumTable({ title, enumList, onChange }: Props) {
     if (enumItemFound) {
       return;
     }
-    const index = enumList.reduce((indexPrev, enumItem) => {
-      if (enumItem.index === indexPrev) {
-        return indexPrev + 1;
-      }
-      return indexPrev;
-    }, 0);
+    const index = findEmptyIndex(enumList.map((enumItem) => enumItem.index));
     const enumListNew = [
       ...enumList,
       { index, name },

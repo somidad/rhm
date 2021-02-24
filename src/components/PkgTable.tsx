@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button, Form, Table } from "semantic-ui-react";
 import { Enum, Pkg } from "../types";
+import { findEmptyIndex } from "../utils";
 
 type Props = {
   pkgList: Pkg[];
@@ -23,12 +24,7 @@ export default function PkgTable({ pkgList, lineupList, onChange }: Props) {
     if (pkgFound) {
       return;
     }
-    const index = pkgList.reduce((indexPrev, pkg) => {
-      if (pkg.index === indexPrev) {
-        return indexPrev + 1;
-      }
-      return indexPrev;
-    }, 0);
+    const index = findEmptyIndex(pkgList.map((pkg) => pkg.index));
     const pkgListNew = [
       ...pkgList,
       { index, name, lineupIndex },
