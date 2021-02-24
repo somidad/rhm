@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button, Form, Icon, Label, Popup, Segment, Table } from "semantic-ui-react";
 import { Enum, Pkg, Release } from "../types";
 
@@ -8,6 +9,32 @@ type Props ={
 }
 
 export default function ReleaseTable({ releaseList, pkgList, customerList }: Props) {
+  const [openCustomer, setOpenCustomer] = useState(false);
+  const [selectedCustomerIndexList, setSelectedCustomerIndexList] = useState<number[]>([]);
+
+  function onClickCustomer(index: number) {
+    const indexFound = selectedCustomerIndexList.findIndex((selectedCustomerIndex) => selectedCustomerIndex === index);
+    if (indexFound === -1) {
+      setSelectedCustomerIndexList([
+        ...selectedCustomerIndexList,
+        index,
+      ]);
+    } else {
+      setSelectedCustomerIndexList([
+        ...selectedCustomerIndexList.slice(0, indexFound),
+        ...selectedCustomerIndexList.slice(indexFound + 1),
+      ]);
+    }
+  }
+
+  function onCloseCustomer() {
+    setOpenCustomer(false);
+  }
+
+  function onOpenCustomer() {
+    setOpenCustomer(true);
+  }
+
   return (
     <Table celled selectable>
       <Table.Header>
@@ -52,14 +79,22 @@ export default function ReleaseTable({ releaseList, pkgList, customerList }: Pro
               wide
               position='top center'
               trigger={<Button icon='edit' size='tiny' />}
+              open={openCustomer}
+              onClose={onCloseCustomer}
+              onOpen={onOpenCustomer}
               content={
                 <>
                   {
                     customerList.map((customer) => {
                       const { index, name } = customer;
+                      const selected = selectedCustomerIndexList.find((selectedCUstomerIndex) => selectedCUstomerIndex === index) !== undefined;
+                      const color = selected ? 'blue' : undefined;
+                      const icon = selected ? 'check' : 'minus';
                       return (
-                        <Label key={index} as='a' className='customer-label'>
-                          <Icon name='minus' />
+                        <Label key={index} as='a' className='customer-label' color={color}
+                          onClick={() => onClickCustomer(index)}
+                        >
+                          <Icon name={icon} />
                           {name}
                         </Label>
                       )
@@ -67,7 +102,7 @@ export default function ReleaseTable({ releaseList, pkgList, customerList }: Pro
                   }
                   <Segment basic textAlign='right'>
                     <Button icon='check' size='tiny' />
-                    <Button icon='cancel' size='tiny' />
+                    <Button icon='cancel' size='tiny' onClick={onCloseCustomer} />
                   </Segment>
                 </>
               }
