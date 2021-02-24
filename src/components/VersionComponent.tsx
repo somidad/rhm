@@ -12,9 +12,9 @@ type Props = {
 };
 
 export default function VersionComponent({ index, versionList, pkgList, customerList }: Props) {
-  const [active, setActive] = useState(false);
-  const [activeChange, setActiveChange] = useState(false);
-  const [activeRelease, setActiveRelease] = useState(false);
+  const [active, setActive] = useState(true);
+  const [activeChange, setActiveChange] = useState(true);
+  const [activeRelease, setActiveRelease] = useState(true);
 
   const versionFound = versionList.find((version) => version.index === index);
   if (!versionFound) {
