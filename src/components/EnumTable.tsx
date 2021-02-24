@@ -26,7 +26,7 @@ export default function EnumTable({ title, enumList, onChange }: Props) {
     const enumListNew = [
       ...enumList,
       { index, name },
-    ].sort((a, b) => a.index - b.index);
+    ].sort((a, b) => a.name.localeCompare(b.name));
     onChange(enumListNew);
     setName('');
   }

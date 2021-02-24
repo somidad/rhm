@@ -28,7 +28,7 @@ export default function PkgTable({ pkgList, lineupList, onChange }: Props) {
     const pkgListNew = [
       ...pkgList,
       { index, name, lineupIndex },
-    ].sort((a, b) => a.index - b.index);
+    ].sort((a, b) => a.name.localeCompare(b.name));
     onChange(pkgListNew);
     setName('');
   }
