@@ -5,10 +5,14 @@ type Props = {
   enumList: Enum[];
   selectedIndexList: number[];
   onChange: (selectedIndexList: number[]) => void;
+  disabled?: boolean;
 };
 
-export default function EnumSelector({ enumList, selectedIndexList, onChange }: Props) {
+export default function EnumSelector({ enumList, selectedIndexList, onChange, disabled }: Props) {
   function toggle(index: number) {
+    if (disabled) {
+      return;
+    }
     const indexFound = selectedIndexList.findIndex((selectedIndex) => selectedIndex === index);
     const selectedIndexListNew = indexFound === -1 ? [
       ...selectedIndexList,

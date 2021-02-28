@@ -73,7 +73,7 @@ export default function ReleaseTable({
         <Table.Row>
           <Table.Cell>
             <Form>
-              <Form.Field>
+              <Form.Field disabled={editIndex !== -1}>
                 <select value={pkgIndex} onChange={(e) => setPkgIndex(+e.target.value)}>
                   <option value={-1}>Select a package</option>
                   {
@@ -91,13 +91,14 @@ export default function ReleaseTable({
             </Form>
           </Table.Cell>
           <Table.Cell rowSpan={2}>
-            <Button icon='plus' size='tiny' onClick={addRelease} />
+            <Button icon='plus' size='tiny' onClick={addRelease} disabled={editIndex !== -1} />
           </Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.Cell>
             <EnumSelector enumList={customerList} selectedIndexList={customerIndexList}
               onChange={setCustomerIndexList}
+              disabled={editIndex !== -1}
             />
           </Table.Cell>
         </Table.Row>
