@@ -58,6 +58,31 @@ export default function ReleaseTable({
     setEditIndex(index);
   }
 
+  function onSubmitEditRelease() {
+    if (!customerIndexListNew.length) {
+      return;
+    }
+    const releaseFound = releaseList.find((release) => release.pkgIndex === pkgIndexNew);
+    if (releaseFound) {
+      return;
+    }
+    const indexFound = releaseList.findIndex((release) => release.index === editIndex);
+    if (indexFound === -1) {
+      return;
+    }
+    const releaseListNew = [
+      ...releaseList.slice(0, indexFound),
+      {
+        index: editIndex,
+        pkgIndex: pkgIndexNew,
+        customerIndexList: customerIndexListNew,
+      },
+      ...releaseList.slice(indexFound + 1),
+    ];
+    onChange(releaseListNew);
+    setEditIndex(-1);
+  }
+
   return (
     <Table celled compact selectable>
       <Table.Header>
@@ -118,9 +143,11 @@ export default function ReleaseTable({
                       <select value={pkgIndexNew} onChange={(e) => setPkgIndexNew(+e.target.value)}>
                         {
                           pkgList.map((pkg) => {
-                            const { index, name } = pkg;
+                            const { index, name, lineupIndex } = pkg;
+                            const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
+                            const lineup = `- Lineup: ${lineupFound ? lineupFound.name : '(None)'}`;
                             return (
-                              <option key={index} value={index}>{name}</option>
+                              <option key={index} value={index}>{name} {lineup}</option>
                             )
                           })
                         }
@@ -129,7 +156,7 @@ export default function ReleaseTable({
                   </Form>
                 </Table.Cell>
                 <Table.Cell rowSpan={2}>
-                  <Button icon='check' size='tiny' />
+                  <Button icon='check' size='tiny' onClick={onSubmitEditRelease} />
                   <Button icon='cancel' size='tiny' onClick={() => setEditIndex(-1)} />
                 </Table.Cell>
               </Table.Row>
