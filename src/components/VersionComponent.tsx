@@ -38,18 +38,18 @@ export default function VersionComponent({
         <Header.Subheader>Previous version: {versionPrevFound ? versionPrevFound.name : '(None)'}</Header.Subheader>
       </Header>
       <Header as='h3'>
-        Changes
-      </Header>
-      <ChangeTable
-        changeList={changeList} lineupList={lineupList} customerList={customerList}
-        onChange={onChangeChangeList}
-      />
-      <Header as='h3'>
         Releases
       </Header>
       <ReleaseTable
         releaseList={releaseList} lineupList={lineupList} pkgList={pkgList} customerList={customerList}
         onChange={onChangeReleaseList}
+      />
+      <Header as='h3'>
+        Changes
+      </Header>
+      <ChangeTable
+        changeList={changeList} lineupList={lineupList} customerList={customerList}
+        onChange={onChangeChangeList}
       />
     </>
   );

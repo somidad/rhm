@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Form, Icon, Item, Label } from "semantic-ui-react";
+import { Button, Form, Icon, Item, Label, Table } from "semantic-ui-react";
 import { Enum, Pkg, Release } from "../types";
 
 type Props ={ 
@@ -32,65 +32,53 @@ export default function ReleaseTable({
   }
 
   return (
-    <Item.Group divided>
-      <Item>
-        <Item.Content>
-          <Form>
-            <Form.Group>
-              <Form.Field inline>
-                <label>Package</label>
-                <select>
-                  <option value={-1}>Select a package</option>
-                  {
-                    pkgList.map((pkg) => {
-                      const { index, name } = pkg;
-                      return (
-                        <option key={index} value={index}>{name}</option>
-                      )
-                    })
-                  }
-                </select>
+    <Table celled compact selectable>
+      <Table.Header>
+        <Table.Row>
+          <Table.HeaderCell>Package</Table.HeaderCell>
+          <Table.HeaderCell>Lineup</Table.HeaderCell>
+          <Table.HeaderCell rowSpan={2}>Actions</Table.HeaderCell>
+        </Table.Row>
+        <Table.Row>
+          <Table.HeaderCell colSpan={2}>Customers</Table.HeaderCell>
+        </Table.Row>
+      </Table.Header>
+      <Table.Body>
+        <Table.Row>
+          <Table.Cell>
+            <Form>
+              <Form.Field>
+                <select></select>
               </Form.Field>
-              <Form.Field inline>
-                <label>Lineup</label>
-                <select>
-                  <option value={-1}>(None)</option>
-                  {
-                    lineupList.map((lineup) => {
-                      const { index, name } = lineup;
-                      return (
-                        <option key={index} value={index}>{name}</option>
-                      )
-                    })
-                  }
-                </select>
+            </Form>
+          </Table.Cell>
+          <Table.Cell>
+            <Form>
+              <Form.Field>
+                <select></select>
               </Form.Field>
-            </Form.Group>
-            <Form.Field>
-              <label>Customers</label>
-              {
-                customerList.map((customer) => {
-                  const { index, name } = customer;
-                  const selected = selectedCustomerIndexList.find((selectedCUstomerIndex) => selectedCUstomerIndex === index) !== undefined;
-                  const color = selected ? 'blue' : undefined;
-                  const icon = selected ? 'check' : 'minus';
-                  return (
-                    <Label key={index} as='a' className='customer-label' color={color}
-                      onClick={() => onClickCustomer(index)}
-                    >
-                      <Icon name={icon} />
-                      {name}
-                    </Label>
-                  )
-                })
-              }
-            </Form.Field>
-          </Form>
-          <Item.Extra>
-            <Button icon='plus' size='tiny' floated='right' />
-          </Item.Extra>
-        </Item.Content>
-      </Item>
-    </Item.Group>
+            </Form>
+          </Table.Cell>
+          <Table.Cell rowSpan={2}>
+            <Button icon='plus' size='tiny' />
+          </Table.Cell>
+        </Table.Row>
+        <Table.Row>
+          <Table.Cell colSpan={2}>
+            {
+              customerList.map((customer) => {
+                const { index, name } = customer;
+                return (
+                  <Label key={index}>
+                    <Icon name='minus' />
+                    {name}
+                  </Label>
+                )
+              })
+            }
+          </Table.Cell>
+        </Table.Row>
+      </Table.Body>
+    </Table>
   )
 }
