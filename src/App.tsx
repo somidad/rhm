@@ -39,7 +39,7 @@ function App() {
     { index: 5, name: 'TELUS' },
     { index: 6, name: 'Verizon Wireless' },
   ]);
-  const [pane, setPane] = useState(PANE_LINEUP);
+  const [pane, setPane] = useState(PANE_VERSION);
 
   return (
     <div className="App">
