@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button, Form, Table } from "semantic-ui-react";
 import { Enum, Pkg, Release } from "../types";
+import { findEmptyIndex } from "../utils";
 import EnumSelector from "./EnumSelector";
 
 type Props ={ 
@@ -16,21 +17,24 @@ export default function ReleaseTable({
   onChange,
 }: Props) {
   const [pkgIndex, setPkgIndex] = useState(-1);
-  const [selectedCustomerIndexList, setSelectedCustomerIndexList] = useState<number[]>([]);
+  const [customerIndexList, setCustomerIndexList] = useState<number[]>([]);
 
-  function onClickCustomer(index: number) {
-    const indexFound = selectedCustomerIndexList.findIndex((selectedCustomerIndex) => selectedCustomerIndex === index);
-    if (indexFound === -1) {
-      setSelectedCustomerIndexList([
-        ...selectedCustomerIndexList,
-        index,
-      ]);
-    } else {
-      setSelectedCustomerIndexList([
-        ...selectedCustomerIndexList.slice(0, indexFound),
-        ...selectedCustomerIndexList.slice(indexFound + 1),
-      ]);
+  function addRelease() {
+    if (pkgIndex === -1) {
+      return;
     }
+    const releaseFound = releaseList.find((release) => release.pkgIndex === pkgIndex);
+    if (releaseFound) {
+      return;
+    }
+    const index = findEmptyIndex(releaseList.map((release) => release.index));
+    const releaseListNew = [
+      ...releaseList,
+      { index, pkgIndex, customerIndexList },
+    ];
+    onChange(releaseListNew);
+    setPkgIndex(-1);
+    setCustomerIndexList([]);
   }
 
   return (
@@ -66,13 +70,13 @@ export default function ReleaseTable({
             </Form>
           </Table.Cell>
           <Table.Cell rowSpan={2}>
-            <Button icon='plus' size='tiny' />
+            <Button icon='plus' size='tiny' onClick={addRelease} />
           </Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.Cell>
-            <EnumSelector enumList={customerList} selectedIndexList={selectedCustomerIndexList}
-              onChange={setSelectedCustomerIndexList}
+            <EnumSelector enumList={customerList} selectedIndexList={customerIndexList}
+              onChange={setCustomerIndexList}
             />
           </Table.Cell>
         </Table.Row>
