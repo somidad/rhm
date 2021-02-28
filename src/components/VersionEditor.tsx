@@ -63,6 +63,13 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
   }
 
   function onSubmitEditVersion() {
+    if (!nameNew) {
+      return;
+    }
+    const versionFound = versionList.find((version) => version.name === nameNew);
+    if (versionFound) {
+      return;
+    }
     const indexFound = versionList.findIndex((version) => version.index === editIndex);
     if (indexFound === -1) {
       return;
