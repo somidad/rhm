@@ -18,9 +18,15 @@ export default function ReleaseTable({
 }: Props) {
   const [pkgIndex, setPkgIndex] = useState(-1);
   const [customerIndexList, setCustomerIndexList] = useState<number[]>([]);
+  const [editIndex, setEditIndex] = useState(-1);
+  const [pkgIndexNew, setPkgIndexNew] = useState(-1);
+  const [customerIndexListNew, setCustomerIndexListNew] = useState<number[]>([]);
 
   function addRelease() {
     if (pkgIndex === -1) {
+      return;
+    }
+    if (!customerIndexList.length) {
       return;
     }
     const releaseFound = releaseList.find((release) => release.pkgIndex === pkgIndex);
@@ -35,6 +41,21 @@ export default function ReleaseTable({
     onChange(releaseListNew);
     setPkgIndex(-1);
     setCustomerIndexList([]);
+  }
+
+  function onClickEdit(index: number) {
+    const releaseFound = releaseList.find((release) => release.index === index);
+    if (!releaseFound) {
+      return;
+    }
+    const { pkgIndex, customerIndexList } = releaseFound;
+    const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex);
+    if (!pkgFound) {
+      return;
+    }
+    setPkgIndexNew(pkgIndex);
+    setCustomerIndexListNew(customerIndexList);
+    setEditIndex(index);
   }
 
   return (
@@ -87,14 +108,46 @@ export default function ReleaseTable({
             const { name, lineupIndex } = pkgFound;
             const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
             const lineup = `- Lineup: ${lineupFound ? lineupFound.name : '(None)'}`;
-            return (
+            return index === editIndex ? (
+              <>
+              <Table.Row key={`${index}-upper`}>
+                <Table.Cell>
+                  <Form>
+                    <Form.Field>
+                      <select value={pkgIndexNew} onChange={(e) => setPkgIndexNew(+e.target.value)}>
+                        {
+                          pkgList.map((pkg) => {
+                            const { index, name } = pkg;
+                            return (
+                              <option key={index} value={index}>{name}</option>
+                            )
+                          })
+                        }
+                      </select>
+                    </Form.Field>
+                  </Form>
+                </Table.Cell>
+                <Table.Cell rowSpan={2}>
+                  <Button icon='check' size='tiny' />
+                  <Button icon='cancel' size='tiny' onClick={() => setEditIndex(-1)} />
+                </Table.Cell>
+              </Table.Row>
+              <Table.Row key={`${index}-lower`}>
+                <Table.Cell>
+                  <EnumSelector enumList={customerList} selectedIndexList={customerIndexListNew}
+                    onChange={setCustomerIndexListNew}
+                  />
+                </Table.Cell>
+              </Table.Row>
+              </>
+            ) : (
               <>
                 <Table.Row key={`${index}-upper`}>
                   <Table.Cell>
                     {name} {lineup}
                   </Table.Cell>
                   <Table.Cell rowSpan={2}>
-                    <Button icon='edit' size='tiny' />
+                    <Button icon='edit' size='tiny' onClick={() => onClickEdit(index)} />
                     <Button icon='trash' size='tiny' />
                     <Button icon size='tiny'>
                       <Icon name='angle up' />
