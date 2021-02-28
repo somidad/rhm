@@ -15,6 +15,7 @@ export default function ReleaseTable({
   releaseList, lineupList, pkgList, customerList,
   onChange,
 }: Props) {
+  const [pkgIndex, setPkgIndex] = useState(-1);
   const [selectedCustomerIndexList, setSelectedCustomerIndexList] = useState<number[]>([]);
 
   function onClickCustomer(index: number) {
@@ -37,11 +38,10 @@ export default function ReleaseTable({
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell>Package</Table.HeaderCell>
-          <Table.HeaderCell>Lineup</Table.HeaderCell>
           <Table.HeaderCell rowSpan={2}>Actions</Table.HeaderCell>
         </Table.Row>
         <Table.Row>
-          <Table.HeaderCell colSpan={2}>Customers</Table.HeaderCell>
+          <Table.HeaderCell>Customers</Table.HeaderCell>
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -49,30 +49,15 @@ export default function ReleaseTable({
           <Table.Cell>
             <Form>
               <Form.Field>
-                <select>
+                <select value={pkgIndex} onChange={(e) => setPkgIndex(+e.target.value)}>
                   <option value={-1}>Select a package</option>
                   {
                     pkgList.map((pkg) => {
-                      const { index, name } = pkg;
+                      const { index, name, lineupIndex } = pkg;
+                      const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
+                      const lineup = `- Lineup: ${lineupFound ? lineupFound.name : '(None)'}`;
                       return (
-                        <option key={index} value={index}>{name}</option>
-                      )
-                    })
-                  }
-                </select>
-              </Form.Field>
-            </Form>
-          </Table.Cell>
-          <Table.Cell>
-            <Form>
-              <Form.Field>
-                <select>
-                  <option value={-1}>(None)</option>
-                  {
-                    lineupList.map((lineup) => {
-                      const { index, name } = lineup;
-                      return (
-                        <option key={index} value={index}>{name}</option>
+                        <option key={index} value={index}>{name} {lineup}</option>
                       )
                     })
                   }
@@ -85,7 +70,7 @@ export default function ReleaseTable({
           </Table.Cell>
         </Table.Row>
         <Table.Row>
-          <Table.Cell colSpan={2}>
+          <Table.Cell>
             <EnumSelector enumList={customerList} selectedIndexList={selectedCustomerIndexList}
               onChange={setSelectedCustomerIndexList}
             />
