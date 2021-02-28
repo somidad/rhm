@@ -44,6 +44,13 @@ export default function PkgTable({ pkgList, lineupList, onChange }: Props) {
   }
 
   function onSubmitEditPkg(index: number) {
+    if (!nameNew) {
+      return;
+    }
+    const pkgFound = pkgList.find((pkg) => pkg.name === nameNew);
+    if (pkgFound) {
+      return;
+    }
     const indexFound = pkgList.findIndex((pkg) => pkg.index === index);
     if (indexFound === -1) {
       return;
