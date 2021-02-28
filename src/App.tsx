@@ -23,7 +23,13 @@ function App() {
     { index: 0, name: '4G' },
     { index: 1, name: '5G' },
   ]);
-  const [pkgList, setPkgList] = useState<Pkg[]>([]);
+  const [pkgList, setPkgList] = useState<Pkg[]>([
+    { index: 0, name: 'PKG A', lineupIndex: -1 },
+    { index: 1, name: 'PKG B', lineupIndex: -1 },
+    { index: 2, name: 'PKG C', lineupIndex: -1 },
+    { index: 3, name: 'PKG D', lineupIndex: 0 },
+    { index: 4, name: 'PKG E', lineupIndex: 1 },
+  ]);
   const [customerList, setCustomerList] = useState<Enum[]>([
     { index: 0, name: 'AT&T Mobility' },
     { index: 1, name: 'KDDI' },
