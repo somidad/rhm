@@ -83,6 +83,18 @@ export default function ReleaseTable({
     setEditIndex(-1);
   }
 
+  function removeRelease(index: number) {
+    const indexFound = releaseList.findIndex((release) => release.index === index);
+    if (indexFound === -1) {
+      return;
+    }
+    const releaseListNew = [
+      ...releaseList.slice(0, indexFound),
+      ...releaseList.slice(indexFound + 1),
+    ];
+    onChange(releaseListNew);
+  }
+
   return (
     <Table celled compact selectable>
       <Table.Header>
@@ -176,7 +188,7 @@ export default function ReleaseTable({
                   </Table.Cell>
                   <Table.Cell rowSpan={2}>
                     <Button icon='edit' size='tiny' onClick={() => onClickEdit(index)} />
-                    <Button icon='trash' size='tiny' />
+                    <Button icon='trash' size='tiny' onClick={() => removeRelease(index)} />
                     <Button icon size='tiny'>
                       <Icon name='angle up' />
                       Older
