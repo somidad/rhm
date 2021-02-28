@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Form, Table } from "semantic-ui-react";
+import { Button, Form, Icon, Table } from "semantic-ui-react";
 import { Enum, Pkg, Release } from "../types";
 import { findEmptyIndex } from "../utils";
 import EnumSelector from "./EnumSelector";
@@ -80,6 +80,46 @@ export default function ReleaseTable({
             />
           </Table.Cell>
         </Table.Row>
+        {
+          releaseList.map((release) => {
+            const { index, pkgIndex, customerIndexList }= release;
+            const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex) as Pkg;
+            const { name, lineupIndex } = pkgFound;
+            const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
+            const lineup = `- Lineup: ${lineupFound ? lineupFound.name : '(None)'}`;
+            return (
+              <>
+                <Table.Row key={`${index}-upper`}>
+                  <Table.Cell>
+                    {name} {lineup}
+                  </Table.Cell>
+                  <Table.Cell rowSpan={2}>
+                    <Button icon='edit' size='tiny' />
+                    <Button icon='trash' size='tiny' />
+                    <Button icon size='tiny'>
+                      <Icon name='angle up' />
+                      Older
+                    </Button>
+                    <Button icon size='tiny'>
+                      <Icon name='angle down' />
+                      Newer
+                    </Button>
+                  </Table.Cell>
+                </Table.Row>
+                <Table.Row key={`${index}-lower`}>
+                  <Table.Cell>
+                    {
+                      customerList
+                        .filter((customer) => customerIndexList.find((customerIndex) => customer.index === customerIndex) !== undefined)
+                        .map((customer) => customer.name)
+                        .join(', ')
+                    }
+                  </Table.Cell>
+                </Table.Row>
+              </>
+            )
+          })
+        }
       </Table.Body>
     </Table>
   )
