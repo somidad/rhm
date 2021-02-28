@@ -41,6 +41,13 @@ export default function EnumTable({ title, enumList, onChange }: Props) {
   }
 
   function onSubmitRename(index: number) {
+    if (!nameNew) {
+      return;
+    }
+    const enumItemFound = enumList.find((enumItem) => enumItem.name === nameNew);
+    if (enumItemFound) {
+      return;
+    }
     const indexFound = enumList.findIndex((enumItem) => enumItem.index === index);
     if (indexFound === -1) {
       return;
