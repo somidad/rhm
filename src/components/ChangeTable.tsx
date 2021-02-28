@@ -13,7 +13,7 @@ export default function ChangeTable({
   onChange,
 }: Props) {
   return (
-    <Table celled selectable>
+    <Table celled compact selectable>
       {
         changeList.map((change) => <></>)
       }

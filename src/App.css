@@ -1,3 +1,18 @@
 .popup > .customer-label {
   margin-bottom: 0.25rem;
 }
+
+.a-like-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline;
+  margin: 0;
+  padding: 0;
+}
+
+.a-like-button:hover,
+.a-like-button:focus {
+  text-decoration: none;
+}

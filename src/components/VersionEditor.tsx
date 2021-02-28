@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Accordion, Button, Form, Segment } from "semantic-ui-react";
+import { Button, Form, Table } from "semantic-ui-react";
 import { Enum, Pkg, Version } from "../types";
 import { findEmptyIndex } from "../utils";
 import VersionComponent from "./VersionComponent";
@@ -15,6 +15,11 @@ type Props = {
 export default function VersionEditor({ versionList, onChange, lineupList, pkgList, customerList }: Props) {
   const [name, setName] = useState('');
   const [indexPrev, setIndexPrev] = useState(-1);
+  const [editIndex, setEditIndex] = useState(-1);
+  const [nameNew, setNameNew] = useState('');
+  const [indexPrevNew, setIndexPrevNew] = useState(-1);
+
+  const [index, setIndex] = useState<number>();
 
   function addVersion() {
     if (!name) {
@@ -47,46 +52,139 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
     onChange(versionListNew);
   }
 
+  function onClickEdit(index: number) {
+    const versionFound = versionList.find((version) => version.index === index);
+    if (!versionFound) {
+      return;
+    }
+    setNameNew(versionFound.name);
+    setIndexPrevNew(versionFound.indexPrev);
+    setEditIndex(versionFound.index);
+  }
+
+  function onSubmitEditVersion() {
+    const indexFound = versionList.findIndex((version) => version.index === editIndex);
+    if (indexFound === -1) {
+      return;
+    }
+    const { changeList, releaseList } = versionList[indexFound];
+    const versionListNew = [
+      ...versionList.slice(0, indexFound),
+      {
+        index: editIndex,
+        name: nameNew,
+        indexPrev: indexPrevNew,
+        changeList,
+        releaseList,
+      },
+      ...versionList.slice(indexFound + 1),
+    ];
+    onChange(versionListNew);
+    setEditIndex(-1);
+  }
+
+  const version = index === undefined ? versionList[0] : versionList.find((version) => version.index === index);
   return (
     <>
-      <Segment>
-        <Form>
-          <Form.Group>
-            <Form.Field inline>
-              <label>Version</label>
-              <input value={name} onChange={(e) => setName(e.target.value)} />
-            </Form.Field>
-            <Form.Field inline>
-              <label>Previous version</label>
-              <select value={indexPrev} onChange={(e) => setIndexPrev(+e.target.value)}>
-                <option value={-1}>(None)</option>
-                {
-                  versionList.map((version) => {
-                    const { index, name } = version;
-                    return (
-                      <option key={index} value={index}>{name}</option>
-                    )
-                  })
-                }
-              </select>
-            </Form.Field>
-            <Button icon='plus' size='tiny' onClick={addVersion} />
-          </Form.Group>
-        </Form>
-      </Segment>
-      <Accordion fluid styled>
-        {
-          versionList.map((version) => {
-            const { index } = version;
-            return (
-              <VersionComponent key={index} version={version}
-                versionList={versionList} lineupList={lineupList} pkgList={pkgList} customerList={customerList}
-                onChange={onChangeVersion}
-              />
-            )
-          })
-        }
-      </Accordion>
+      <Table celled compact selectable>
+        <Table.Header>
+          <Table.HeaderCell>Version</Table.HeaderCell>
+          <Table.HeaderCell>Previous version</Table.HeaderCell>
+          <Table.HeaderCell>Actions</Table.HeaderCell>
+        </Table.Header>
+        <Table.Body>
+          <Table.Row>
+            <Table.Cell>
+              <Form>
+                <Form.Field>
+                  <input value={name} onChange={(e) => setName(e.target.value)} />
+                </Form.Field>
+              </Form>
+            </Table.Cell>
+            <Table.Cell>
+              <Form>
+                <Form.Field>
+                  <select value={indexPrev} onChange={(e) => setIndexPrev(+e.target.value)}>
+                    <option value={-1}>(None)</option>
+                    {
+                      versionList.map((version) => {
+                        const { index, name } = version;
+                        return (
+                          <option key={index} value={index}>{name}</option>
+                        )
+                      })
+                    }
+                  </select>
+                </Form.Field>
+              </Form>
+            </Table.Cell>
+            <Table.Cell>
+              <Button icon='plus' size='tiny' onClick={addVersion} />
+            </Table.Cell>
+          </Table.Row>
+          {
+            versionList.map((version) => {
+              const { index, name, indexPrev } = version;
+              if (index === editIndex) {
+                return (
+                  <Table.Row key={index}>
+                    <Table.Cell>
+                      <Form>
+                        <Form.Field>
+                          <input value={nameNew} onChange={(e) => setNameNew(e.target.value)} />
+                        </Form.Field>
+                      </Form>
+                    </Table.Cell>
+                    <Table.Cell>
+                      <Form>
+                        <Form.Field>
+                          <select value={indexPrevNew} onChange={(e) => setIndexPrevNew(+e.target.value)}>
+                            <option value={-1}>(None)</option>
+                            {
+                              versionList.map((version) => {
+                                const { index, name } = version;
+                                return (
+                                  <option key={index} value={index}>{name}</option>
+                                )
+                              })
+                            }
+                          </select>
+                        </Form.Field>
+                      </Form>
+                    </Table.Cell>
+                    <Table.Cell>
+                      <Button icon='check' size='tiny' onClick={onSubmitEditVersion} />
+                      <Button icon='cancel' size='tiny' onClick={() => setEditIndex(-1)} />
+                    </Table.Cell>
+                  </Table.Row>
+                )
+              }
+              const versionPrevFound = versionList.find((version) => version.index === indexPrev);
+              const namePrev = versionPrevFound ? versionPrevFound.name : '(None)';
+              return (
+                <Table.Row key={index}>
+                  <Table.Cell>
+                    <button className='a-like-button' onClick={() => setIndex(index)}>{name}</button>
+                    </Table.Cell>
+                  <Table.Cell>{namePrev}</Table.Cell>
+                  <Table.Cell>
+                    <Button icon='edit' size='tiny' onClick={() => onClickEdit(index)} />
+                    <Button icon='trash' size='tiny' />
+                  </Table.Cell>
+                </Table.Row>
+              )
+            })
+          }
+        </Table.Body>
+      </Table>
+      {
+        version ? (
+          <VersionComponent version={version} versionList={versionList}
+            lineupList={lineupList} pkgList={pkgList} customerList={customerList}
+            onChange={onChangeVersion}
+          />
+        ) : <></>
+      }
     </>
   );
 }
