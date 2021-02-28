@@ -43,6 +43,40 @@ export default function ReleaseTable({
     setCustomerIndexList([]);
   }
 
+  function moveNewer(index: number) {
+    const indexFound = releaseList.findIndex((release) => release.index === index);
+    if (indexFound === -1) {
+      return;
+    }
+    if (indexFound === releaseList.length - 1) {
+      return;
+    }
+    const releaseListNew = [
+      ...releaseList.slice(0, indexFound),
+      releaseList[indexFound + 1],
+      releaseList[indexFound],
+      ...releaseList.slice(indexFound + 2),
+    ];
+    onChange(releaseListNew);
+  }
+
+  function moveOlder(index: number) {
+    const indexFound = releaseList.findIndex((release) => release.index === index);
+    if (indexFound === -1) {
+      return;
+    }
+    if (indexFound === 0) {
+      return;
+    }
+    const releaseListNew = [
+      ...releaseList.slice(0, indexFound - 1),
+      releaseList[indexFound],
+      releaseList[indexFound - 1],
+      ...releaseList.slice(indexFound + 1),
+    ];
+    onChange(releaseListNew);
+  }
+
   function onClickEdit(index: number) {
     const releaseFound = releaseList.find((release) => release.index === index);
     if (!releaseFound) {
@@ -189,11 +223,11 @@ export default function ReleaseTable({
                   <Table.Cell rowSpan={2}>
                     <Button icon='edit' size='tiny' onClick={() => onClickEdit(index)} />
                     <Button icon='trash' size='tiny' onClick={() => removeRelease(index)} />
-                    <Button icon size='tiny'>
+                    <Button icon size='tiny' onClick={() => moveOlder(index)} disabled={editIndex !== -1}>
                       <Icon name='angle up' />
                       Older
                     </Button>
-                    <Button icon size='tiny'>
+                    <Button icon size='tiny' onClick={() => moveNewer(index)} disabled={editIndex !== -1}>
                       <Icon name='angle down' />
                       Newer
                     </Button>
