@@ -49,14 +49,34 @@ export default function ReleaseTable({
           <Table.Cell>
             <Form>
               <Form.Field>
-                <select></select>
+                <select>
+                  <option value={-1}>Select a package</option>
+                  {
+                    pkgList.map((pkg) => {
+                      const { index, name } = pkg;
+                      return (
+                        <option key={index} value={index}>{name}</option>
+                      )
+                    })
+                  }
+                </select>
               </Form.Field>
             </Form>
           </Table.Cell>
           <Table.Cell>
             <Form>
               <Form.Field>
-                <select></select>
+                <select>
+                  <option value={-1}>(None)</option>
+                  {
+                    lineupList.map((lineup) => {
+                      const { index, name } = lineup;
+                      return (
+                        <option key={index} value={index}>{name}</option>
+                      )
+                    })
+                  }
+                </select>
               </Form.Field>
             </Form>
           </Table.Cell>
