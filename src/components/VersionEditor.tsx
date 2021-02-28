@@ -83,6 +83,18 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
     setEditIndex(-1);
   }
 
+  function removeVersion(index: number) {
+    const indexFound = versionList.findIndex((version) => version.index === index);
+    if (indexFound === -1) {
+      return;
+    }
+    const versionListNew = [
+      ...versionList.slice(0, indexFound),
+      ...versionList.slice(indexFound + 1),
+    ];
+    onChange(versionListNew);
+  }
+
   const version = index === undefined ? versionList[0] : versionList.find((version) => version.index === index);
   return (
     <>
@@ -161,6 +173,7 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
               }
               const versionPrevFound = versionList.find((version) => version.index === indexPrev);
               const namePrev = versionPrevFound ? versionPrevFound.name : '(None)';
+              const versionReferringFound = !!versionList.find((version) => version.indexPrev === index);
               return (
                 <Table.Row key={index}>
                   <Table.Cell>
@@ -169,7 +182,10 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
                   <Table.Cell>{namePrev}</Table.Cell>
                   <Table.Cell>
                     <Button icon='edit' size='tiny' onClick={() => onClickEdit(index)} />
-                    <Button icon='trash' size='tiny' />
+                    <Button icon='trash' size='tiny'
+                      disabled={versionReferringFound}
+                      onClick={() => removeVersion(index)}
+                    />
                   </Table.Cell>
                 </Table.Row>
               )
