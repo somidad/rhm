@@ -1,5 +1,7 @@
-import { Button, Form, Icon, Label, Table, TextArea } from "semantic-ui-react";
+import { useState } from "react";
+import { Button, Form, Table, TextArea } from "semantic-ui-react";
 import { Change, Enum } from "../types";
+import EnumSelector from "./EnumSelector";
 
 type Props = {
   changeList: Change[];
@@ -12,6 +14,8 @@ export default function ChangeTable({
   changeList, lineupList, customerList,
   onChange,
 }: Props) {
+  const [selectedCustomerIndexList, setSelectedCustomerIndexList] = useState<number[]>([]);
+
   return (
     <Table celled compact selectable>
       <Table.Header>
@@ -54,17 +58,9 @@ export default function ChangeTable({
         </Table.Row>
         <Table.Row>
           <Table.Cell colSpan={3}>
-            {
-              customerList.map((customer) => {
-                const { index, name } = customer;
-                return (
-                  <Label key={index}>
-                    <Icon name='minus' />
-                    {name}
-                  </Label>
-                )
-              })
-            }
+            <EnumSelector enumList={customerList} selectedIndexList={selectedCustomerIndexList}
+              onChange={setSelectedCustomerIndexList}
+            />
           </Table.Cell>
         </Table.Row>
       </Table.Body>

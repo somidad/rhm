@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Button, Form, Icon, Item, Label, Table } from "semantic-ui-react";
+import { Button, Form, Table } from "semantic-ui-react";
 import { Enum, Pkg, Release } from "../types";
+import EnumSelector from "./EnumSelector";
 
 type Props ={ 
   releaseList: Release[];
@@ -65,17 +66,9 @@ export default function ReleaseTable({
         </Table.Row>
         <Table.Row>
           <Table.Cell colSpan={2}>
-            {
-              customerList.map((customer) => {
-                const { index, name } = customer;
-                return (
-                  <Label key={index}>
-                    <Icon name='minus' />
-                    {name}
-                  </Label>
-                )
-              })
-            }
+            <EnumSelector enumList={customerList} selectedIndexList={selectedCustomerIndexList}
+              onChange={setSelectedCustomerIndexList}
+            />
           </Table.Cell>
         </Table.Row>
       </Table.Body>
