@@ -57,6 +57,10 @@ export function getEnumNameList(enumList: Enum[], indexList: number[]) {
     .map((enumItem) => enumItem.name);
 }
 
+function indent(input: string) {
+  return input.replace(/^/gm, '    ');
+}
+
 export function publish(versionList: Version[], versionIndex: number, lineupList: Enum[], pkgList: Pkg[], customerList: Enum[]) {
   console.log('Publishing release history...');
   console.group();
@@ -73,8 +77,8 @@ export function publish(versionList: Version[], versionIndex: number, lineupList
       const { customerIndexList, releaseHistory } = relaseHistoryPerCustomerIndexList;
       const customerNameJoined = getEnumNameList(customerList, customerIndexList).join(', ');
       return `<${customerNameJoined}>
-  ${releaseHistory}
-  </${customerNameJoined}>`;
+${indent(releaseHistory)}
+</${customerNameJoined}>`;
     }).join('\n');
   console.groupEnd();
   return releaseHistory;
@@ -97,12 +101,12 @@ function publishPerCustomer(versionList: Version[], versionIndex: number, lineup
       const { lineupIndex, releaseHistory } = releaseHistoryPerLineup;
       const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
       if (!lineupFound) {
-        return releaseHistory;
+        return indent(releaseHistory);
       } else {
         const lineupName = lineupFound.name;
         return `<${lineupName}>
-  ${releaseHistory}
-  </${lineupName}>`;
+${indent(releaseHistory)}
+</${lineupName}>`;
       }
     }).join('\n');
   console.groupEnd();
@@ -157,15 +161,15 @@ function publishPerLineup(versionList: Version[], versionIndex: number, lineupIn
     const { pkgName, changeList } = changeListPerPkg;
     const changes = changeList.map((change) => {
       const { description, beforeChange, afterChange } = change;
-      return `Description
-${description}
-Before change
-${beforeChange}
-After change
-${afterChange}`;
+      return `[Description]
+${indent(description)}
+[Before change]
+${indent(beforeChange)}
+[After change]
+${indent(afterChange)}`;
     }).join('\n');
     return `${pkgName}
-${changes}`
+${indent(changes)}`
   }).join('\n');
   return releaseHistory;
 }
