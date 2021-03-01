@@ -19,31 +19,10 @@ function App() {
   let file: File | undefined;
   const refSave = createRef<HTMLAnchorElement>();
   const [featureName, setFeatureName] = useState(UNTITLED);
-  const [versionList, setVersionList] = useState<Version[]>([
-    { index: 0, name: 'V1', indexPrev: -1, changeList: [], releaseList: [] },
-    { index: 1, name: 'V2', indexPrev: 0, changeList: [], releaseList: [] },
-    { index: 2, name: 'V3', indexPrev: 1, changeList: [], releaseList: [] },
-  ]);
-  const [lineupList, setLineupList] = useState<Enum[]>([
-    { index: 0, name: '4G' },
-    { index: 1, name: '5G' },
-  ]);
-  const [pkgList, setPkgList] = useState<Pkg[]>([
-    { index: 0, name: 'PKG A', lineupIndex: -1 },
-    { index: 1, name: 'PKG B', lineupIndex: -1 },
-    { index: 2, name: 'PKG C', lineupIndex: -1 },
-    { index: 3, name: 'PKG D', lineupIndex: 0 },
-    { index: 4, name: 'PKG E', lineupIndex: 1 },
-  ]);
-  const [customerList, setCustomerList] = useState<Enum[]>([
-    { index: 0, name: 'AT&T Mobility' },
-    { index: 1, name: 'KDDI' },
-    { index: 2, name: 'KT' },
-    { index: 3, name: 'LGU+' },
-    { index: 4, name: 'SK Telecom' },
-    { index: 5, name: 'TELUS' },
-    { index: 6, name: 'Verizon Wireless' },
-  ]);
+  const [versionList, setVersionList] = useState<Version[]>([]);
+  const [lineupList, setLineupList] = useState<Enum[]>([]);
+  const [pkgList, setPkgList] = useState<Pkg[]>([]);
+  const [customerList, setCustomerList] = useState<Enum[]>([]);
   const [pane, setPane] = useState(PANE_VERSION);
 
   function onChangeFile(e: React.ChangeEvent<HTMLInputElement>) {
