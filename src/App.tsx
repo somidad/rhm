@@ -1,7 +1,7 @@
 import { createRef, useState } from 'react';
 import 'semantic-ui-css/semantic.min.css';
 import './App.css';
-import { Container, Form, Header, Menu, Segment } from 'semantic-ui-react';
+import { Container, Form, Header, Icon, Menu, Segment } from 'semantic-ui-react';
 import EnumTable from './components/EnumTable';
 import PkgTable from './components/PkgTable';
 import VersionEditor from './components/VersionEditor';
@@ -207,6 +207,11 @@ function App() {
           </Container>
         ) : <></>
       }
+      <Container textAlign='center'>
+        <a href='https://github.com/gsongsong/rhm' target='_blank' rel='noreferrer'>
+          <Icon name='github' size='large' />
+        </a>
+      </Container>
     </div>
   );
 }
