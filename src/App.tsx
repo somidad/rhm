@@ -16,6 +16,7 @@ const PANE_CUSTOMER = 'customer';
 
 function App() {
   const refLoad = createRef<HTMLInputElement>();
+  let file: File | undefined;
   const refSave = createRef<HTMLAnchorElement>();
   const [featureName, setFeatureName] = useState(UNTITLED);
   const [versionList, setVersionList] = useState<Version[]>([
@@ -51,25 +52,11 @@ function App() {
     if (!files) {
       return;
     }
-    const file = files[0];
+    file = files[0];
     if (!file) {
       return;
     }
-    const reader = new FileReader();
     reader.readAsText(file);
-    if (reader.result === null || reader.result instanceof ArrayBuffer) {
-      return;
-    }
-    const { name } = file;
-    const indexLast = name.lastIndexOf('.');
-    const featureName = name.substring(0, indexLast);
-    const { versionList, lineupList, pkgList, customerList } = JSON.parse(reader.result);
-    // Check validity
-    setFeatureName(featureName);
-    setVersionList(versionList);
-    setLineupList(lineupList);
-    setPkgList(pkgList);
-    setCustomerList(customerList);
   }
 
   function onClickNew() {
@@ -93,6 +80,30 @@ function App() {
     refSave.current.download = `${featureName}.json`;
     refSave.current.href=window.URL.createObjectURL(blob);
     refSave.current.click();
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    if (!file) {
+      return;
+    }
+    if (!e.target) {
+      return;
+    }
+    const { result } = e.target;
+    if (result === null || result instanceof ArrayBuffer) {
+      return;
+    }
+    const { name } = file;
+    const indexLast = name.lastIndexOf('.');
+    const featureName = name.substring(0, indexLast);
+    const { versionList, lineupList, pkgList, customerList } = JSON.parse(result);
+    // TODO: Check validity
+    setFeatureName(featureName);
+    setVersionList(versionList);
+    setLineupList(lineupList);
+    setPkgList(pkgList);
+    setCustomerList(customerList);
   }
 
   return (
@@ -139,7 +150,7 @@ function App() {
           </Menu.Item>
         </Menu.Menu>
       </Menu>
-      <input type='file' hidden ref={refLoad} onChange={onChangeFile} />
+      <input type='file' accept='.json' hidden ref={refLoad} onChange={onChangeFile} />
       {/* eslint-disable-next-line jsx-a11y/anchor-has-content, jsx-a11y/anchor-is-valid */}
       <a href='#' ref={refSave} hidden />
       {
