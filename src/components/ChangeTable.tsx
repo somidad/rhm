@@ -114,21 +114,21 @@ export default function ChangeTable({
                   <Table.Cell>
                     <Form>
                       <Form.Field>
-                        <TextArea value={description} />
+                        <TextArea value={description} className='no-border-textarea' />
                       </Form.Field>
                     </Form>
                   </Table.Cell>
                   <Table.Cell>
                     <Form>
                       <Form.Field>
-                        <TextArea value={beforeChange} />
+                        <TextArea value={beforeChange} className='no-border-textarea' />
                       </Form.Field>
                     </Form>
                   </Table.Cell>
                   <Table.Cell>
                     <Form>
                       <Form.Field>
-                        <TextArea value={afterChange} />
+                        <TextArea value={afterChange} className='no-border-textarea' />
                       </Form.Field>
                     </Form>
                   </Table.Cell>

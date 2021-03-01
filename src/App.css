@@ -20,3 +20,7 @@
 .ui.form textarea {
   resize: none;
 }
+
+.ui.form textarea.no-border-textarea {
+  border: none;
+}
