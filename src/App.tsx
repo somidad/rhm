@@ -16,6 +16,7 @@ const PANE_CUSTOMER = 'customer';
 
 function App() {
   const refLoad = createRef<HTMLInputElement>();
+  const refSave = createRef<HTMLAnchorElement>();
   const [featureName, setFeatureName] = useState(UNTITLED);
   const [versionList, setVersionList] = useState<Version[]>([
     { index: 0, name: 'V1', indexPrev: -1, changeList: [], releaseList: [] },
@@ -81,6 +82,19 @@ function App() {
     setCustomerList([]);
   }
 
+  function onClickSave() {
+    if (refSave.current === null) {
+      return;
+    }
+    const blob = new Blob(
+      [JSON.stringify({ versionList, lineupList, pkgList, customerList })],
+      { type: 'application/json' },
+    );
+    refSave.current.download = `${featureName}.json`;
+    refSave.current.href=window.URL.createObjectURL(blob);
+    refSave.current.click();
+  }
+
   return (
     <div className="App">
       <Menu pointing>
@@ -94,12 +108,10 @@ function App() {
         </Menu.Item>
         <Menu.Item onClick={() => refLoad.current?.click()}>
           Load
-          <input type='file' hidden
-            ref={refLoad}
-            onChange={onChangeFile}
-          />
         </Menu.Item>
-        <Menu.Item>Save</Menu.Item>
+        <Menu.Item onClick={() => onClickSave()}>
+          Save
+        </Menu.Item>
         <Menu.Menu position='right'>
           <Menu.Item
             active={pane === PANE_VERSION}
@@ -127,6 +139,9 @@ function App() {
           </Menu.Item>
         </Menu.Menu>
       </Menu>
+      <input type='file' hidden ref={refLoad} onChange={onChangeFile} />
+      {/* eslint-disable-next-line jsx-a11y/anchor-has-content, jsx-a11y/anchor-is-valid */}
+      <a href='#' ref={refSave} hidden />
       {
         pane === PANE_VERSION ? (
           <Container as={Segment}>
