@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button, Form, Table, TextArea } from "semantic-ui-react";
 import { Change, Enum } from "../types";
+import { findEmptyIndex } from "../utils";
 import EnumSelector from "./EnumSelector";
 
 const COLSPAN = 4;
@@ -20,7 +21,25 @@ export default function ChangeTable({
   const [description, setDescription] = useState('');
   const [beforeChange, setBeforeChange] = useState('');
   const [afterChange, setAfterChange] = useState('');
-  const [selectedCustomerIndexList, setSelectedCustomerIndexList] = useState<number[]>([]);
+  const [customerIndexList, setCustomerIndexList] = useState<number[]>([]);
+  const [lineupIndex, setLineupIndex] = useState(0);
+
+  function addChange() {
+    if (!description) {
+      return;
+    }
+    const index = findEmptyIndex(changeList.map((change) => change.index));
+    const changeListNew = [
+      ...changeList,
+      { index, description, beforeChange, afterChange, customerIndexList, lineupIndex },
+    ];
+    onChange(changeListNew);
+    setDescription('');
+    setBeforeChange('');
+    setAfterChange('');
+    setCustomerIndexList([]);
+    setLineupIndex(0);
+  }
 
   return (
     <Table celled compact selectable>
@@ -62,7 +81,7 @@ export default function ChangeTable({
           <Table.Cell>
             <Form>
               <Form.Field>
-                <select>
+                <select value={lineupIndex} onChange={(e) => setLineupIndex(+e.target.value)}>
                   {
                     lineupList.map((lineup) => {
                       const { index, name } = lineup;
@@ -76,13 +95,13 @@ export default function ChangeTable({
             </Form>
           </Table.Cell>
           <Table.Cell rowSpan={ROWSPAN}>
-            <Button icon='plus' size='tiny' />
+            <Button icon='plus' size='tiny' onClick={addChange} />
           </Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.Cell colSpan={COLSPAN}>
-            <EnumSelector enumList={customerList} selectedIndexList={selectedCustomerIndexList}
-              onChange={setSelectedCustomerIndexList}
+            <EnumSelector enumList={customerList} selectedIndexList={customerIndexList}
+              onChange={setCustomerIndexList}
             />
           </Table.Cell>
         </Table.Row>
