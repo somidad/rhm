@@ -43,7 +43,12 @@ export default function ChangeTable({
   }
 
   function removeChange(index: number) {
-    // TODO
+    const indexFound = changeList.findIndex((change) => change.index === index);
+    const changeListNew = [
+      ...changeList.slice(0, indexFound),
+      ...changeList.slice(indexFound + 1),
+    ];
+    onChange(changeListNew);
   }
 
   return (
