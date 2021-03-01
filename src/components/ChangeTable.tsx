@@ -22,13 +22,13 @@ export default function ChangeTable({
   const [beforeChange, setBeforeChange] = useState('');
   const [afterChange, setAfterChange] = useState('');
   const [customerIndexList, setCustomerIndexList] = useState<number[]>([]);
-  const [lineupIndex, setLineupIndex] = useState(0);
+  const [lineupIndex, setLineupIndex] = useState(-1);
   const [editIndex, setEditIndex] = useState(-1);
   const [descriptionNew, setDescriptionNew] = useState('');
   const [beforeChangeNew, setBeforeChangeNew] = useState('');
   const [afterChangeNew, setAfterChangeNew] = useState('');
   const [customerIndexListNew, setCustomerIndexListNew] = useState<number[]>([]);
-  const [lineupIndexNew, setLineupIndexNew] = useState(0);
+  const [lineupIndexNew, setLineupIndexNew] = useState(-1);
 
   function addChange() {
     if (!description) {
@@ -132,6 +132,7 @@ export default function ChangeTable({
             <Form>
               <Form.Field disabled={editIndex !== -1}>
                 <select value={lineupIndex} onChange={(e) => setLineupIndex(+e.target.value)}>
+                  <option value={-1}>(None)</option>
                   {
                     lineupList.map((lineup) => {
                       const { index, name } = lineup;
@@ -160,7 +161,7 @@ export default function ChangeTable({
           changeList.map((change) => {
             const { index, description, beforeChange, afterChange, customerIndexList, lineupIndex } = change;
             const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
-            const lineup = lineupFound ? lineupFound.name : 'Lineup not found';
+            const lineup = lineupFound ? lineupFound.name : '(None)';
             return index === editIndex ? (
               <>
                 <Table.Row key={`${index}-upper`}>
@@ -189,6 +190,7 @@ export default function ChangeTable({
                     <Form>
                       <Form.Field>
                         <select value={lineupIndexNew} onChange={(e) => setLineupIndexNew(+e.target.value)}>
+                          <option value={-1}>(None)</option>
                           {
                             lineupList.map((lineup) => {
                               const { index, name } = lineup;

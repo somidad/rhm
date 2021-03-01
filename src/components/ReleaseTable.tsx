@@ -151,7 +151,7 @@ export default function ReleaseTable({
                     pkgList.map((pkg) => {
                       const { index, name, lineupIndex } = pkg;
                       const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
-                      const lineup = `- Lineup: ${lineupFound ? lineupFound.name : 'Lineup not found'}`;
+                      const lineup = `- Lineup: ${lineupFound ? lineupFound.name : '(None)'}`;
                       return (
                         <option key={index} value={index}>{name} {lineup}</option>
                       )
@@ -179,7 +179,7 @@ export default function ReleaseTable({
             const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex) as Pkg;
             const { name, lineupIndex } = pkgFound;
             const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
-            const lineup = `- Lineup: ${lineupFound ? lineupFound.name : 'Lineup not found'}`;
+            const lineup = `- Lineup: ${lineupFound ? lineupFound.name : '(None)'}`;
             return index === editIndex ? (
               <>
               <Table.Row key={`${index}-upper`}>
@@ -191,7 +191,7 @@ export default function ReleaseTable({
                           pkgList.map((pkg) => {
                             const { index, name, lineupIndex } = pkg;
                             const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
-                            const lineup = `- Lineup: ${lineupFound ? lineupFound.name : 'Lineup not found'}`;
+                            const lineup = `- Lineup: ${lineupFound ? lineupFound.name : '(None)'}`;
                             return (
                               <option key={index} value={index}>{name} {lineup}</option>
                             )

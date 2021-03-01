@@ -13,9 +13,9 @@ type Props = {
 export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexList }: Props) {
   const [editIndex, setEditIndex] = useState(-1);
   const [name, setName] = useState('');
-  const [lineupIndex, setLineupIndex] = useState(0);
+  const [lineupIndex, setLineupIndex] = useState(-1);
   const [nameNew, setNameNew] = useState('');
-  const [lineupIndexNew, setLineupIndexNew] = useState(0);
+  const [lineupIndexNew, setLineupIndexNew] = useState(-1);
 
   function addPkg() {
     if (!name) {
@@ -102,6 +102,7 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
             <Form>
               <Form.Field disabled={editIndex !== -1}>
                 <select value={lineupIndex} onChange={(e) => setLineupIndex(+e.target.value)}>
+                  <option value={-1}>(None)</option>
                   {
                     lineupList.map((lineup) => {
                       const { index, name} = lineup;
@@ -126,7 +127,7 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
           pkgList.map((pkg) => {
             const { index, name, lineupIndex } = pkg;
             const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
-            const lineupName = lineupFound ? lineupFound.name : 'Lineup not found';
+            const lineup = lineupFound ? lineupFound.name : '(None)';
             return index === editIndex ? (
               <Table.Row key={index}>
                 <Table.Cell>
@@ -140,6 +141,7 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
                   <Form>
                     <Form.Field>
                       <select value={lineupIndexNew} onChange={(e) => setLineupIndexNew(+e.target.value)}>
+                        <option value={-1}>(None)</option>
                         {
                           lineupList.map((lineup) => {
                             const { index, name } = lineup;
@@ -160,7 +162,7 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
             ) : (
               <Table.Row key={index}>
                 <Table.Cell>{name}</Table.Cell>
-                <Table.Cell>{lineupName}</Table.Cell>
+                <Table.Cell>{lineup}</Table.Cell>
                 <Table.Cell>
                   <Button icon='edit' size='tiny' onClick={() => onClickEdit(index)} />
                   <Button icon='trash' size='tiny' onClick={() => removePkg(index)}
