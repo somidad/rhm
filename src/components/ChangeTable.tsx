@@ -23,6 +23,7 @@ export default function ChangeTable({
   const [afterChange, setAfterChange] = useState('');
   const [customerIndexList, setCustomerIndexList] = useState<number[]>([]);
   const [lineupIndex, setLineupIndex] = useState(0);
+  const [editIndex, setEditIndex] = useState(-1);
 
   function addChange() {
     if (!description) {
@@ -39,6 +40,10 @@ export default function ChangeTable({
     setAfterChange('');
     setCustomerIndexList([]);
     setLineupIndex(0);
+  }
+
+  function removeChange(index: number) {
+    // TODO
   }
 
   return (
@@ -59,28 +64,28 @@ export default function ChangeTable({
         <Table.Row active>
           <Table.Cell>
             <Form>
-              <Form.Field>
+              <Form.Field disabled={editIndex !== -1}>
                 <TextArea value={description} onChange={(e) => setDescription(e.target.value)} />
               </Form.Field>
             </Form>
           </Table.Cell>
           <Table.Cell>
             <Form>
-              <Form.Field>
+              <Form.Field disabled={editIndex !== -1}>
                 <TextArea value={beforeChange} onChange={(e) => setBeforeChange(e.target.value)} />
               </Form.Field>
             </Form>
           </Table.Cell>
           <Table.Cell>
             <Form>
-              <Form.Field>
+              <Form.Field disabled={editIndex !== -1}>
                 <TextArea value={afterChange} onChange={(e) => setAfterChange(e.target.value)} />
               </Form.Field>
             </Form>
           </Table.Cell>
           <Table.Cell>
             <Form>
-              <Form.Field>
+              <Form.Field disabled={editIndex !== -1}>
                 <select value={lineupIndex} onChange={(e) => setLineupIndex(+e.target.value)}>
                   {
                     lineupList.map((lineup) => {
@@ -95,13 +100,14 @@ export default function ChangeTable({
             </Form>
           </Table.Cell>
           <Table.Cell rowSpan={ROWSPAN}>
-            <Button icon='plus' size='tiny' onClick={addChange} />
+            <Button icon='plus' size='tiny' onClick={addChange} disabled={editIndex !== -1} />
           </Table.Cell>
         </Table.Row>
         <Table.Row active>
           <Table.Cell colSpan={COLSPAN}>
             <EnumSelector enumList={customerList} selectedIndexList={customerIndexList}
               onChange={setCustomerIndexList}
+              disabled={editIndex !== -1}
             />
           </Table.Cell>
         </Table.Row>
@@ -136,8 +142,8 @@ export default function ChangeTable({
                   </Table.Cell>
                   <Table.Cell>{lineup}</Table.Cell>
                   <Table.Cell rowSpan={ROWSPAN}>
-                    <Button icon='edit' size='tiny' />
-                    <Button icon='trash' size='tiny' />
+                    <Button icon='edit' size='tiny' onClick={() => setEditIndex(index)} />
+                    <Button icon='trash' size='tiny' onClick={() => removeChange(index)} />
                   </Table.Cell>
                 </Table.Row>
                 <Table.Row key={`${index}_lower`}>
