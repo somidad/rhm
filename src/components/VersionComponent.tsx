@@ -1,4 +1,4 @@
-import { Header } from "semantic-ui-react";
+import { Divider, Header } from "semantic-ui-react";
 import { Change, Enum, Pkg, Release, Version } from "../types";
 import ChangeTable from "./ChangeTable";
 import ReleaseTable from "./ReleaseTable";
@@ -33,10 +33,12 @@ export default function VersionComponent({
 
   return (
     <>
-      <Header as='h2'>
-        {name}
-        <Header.Subheader>Previous version: {versionPrevFound ? versionPrevFound.name : '(None)'}</Header.Subheader>
-      </Header>
+      <Divider horizontal>
+        <Header as='h2'>
+          {name}
+          <Header.Subheader>Previous version: {versionPrevFound ? versionPrevFound.name : '(None)'}</Header.Subheader>
+        </Header>
+      </Divider>
       <Header as='h3'>
         Releases
       </Header>
