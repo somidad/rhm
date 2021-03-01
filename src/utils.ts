@@ -1,4 +1,4 @@
-import { Change, Enum, Pkg, Version } from "./types";
+import { Change, Enum, OldCustomer, OldPkg, OldVersion, Pkg, Release, Version } from "./types";
 
 type ReleaseHistoryPerCustomerIndexList = {
   customerIndexList: number[];
@@ -59,6 +59,47 @@ export function getEnumNameList(enumList: Enum[], indexList: number[]) {
 
 function indent(input: string) {
   return input.replace(/^/gm, '    ');
+}
+
+export function load(input: string) {
+  const parsed = JSON.parse(input);
+  const { versionList, lineupList, pkgList, customerList } = parsed;
+  // Check if it comes from release-history-manager
+  if (versionList[0] && versionList[0].versionIndex !== undefined) {
+    // Migrate
+    const versionListNew: Version[] = (versionList as OldVersion[]).map((version) => {
+      const { versionIndex: index, versionName: name, versionIndexPrev: indexPrev, changeList, releaseList } = version;
+      const changeListNew: Change[] = changeList.map((change) => {
+        const { changeIndex: index, description, beforeChange, afterChange, targetCustomerList } = change;
+        const customerIndexList = targetCustomerList.map((targetCustomer) => targetCustomer.customerIndex);
+        return { index, description, beforeChange, afterChange, customerIndexList, lineupIndex: -1 };
+      });
+      const releaseListNew: Release[] = releaseList.map((release) => {
+        const { releaseIndex: index, pkgIndex, targetCustomerList } = release;
+        const customerIndexList = targetCustomerList.map((targetCustomer) => targetCustomer.customerIndex);
+        return { index, pkgIndex, customerIndexList };
+      })
+      return {
+        index,
+        name,
+        indexPrev,
+        changeList: changeListNew,
+        releaseList: releaseListNew,
+      }
+    });
+    const pkgListNew: Pkg[] = (pkgList as OldPkg[]).map((pkg) => {
+      const { pkgIndex: index, pkgName: name } = pkg;
+      return { index, name, lineupIndex: -1 };
+    });
+    const customerListNew: Enum[] = (customerList as OldCustomer[]).map((customer) => {
+      const { customerIndex: index, customerName: name } = customer;
+      return { index, name };
+    });
+    return { versionList: versionListNew, lineupList: [], pkgList: pkgListNew, customerList: customerListNew };
+  } else {
+    // TODO: Check validity
+  }
+  return { versionList, lineupList, pkgList, customerList };
 }
 
 export function publish(versionList: Version[], versionIndex: number, lineupList: Enum[], pkgList: Pkg[], customerList: Enum[]) {

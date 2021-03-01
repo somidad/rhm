@@ -6,6 +6,7 @@ import EnumTable from './components/EnumTable';
 import PkgTable from './components/PkgTable';
 import VersionEditor from './components/VersionEditor';
 import { Enum, Pkg, Version } from './types';
+import { load } from './utils';
 
 const UNTITLED = 'Untitled';
 
@@ -75,8 +76,7 @@ function App() {
     const { name } = file;
     const indexLast = name.lastIndexOf('.');
     const featureName = name.substring(0, indexLast);
-    const { versionList, lineupList, pkgList, customerList } = JSON.parse(result);
-    // TODO: Check validity
+    const { versionList, lineupList, pkgList, customerList } = load(result);
     setFeatureName(featureName);
     setVersionList(versionList);
     setLineupList(lineupList);
