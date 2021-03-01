@@ -7,9 +7,10 @@ type Props = {
   pkgList: Pkg[];
   lineupList: Enum[];
   onChange: (pkgList: Pkg[]) => void;
+  usedPkgIndexList?: number[];
 };
 
-export default function PkgTable({ pkgList, lineupList, onChange }: Props) {
+export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexList }: Props) {
   const [editIndex, setEditIndex] = useState(-1);
   const [name, setName] = useState('');
   const [lineupIndex, setLineupIndex] = useState(0);
@@ -62,6 +63,21 @@ export default function PkgTable({ pkgList, lineupList, onChange }: Props) {
     ];
     onChange(pkgListNew);
     setEditIndex(-1);
+  }
+
+  function removePkg(index: number) {
+    if (usedPkgIndexList && usedPkgIndexList.includes(index)) {
+      return;
+    }
+    const indexFound = pkgList.findIndex((pkg) => pkg.index === index);
+    if (indexFound === -1) {
+      return;
+    }
+    const enumListNew = [
+      ...pkgList.slice(0, indexFound),
+      ...pkgList.slice(indexFound + 1),
+    ];
+    onChange(enumListNew);
   }
 
   return (
@@ -147,7 +163,9 @@ export default function PkgTable({ pkgList, lineupList, onChange }: Props) {
                 <Table.Cell>{lineupName}</Table.Cell>
                 <Table.Cell>
                   <Button icon='edit' size='tiny' onClick={() => onClickEdit(index)} />
-                  <Button icon='trash' size='tiny' />
+                  <Button icon='trash' size='tiny' onClick={() => removePkg(index)}
+                    disabled={usedPkgIndexList && usedPkgIndexList.includes(index)}
+                  />
                 </Table.Cell>
               </Table.Row>
             )
