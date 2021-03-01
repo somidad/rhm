@@ -57,12 +57,29 @@ export default function ChangeTable({
     setBeforeChangeNew(beforeChange);
     setAfterChangeNew(afterChange);
     setLineupIndexNew(lineupIndex);
-    setCustomerIndexListNew(([...customerIndexList]));
+    setCustomerIndexListNew(customerIndexList);
     setEditIndex(index);
   }
 
   function onSubmitEditChange() {
-    // TODO
+    const indexFound = changeList.findIndex((change) => change.index === editIndex);
+    if (indexFound === -1) {
+      return;
+    }
+    const changeListNew = [
+      ...changeList.slice(0, indexFound),
+      {
+        index: editIndex,
+        description: descriptionNew,
+        beforeChange: beforeChangeNew,
+        afterChange: afterChangeNew,
+        customerIndexList: customerIndexListNew,
+        lineupIndex: lineupIndexNew,
+      },
+      ...changeList.slice(indexFound + 1),
+    ];
+    onChange(changeListNew);
+    setEditIndex(-1);
   }
 
   function removeChange(index: number) {
@@ -157,14 +174,14 @@ export default function ChangeTable({
                   <Table.Cell>
                     <Form>
                       <Form.Field>
-                        <TextArea value={beforeChange} onChange={(e) => setBeforeChangeNew(e.target.value)} />
+                        <TextArea value={beforeChangeNew} onChange={(e) => setBeforeChangeNew(e.target.value)} />
                       </Form.Field>
                     </Form>
                   </Table.Cell>
                   <Table.Cell>
                     <Form>
                       <Form.Field>
-                        <TextArea value={afterChange} onChange={(e) => setAfterChangeNew(e.target.value)} />
+                        <TextArea value={afterChangeNew} onChange={(e) => setAfterChangeNew(e.target.value)} />
                       </Form.Field>
                     </Form>
                   </Table.Cell>
