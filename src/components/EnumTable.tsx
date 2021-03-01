@@ -7,9 +7,10 @@ type Props = {
   title: string;
   enumList: Enum[];
   onChange: (enumList: Enum[]) => void;
+  usedIndexList?: number[];
 };
 
-export default function EnumTable({ title, enumList, onChange }: Props) {
+export default function EnumTable({ title, enumList, onChange, usedIndexList }: Props) {
   const [editIndex, setEditIndex] = useState(-1);
   const [name, setName] = useState('');
   const [nameNew, setNameNew] = useState('');
@@ -61,6 +62,21 @@ export default function EnumTable({ title, enumList, onChange }: Props) {
     setEditIndex(-1);
   }
 
+  function removeEnumItem(index: number) {
+    if (usedIndexList && usedIndexList.includes(index)) {
+      return;
+    }
+    const indexFound = enumList.findIndex((enumItem) => enumItem.index === index);
+    if (indexFound === -1) {
+      return;
+    }
+    const enumListNew = [
+      ...enumList.slice(0, indexFound),
+      ...enumList.slice(indexFound + 1),
+    ];
+    onChange(enumListNew);
+  }
+
   return (
     <Table celled compact selectable>
       <Table.Header>
@@ -108,7 +124,9 @@ export default function EnumTable({ title, enumList, onChange }: Props) {
                 <Table.Cell>{name}</Table.Cell>
                 <Table.Cell>
                   <Button icon='edit' size='tiny' onClick={() => onClickEdit(index)} />
-                  <Button icon='trash' size='tiny' />
+                  <Button icon='trash' size='tiny' onClick={() => removeEnumItem(index)}
+                    disabled={usedIndexList && usedIndexList.includes(index)}
+                  />
                 </Table.Cell>
               </Table.Row>
             )
