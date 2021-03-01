@@ -29,7 +29,7 @@ function accumulateChangeList(
     if (releaseFound) {
       break;
     }
-    changeListAccumulated.push(
+    changeListAccumulated.unshift(
       ...changeList.filter((change) => {
         const { customerIndexList } = change;
         return !customerIndexList.length || customerIndexList.includes(customerIndex);
@@ -166,12 +166,11 @@ function publishPerLineup(versionList: Version[], versionIndex: number, lineupIn
         ];
         // Accumulate unreleased versions and get the second latest released version
         versionNext = accumulateChangeList(changeListAccumulated, customerIndex, versionList, indexPrev);
-        changeListPerPkgList.push({ pkgName, changeList: changeListAccumulated });
+        changeListPerPkgList.unshift({ pkgName, changeList: changeListAccumulated });
       }
     }
     console.groupEnd();
   }
-  changeListPerPkgList.reverse();
   const releaseHistory = changeListPerPkgList.map((changeListPerPkg, index) => {
     const { pkgName, changeList } = changeListPerPkg;
     const changes = index === 0 ? `[Description]
