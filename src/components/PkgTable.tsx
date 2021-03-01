@@ -74,7 +74,7 @@ export default function PkgTable({ pkgList, lineupList, onChange }: Props) {
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        <Table.Row>
+        <Table.Row active>
           <Table.Cell>
             <Form>
               <Form.Field disabled={editIndex !== -1}>

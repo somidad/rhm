@@ -141,7 +141,7 @@ export default function ReleaseTable({
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        <Table.Row>
+        <Table.Row active>
           <Table.Cell>
             <Form>
               <Form.Field disabled={editIndex !== -1}>
@@ -165,7 +165,7 @@ export default function ReleaseTable({
             <Button icon='plus' size='tiny' onClick={addRelease} disabled={editIndex !== -1} />
           </Table.Cell>
         </Table.Row>
-        <Table.Row>
+        <Table.Row active>
           <Table.Cell>
             <EnumSelector enumList={customerList} selectedIndexList={customerIndexList}
               onChange={setCustomerIndexList}

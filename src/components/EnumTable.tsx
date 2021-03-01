@@ -70,7 +70,7 @@ export default function EnumTable({ title, enumList, onChange }: Props) {
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        <Table.Row>
+        <Table.Row active>
           <Table.Cell>
             <Form onSubmit={addEnumItem}>
               <Form.Field disabled={editIndex !== -1}>

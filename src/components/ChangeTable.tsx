@@ -56,7 +56,7 @@ export default function ChangeTable({
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        <Table.Row>
+        <Table.Row active>
           <Table.Cell>
             <Form>
               <Form.Field>
@@ -98,7 +98,7 @@ export default function ChangeTable({
             <Button icon='plus' size='tiny' onClick={addChange} />
           </Table.Cell>
         </Table.Row>
-        <Table.Row>
+        <Table.Row active>
           <Table.Cell colSpan={COLSPAN}>
             <EnumSelector enumList={customerList} selectedIndexList={customerIndexList}
               onChange={setCustomerIndexList}

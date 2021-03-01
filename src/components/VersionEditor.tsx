@@ -114,7 +114,7 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          <Table.Row>
+          <Table.Row active>
             <Table.Cell>
               <Form>
                 <Form.Field>
