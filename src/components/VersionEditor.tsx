@@ -173,7 +173,7 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
                               versionList.map((version) => {
                                 const { index, name } = version;
                                 return (
-                                  <option key={index} value={index}>{name}</option>
+                                  <option key={index} value={index} disabled={index === editIndex}>{name}</option>
                                 )
                               })
                             }
