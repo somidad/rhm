@@ -17,10 +17,10 @@
   text-decoration: none;
 }
 
-.ui.form textarea {
-  resize: none;
-}
-
 .ui.form textarea.no-border-textarea {
   border: none;
+}
+
+.ui.form textarea.no-resize-textarea {
+  resize: none;
 }

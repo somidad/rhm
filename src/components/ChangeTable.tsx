@@ -110,21 +110,27 @@ export default function ChangeTable({
           <Table.Cell>
             <Form>
               <Form.Field disabled={editIndex !== -1}>
-                <TextArea value={description} onChange={(e) => setDescription(e.target.value)} />
+                <TextArea value={description} onChange={(e) => setDescription(e.target.value)}
+                  className='no-resize-textarea'
+                />
               </Form.Field>
             </Form>
           </Table.Cell>
           <Table.Cell>
             <Form>
               <Form.Field disabled={editIndex !== -1}>
-                <TextArea value={beforeChange} onChange={(e) => setBeforeChange(e.target.value)} />
+                <TextArea value={beforeChange} onChange={(e) => setBeforeChange(e.target.value)}
+                  className='no-resize-textarea'
+                />
               </Form.Field>
             </Form>
           </Table.Cell>
           <Table.Cell>
             <Form>
               <Form.Field disabled={editIndex !== -1}>
-                <TextArea value={afterChange} onChange={(e) => setAfterChange(e.target.value)} />
+                <TextArea value={afterChange} onChange={(e) => setAfterChange(e.target.value)}
+                  className='no-resize-textarea'
+                />
               </Form.Field>
             </Form>
           </Table.Cell>
@@ -168,21 +174,27 @@ export default function ChangeTable({
                   <Table.Cell>
                     <Form>
                       <Form.Field>
-                        <TextArea value={descriptionNew} onChange={(e) => setDescriptionNew(e.target.value)} />
+                        <TextArea value={descriptionNew} onChange={(e) => setDescriptionNew(e.target.value)}
+                          className='no-resize-textarea'
+                        />
                       </Form.Field>
                     </Form>
                   </Table.Cell>
                   <Table.Cell>
                     <Form>
                       <Form.Field>
-                        <TextArea value={beforeChangeNew} onChange={(e) => setBeforeChangeNew(e.target.value)} />
+                        <TextArea value={beforeChangeNew} onChange={(e) => setBeforeChangeNew(e.target.value)}
+                          className='no-resize-textarea'
+                        />
                       </Form.Field>
                     </Form>
                   </Table.Cell>
                   <Table.Cell>
                     <Form>
                       <Form.Field>
-                        <TextArea value={afterChangeNew} onChange={(e) => setAfterChangeNew(e.target.value)} />
+                        <TextArea value={afterChangeNew} onChange={(e) => setAfterChangeNew(e.target.value)}
+                          className='no-resize-textarea'
+                        />
                       </Form.Field>
                     </Form>
                   </Table.Cell>
@@ -222,21 +234,21 @@ export default function ChangeTable({
                   <Table.Cell>
                     <Form>
                       <Form.Field>
-                        <TextArea value={description} className='no-border-textarea' />
+                        <TextArea value={description} className='no-border-textarea no-resize-textarea' />
                       </Form.Field>
                     </Form>
                   </Table.Cell>
                   <Table.Cell>
                     <Form>
                       <Form.Field>
-                        <TextArea value={beforeChange} className='no-border-textarea' />
+                        <TextArea value={beforeChange} className='no-border-textarea no-resize-textarea' />
                       </Form.Field>
                     </Form>
                   </Table.Cell>
                   <Table.Cell>
                     <Form>
                       <Form.Field>
-                        <TextArea value={afterChange} className='no-border-textarea' />
+                        <TextArea value={afterChange} className='no-border-textarea no-resize-textarea' />
                       </Form.Field>
                     </Form>
                   </Table.Cell>
