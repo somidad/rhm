@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button, Form, Icon, Modal, Table, TextArea } from "semantic-ui-react";
 import { Enum, Pkg, Version } from "../types";
-import { accumulateChangeList, findEmptyIndex } from "../utils";
+import { findEmptyIndex, publish } from "../utils";
 import VersionComponent from "./VersionComponent";
 
 type Props = {
@@ -92,31 +92,9 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
     setEditIndex(-1);
   }
 
-  function publish(index: number) {
-    let versionNext = versionList.find((version) => version.index === index);
-    const releaseHistoryArr: string[] = [];
-    customerList.forEach((customer) => {
-      const { index: customerIndex } = customer;
-      while(versionNext) {
-        const { indexPrev, changeList, releaseList } = versionNext;
-        // Check the current version is released
-        const releaseFound = releaseList.find((release) => release.customerIndexList.includes(customerIndex));
-        // If the current version is not released, find the second latest released version
-        if (!releaseFound) {
-          versionNext = versionList.find((version) => version.index === indexPrev);
-          continue;
-        }
-        const changeListAccumulated = [
-          ...changeList.filter((change) => {
-            const { customerIndexList } = change;
-            return !customerIndexList.length || customerIndexList.includes(customerIndex);
-          }),
-        ];
-        // Accumulate unreleased versions and get the second latest released version
-        versionNext = accumulateChangeList(changeListAccumulated, customerIndex, versionList, indexPrev);
-      }
-    })
-    setReleaseHistory(releaseHistoryArr.join('\n'));
+  function onClickPublish(index: number) {
+    const releaseHistory = publish(versionList, index, customerList);
+    setReleaseHistory(releaseHistory);
     setOpenModal(true);
   }
 
@@ -225,7 +203,7 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
                       disabled={versionReferringFound}
                       onClick={() => removeVersion(index)}
                     />
-                    <Button icon='list' size='tiny' onClick={() => publish(index)} />
+                    <Button icon='list' size='tiny' onClick={() => onClickPublish(index)} />
                   </Table.Cell>
                 </Table.Row>
               )
