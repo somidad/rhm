@@ -24,6 +24,11 @@ export default function ChangeTable({
   const [customerIndexList, setCustomerIndexList] = useState<number[]>([]);
   const [lineupIndex, setLineupIndex] = useState(0);
   const [editIndex, setEditIndex] = useState(-1);
+  const [descriptionNew, setDescriptionNew] = useState('');
+  const [beforeChangeNew, setBeforeChangeNew] = useState('');
+  const [afterChangeNew, setAfterChangeNew] = useState('');
+  const [customerIndexListNew, setCustomerIndexListNew] = useState<number[]>([]);
+  const [lineupIndexNew, setLineupIndexNew] = useState(0);
 
   function addChange() {
     if (!description) {
@@ -40,6 +45,24 @@ export default function ChangeTable({
     setAfterChange('');
     setCustomerIndexList([]);
     setLineupIndex(0);
+  }
+
+  function onClickEdit(index: number) {
+    const changeFound = changeList.find((change) => change.index === index);
+    if (!changeFound) {
+      return;
+    }
+    const { description, beforeChange, afterChange, lineupIndex, customerIndexList } = changeFound;
+    setDescriptionNew(description);
+    setBeforeChangeNew(beforeChange);
+    setAfterChangeNew(afterChange);
+    setLineupIndexNew(lineupIndex);
+    setCustomerIndexListNew(([...customerIndexList]));
+    setEditIndex(index);
+  }
+
+  function onSubmitEditChange() {
+    // TODO
   }
 
   function removeChange(index: number) {
@@ -121,7 +144,45 @@ export default function ChangeTable({
             const { index, description, beforeChange, afterChange, customerIndexList, lineupIndex } = change;
             const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
             const lineup = lineupFound ? lineupFound.name : 'Lineup not found';
-            return (
+            return index === editIndex ? (
+              <>
+                <Table.Row key={`${index}-upper`}>
+                  <Table.Cell>
+                    <Form>
+                      <Form.Field>
+                        <TextArea value={descriptionNew} onChange={(e) => setDescriptionNew(e.target.value)} />
+                      </Form.Field>
+                    </Form>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <Form>
+                      <Form.Field>
+                        <TextArea value={beforeChange} onChange={(e) => setBeforeChangeNew(e.target.value)} />
+                      </Form.Field>
+                    </Form>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <Form>
+                      <Form.Field>
+                        <TextArea value={afterChange} onChange={(e) => setAfterChangeNew(e.target.value)} />
+                      </Form.Field>
+                    </Form>
+                  </Table.Cell>
+                  <Table.Cell>{lineup}</Table.Cell>
+                  <Table.Cell rowSpan={ROWSPAN}>
+                    <Button icon='check' size='tiny' onClick={onSubmitEditChange} />
+                    <Button icon='cancel' size='tiny' onClick={() => setEditIndex(-1)} />
+                  </Table.Cell>
+                </Table.Row>
+                <Table.Row key={`${index}_lower`}>
+                  <Table.Cell colSpan={COLSPAN}>
+                    <EnumSelector enumList={customerList} selectedIndexList={customerIndexListNew}
+                      onChange={setCustomerIndexListNew}
+                    />
+                  </Table.Cell>
+                </Table.Row>
+              </>
+            ) : (
               <>
                 <Table.Row key={`${index}-upper`}>
                   <Table.Cell>
@@ -147,7 +208,7 @@ export default function ChangeTable({
                   </Table.Cell>
                   <Table.Cell>{lineup}</Table.Cell>
                   <Table.Cell rowSpan={ROWSPAN}>
-                    <Button icon='edit' size='tiny' onClick={() => setEditIndex(index)} />
+                    <Button icon='edit' size='tiny' onClick={() => onClickEdit(index)} />
                     <Button icon='trash' size='tiny' onClick={() => removeChange(index)} />
                   </Table.Cell>
                 </Table.Row>
