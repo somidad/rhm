@@ -65,12 +65,26 @@ export function publish(versionList: Version[], versionIndex: number, lineupList
   console.log('Publishing release history...');
   console.group();
   const releaseHistoryPerCustomerIndexListList: ReleaseHistoryPerCustomerIndexList[] = [];
+  // Generate
   customerList.forEach((customer) => {
     releaseHistoryPerCustomerIndexListList.push({
       customerIndexList: [customer.index],
       releaseHistory: publishPerCustomer(versionList, versionIndex, lineupList, pkgList, customer),
     });
   });
+  // Merge
+  for (let i = releaseHistoryPerCustomerIndexListList.length - 1; i >= 0; i -= 1) {
+    const { customerIndexList: cil1, releaseHistory: rh1 } = releaseHistoryPerCustomerIndexListList[i];
+    for (let j = i - 1; j >= 0; j -= 1) {
+      const { customerIndexList: cil2, releaseHistory: rh2 } = releaseHistoryPerCustomerIndexListList[j];
+      if (rh1 === rh2) {
+        cil2.push(...cil1);
+        releaseHistoryPerCustomerIndexListList.splice(i, 1);
+        break;
+      }
+    }
+  }
+  // Export
   const releaseHistory = releaseHistoryPerCustomerIndexListList
     .filter((relaseHistoryPerCustomerIndexList) => relaseHistoryPerCustomerIndexList.releaseHistory)
     .map((relaseHistoryPerCustomerIndexList) => {
