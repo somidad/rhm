@@ -177,12 +177,19 @@ function publishPerLineup(versionList: Version[], versionIndex: number, lineupIn
     const changes = index === 0 ? `[Description]
 ${indent('- Initial release')}` : changeList.map((change) => {
       const { description, beforeChange, afterChange } = change;
-      return `[Description]
-${indent(description)}
-[Before change]
-${indent(beforeChange)}
-[After change]
-${indent(afterChange)}`;
+      const listToChanges = [
+        '[Description]',
+        indent(description),
+      ];
+      if (beforeChange) {
+        listToChanges.push('[Before change]');
+        listToChanges.push(indent(beforeChange));
+      }
+      if (afterChange) {
+        listToChanges.push('[After change]');
+        listToChanges.push(indent(afterChange));
+      }
+      return listToChanges.join('\n');
     }).join('\n');
     return `${pkgName}
 ${indent(changes)}`
