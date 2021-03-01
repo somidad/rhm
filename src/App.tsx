@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { createRef, useState } from 'react';
 import 'semantic-ui-css/semantic.min.css';
 import './App.css';
 import { Container, Form, Header, Menu, Segment } from 'semantic-ui-react';
@@ -15,6 +15,7 @@ const PANE_PACKAGE = 'package';
 const PANE_CUSTOMER = 'customer';
 
 function App() {
+  const refLoad = createRef<HTMLInputElement>();
   const [featureName, setFeatureName] = useState(UNTITLED);
   const [versionList, setVersionList] = useState<Version[]>([
     { index: 0, name: 'V1', indexPrev: -1, changeList: [], releaseList: [] },
@@ -44,6 +45,32 @@ function App() {
   ]);
   const [pane, setPane] = useState(PANE_VERSION);
 
+  function onChangeFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const { files } = e.target;
+    if (!files) {
+      return;
+    }
+    const file = files[0];
+    if (!file) {
+      return;
+    }
+    const reader = new FileReader();
+    reader.readAsText(file);
+    if (reader.result === null || reader.result instanceof ArrayBuffer) {
+      return;
+    }
+    const { name } = file;
+    const indexLast = name.lastIndexOf('.');
+    const featureName = name.substring(0, indexLast);
+    const { versionList, lineupList, pkgList, customerList } = JSON.parse(reader.result);
+    // Check validity
+    setFeatureName(featureName);
+    setVersionList(versionList);
+    setLineupList(lineupList);
+    setPkgList(pkgList);
+    setCustomerList(customerList);
+  }
+
   function onClickNew() {
     setFeatureName(UNTITLED);
     setVersionList([]);
@@ -65,7 +92,13 @@ function App() {
             </Form.Field>
           </Form>
         </Menu.Item>
-        <Menu.Item>Load</Menu.Item>
+        <Menu.Item onClick={() => refLoad.current?.click()}>
+          Load
+          <input type='file' hidden
+            ref={refLoad}
+            onChange={onChangeFile}
+          />
+        </Menu.Item>
         <Menu.Item>Save</Menu.Item>
         <Menu.Menu position='right'>
           <Menu.Item
