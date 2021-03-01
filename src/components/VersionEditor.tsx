@@ -117,14 +117,14 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
           <Table.Row active>
             <Table.Cell>
               <Form>
-                <Form.Field>
+                <Form.Field disabled={editIndex !== -1}>
                   <input value={name} onChange={(e) => setName(e.target.value)} />
                 </Form.Field>
               </Form>
             </Table.Cell>
             <Table.Cell>
               <Form>
-                <Form.Field>
+                <Form.Field disabled={editIndex !== -1}>
                   <select value={indexPrev} onChange={(e) => setIndexPrev(+e.target.value)}>
                     <option value={-1}>(None)</option>
                     {
@@ -140,7 +140,7 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
               </Form>
             </Table.Cell>
             <Table.Cell>
-              <Button icon='plus' size='tiny' onClick={addVersion} />
+              <Button icon='plus' size='tiny' onClick={addVersion} disabled={editIndex !== -1} />
             </Table.Cell>
           </Table.Row>
           {
