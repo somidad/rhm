@@ -185,7 +185,22 @@ export default function ChangeTable({
                       </Form.Field>
                     </Form>
                   </Table.Cell>
-                  <Table.Cell>{lineup}</Table.Cell>
+                  <Table.Cell>
+                    <Form>
+                      <Form.Field>
+                        <select value={lineupIndexNew} onChange={(e) => setLineupIndexNew(+e.target.value)}>
+                          {
+                            lineupList.map((lineup) => {
+                              const { index, name } = lineup;
+                              return (
+                                <option key={index} value={index}>{name}</option>
+                              )
+                            })
+                          }
+                        </select>
+                      </Form.Field>
+                    </Form>
+                  </Table.Cell>
                   <Table.Cell rowSpan={ROWSPAN}>
                     <Button icon='check' size='tiny' onClick={onSubmitEditChange} />
                     <Button icon='cancel' size='tiny' onClick={() => setEditIndex(-1)} />
