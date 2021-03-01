@@ -45,7 +45,7 @@ export default function ChangeTable({
     setBeforeChange('');
     setAfterChange('');
     setCustomerIndexList([]);
-    setLineupIndex(0);
+    setLineupIndex(-1);
   }
 
   function onClickEdit(index: number) {
