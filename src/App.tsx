@@ -106,6 +106,44 @@ function App() {
     setCustomerList(customerList);
   }
 
+  const usedLineupIndexList = [
+    ...versionList.map((version) => {
+      return version.changeList.map((change) => change.lineupIndex);
+    }).reduce((indexPrevList, indexList) => {
+      return [...indexPrevList, ...indexList];
+    }, []),
+    ...pkgList.map((pkg) => pkg.lineupIndex),
+  ];
+  const usedPkgIndexList = [
+    ...versionList.map((version) => {
+      return version.releaseList.map((release) => release.pkgIndex);
+    }).reduce((indexPrevList, indexList) => {
+      return [...indexPrevList, ...indexList];
+    }, []),
+  ];
+  const usedCustomerIndexList = [
+    ...versionList.map((version) => {
+      return version.changeList.map((change) => change.customerIndexList).reduce((indexListPrev, indexList) => {
+        return [
+          ...indexListPrev,
+          ...indexList,
+        ];
+      }, []);
+    }).reduce((indexPrevList, indexList) => {
+      return [...indexPrevList, ...indexList];
+    }, []),
+    ...versionList.map((version) => {
+      return version.releaseList.map((release) => release.customerIndexList).reduce((indexListPrev, indexList) => {
+        return [
+          ...indexListPrev,
+          ...indexList,
+        ];
+      }, []);
+    }).reduce((indexPrevList, indexList) => {
+      return [...indexPrevList, ...indexList];
+    }, []),
+  ];
+
   return (
     <div className="App">
       <Menu pointing>
@@ -165,7 +203,9 @@ function App() {
         pane === PANE_LINEUP ? (
           <Container as={Segment}>
             <Header as='h1'>Lineups</Header>
-            <EnumTable title='Lineup' enumList={lineupList} onChange={setLineupList} />
+            <EnumTable title='Lineup' enumList={lineupList} onChange={setLineupList}
+              usedIndexList={usedLineupIndexList}
+            />
           </Container>
         ) : <></>
       }
@@ -173,7 +213,9 @@ function App() {
         pane === PANE_PACKAGE ? (
           <Container as={Segment}>
             <Header as='h1'>Packages</Header>
-            <PkgTable pkgList={pkgList} lineupList={lineupList} onChange={setPkgList} />
+            <PkgTable pkgList={pkgList} lineupList={lineupList} onChange={setPkgList}
+              usedPkgIndexList={usedPkgIndexList}
+            />
           </Container>
         ) : <></>
       }
@@ -181,7 +223,9 @@ function App() {
         pane === PANE_CUSTOMER ? (
           <Container as={Segment}>
             <Header as='h1'>Customers</Header>
-            <EnumTable title='Customer' enumList={customerList} onChange={setCustomerList} />
+            <EnumTable title='Customer' enumList={customerList} onChange={setCustomerList}
+              usedIndexList={usedCustomerIndexList}
+            />
           </Container>
         ) : <></>
       }
