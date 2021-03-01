@@ -107,9 +107,11 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
     <>
       <Table celled compact selectable>
         <Table.Header>
-          <Table.HeaderCell>Version</Table.HeaderCell>
-          <Table.HeaderCell>Previous version</Table.HeaderCell>
-          <Table.HeaderCell>Actions</Table.HeaderCell>
+          <Table.Row>
+            <Table.HeaderCell>Version</Table.HeaderCell>
+            <Table.HeaderCell>Previous version</Table.HeaderCell>
+            <Table.HeaderCell>Actions</Table.HeaderCell>
+          </Table.Row>
         </Table.Header>
         <Table.Body>
           <Table.Row>
