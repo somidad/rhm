@@ -61,6 +61,40 @@ function indent(input: string) {
   return input.replace(/^/gm, '    ');
 }
 
+function isVersionListCircular(versionList: Version[], index: number) {
+    const versionFound = versionList.find((version) => version.index === index);
+    if (!versionFound) {
+      return false;
+    }
+    let v1: Version | undefined = versionFound;
+    let { index: index1, indexPrev: indexPrev1 } = v1;
+    let v2: Version | undefined = versionFound;
+    let { index: index2, indexPrev: indexPrev2 } = v2;
+    while (v1 || v2) {
+      // eslint-disable-next-line no-loop-func
+      v1 = versionList.find((version) => version.index === indexPrev1);
+      if (!v1) {
+        return false;
+      }
+      ({ index: index1, indexPrev: indexPrev1 } = v1);
+      // eslint-disable-next-line no-loop-func
+      v2 = versionList.find((version) => version.index === indexPrev2);
+      if (!v2) {
+        return false;
+      }
+      ({ index: index2, indexPrev: indexPrev2 } = v2);
+      // eslint-disable-next-line no-loop-func
+      v2 = versionList.find((version) => version.index === indexPrev2);
+      if (!v2) {
+        return false;
+      }
+      ({ index: index2, indexPrev: indexPrev2 } = v2);
+      if (index1 === index2) {
+        return true;
+      }
+    }
+}
+
 export function load(input: string) {
   const parsed = JSON.parse(input);
   const { versionList, lineupList, pkgList, customerList } = parsed;
@@ -103,8 +137,9 @@ export function load(input: string) {
 }
 
 export function publish(versionList: Version[], versionIndex: number, lineupList: Enum[], pkgList: Pkg[], customerList: Enum[]) {
-  console.log('Publishing release history...');
-  console.group();
+  if (isVersionListCircular(versionList, versionIndex)) {
+    return;
+  }
   const releaseHistoryPerCustomerIndexListList: ReleaseHistoryPerCustomerIndexList[] = [];
   // Generate
   customerList.forEach((customer) => {
@@ -135,14 +170,11 @@ export function publish(versionList: Version[], versionIndex: number, lineupList
 ${indent(releaseHistory)}
 </${customerNameJoined}>`;
     }).join('\n');
-  console.groupEnd();
   return releaseHistory;
 }
 
 function publishPerCustomer(versionList: Version[], versionIndex: number, lineupList: Enum[], pkgList: Pkg[], customer: Enum) {
   const candidateLineupIndexList = [-1, ...lineupList.map((lineup) => lineup.index)];
-  console.log(customer.name);
-  console.group();
   const releaseHistoryPerLineupList: ReleaseHistoryPerLineupIndex[] = [];
   candidateLineupIndexList.forEach((lineupIndex) => {
     releaseHistoryPerLineupList.push({
@@ -164,7 +196,6 @@ ${indent(releaseHistory)}
 </${lineupName}>`;
       }
     }).join('\n');
-  console.groupEnd();
   return releaseHistory;
 }
 
@@ -173,9 +204,7 @@ function publishPerLineup(versionList: Version[], versionIndex: number, lineupIn
   const { index: customerIndex } = customer;
   const changeListPerPkgList: ReleaseHistoryPerPkg[] = [];
   while(versionNext) {
-    const { name, indexPrev, changeList, releaseList } = versionNext;
-    console.log(`Version: ${name}. Previous version: ${indexPrev}`);
-    console.group();
+    const { indexPrev, changeList, releaseList } = versionNext;
     // Check the current version is released
     const releaseFound = releaseList.find((release) => {
       const customerIncluded = release.customerIndexList.includes(customerIndex);
@@ -186,7 +215,6 @@ function publishPerLineup(versionList: Version[], versionIndex: number, lineupIn
       const pkgFound = pkgList.find((pkg) => pkg.lineupIndex === lineupIndex && pkg.index === pkgIndex);
       return !!pkgFound;
     });
-    console.log(releaseFound);
     // If the current version is not released, it is not for the given customer
     if (!releaseFound) {
       versionNext = undefined;
@@ -210,7 +238,6 @@ function publishPerLineup(versionList: Version[], versionIndex: number, lineupIn
         changeListPerPkgList.unshift({ pkgName, changeList: changeListAccumulated });
       }
     }
-    console.groupEnd();
   }
   const releaseHistory = changeListPerPkgList.map((changeListPerPkg, index) => {
     const { pkgName, changeList } = changeListPerPkg;

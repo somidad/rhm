@@ -94,6 +94,9 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
 
   function onClickPublish(index: number) {
     const releaseHistory = publish(versionList, index, lineupList, pkgList, customerList);
+    if (!releaseHistory) {
+      return;
+    }
     setReleaseHistory(releaseHistory);
     setOpenModal(true);
   }
