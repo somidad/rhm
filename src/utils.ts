@@ -171,6 +171,7 @@ function publishPerLineup(versionList: Version[], versionIndex: number, lineupIn
     }
     console.groupEnd();
   }
+  changeListPerPkgList.reverse();
   const releaseHistory = changeListPerPkgList.map((changeListPerPkg) => {
     const { pkgName, changeList } = changeListPerPkg;
     const changes = changeList.map((change) => {
