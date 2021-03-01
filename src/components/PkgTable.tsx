@@ -110,7 +110,7 @@ export default function PkgTable({ pkgList, lineupList, onChange }: Props) {
           pkgList.map((pkg) => {
             const { index, name, lineupIndex } = pkg;
             const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
-            const lineupName = lineupFound ? lineupFound.name : '(None)';
+            const lineupName = lineupFound ? lineupFound.name : 'Lineup not found';
             return index === editIndex ? (
               <Table.Row key={index}>
                 <Table.Cell>
