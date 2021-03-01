@@ -97,7 +97,7 @@ export default function ReleaseTable({
     if (!customerIndexListNew.length) {
       return;
     }
-    const releaseFound = releaseList.find((release) => release.pkgIndex === pkgIndexNew);
+    const releaseFound = releaseList.find((release) => release.index !== editIndex && release.pkgIndex === pkgIndexNew);
     if (releaseFound) {
       return;
     }

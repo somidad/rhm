@@ -1,9 +1,19 @@
-import { Change, Enum, Version } from "./types";
+import { Change, Enum, Pkg, Version } from "./types";
 
 type ReleaseHistoryPerCustomerIndexList = {
   customerIndexList: number[];
   releaseHistory: string;
 }
+
+type ReleaseHistoryPerLineupIndex = {
+  lineupIndex: number;
+  releaseHistory: string;
+}
+
+type ReleaseHistoryPerPkg = {
+  pkgName: string;
+  changeList: Change[];
+};
 
 function accumulateChangeList(
   changeListAccumulated: Change[], customerIndex: number,
@@ -41,49 +51,121 @@ export function findEmptyIndex(indexList: number[]) {
     }, 0);
 }
 
-export function publish(versionList: Version[], index: number, customerList: Enum[]) {
+export function getEnumNameList(enumList: Enum[], indexList: number[]) {
+  return enumList
+    .filter((enumItem) => indexList.includes(enumItem.index))
+    .map((enumItem) => enumItem.name);
+}
+
+export function publish(versionList: Version[], versionIndex: number, lineupList: Enum[], pkgList: Pkg[], customerList: Enum[]) {
   console.log('Publishing release history...');
   console.group();
-  const releaseHistoryPerCustomerList: ReleaseHistoryPerCustomerIndexList[] = [];
+  const releaseHistoryPerCustomerIndexListList: ReleaseHistoryPerCustomerIndexList[] = [];
   customerList.forEach((customer) => {
-    console.log(customer.name);
-    console.group();
-    const releaseHistoryArrPerCustomer = [];
-    const { index: customerIndex } = customer;
-    let versionNext = versionList.find((version) => version.index === index);
-    while(versionNext) {
-      const { name, indexPrev, changeList, releaseList } = versionNext;
-      console.log(`Version: ${name}. Previous version: ${indexPrev}`);
-      console.group();
-      // Check the current version is released
-      const releaseFound = releaseList.find((release) => release.customerIndexList.includes(customerIndex));
-      console.log(releaseFound);
-      // If the current version is not released, it is not for the given customer
-      if (!releaseFound) {
-        versionNext = undefined;
+    releaseHistoryPerCustomerIndexListList.push({
+      customerIndexList: [customer.index],
+      releaseHistory: publishPerCustomer(versionList, versionIndex, lineupList, pkgList, customer),
+    });
+  });
+  const releaseHistory = releaseHistoryPerCustomerIndexListList
+    .filter((relaseHistoryPerCustomerIndexList) => relaseHistoryPerCustomerIndexList.releaseHistory)
+    .map((relaseHistoryPerCustomerIndexList) => {
+      const { customerIndexList, releaseHistory } = relaseHistoryPerCustomerIndexList;
+      const customerNameJoined = getEnumNameList(customerList, customerIndexList).join(', ');
+      return `<${customerNameJoined}>
+  ${releaseHistory}
+  </${customerNameJoined}>`;
+    }).join('\n');
+  console.groupEnd();
+  return releaseHistory;
+}
+
+function publishPerCustomer(versionList: Version[], versionIndex: number, lineupList: Enum[], pkgList: Pkg[], customer: Enum) {
+  const candidateLineupIndexList = [-1, ...lineupList.map((lineup) => lineup.index)];
+  console.log(customer.name);
+  console.group();
+  const releaseHistoryPerLineupList: ReleaseHistoryPerLineupIndex[] = [];
+  candidateLineupIndexList.forEach((lineupIndex) => {
+    releaseHistoryPerLineupList.push({
+      lineupIndex,
+      releaseHistory: publishPerLineup(versionList, versionIndex, lineupIndex, pkgList, customer),
+    });
+  })
+  const releaseHistory = releaseHistoryPerLineupList
+    .filter((releaseHistoryPerLineup) => releaseHistoryPerLineup.releaseHistory)
+    .map((releaseHistoryPerLineup) => {
+      const { lineupIndex, releaseHistory } = releaseHistoryPerLineup;
+      const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
+      if (!lineupFound) {
+        return releaseHistory;
       } else {
-        const { pkgIndex } = releaseFound;
+        const lineupName = lineupFound.name;
+        return `<${lineupName}>
+  ${releaseHistory}
+  </${lineupName}>`;
+      }
+    }).join('\n');
+  console.groupEnd();
+  return releaseHistory;
+}
+
+function publishPerLineup(versionList: Version[], versionIndex: number, lineupIndex: number, pkgList: Pkg[], customer: Enum) {
+  let versionNext = versionList.find((version) => version.index === versionIndex);
+  const { index: customerIndex } = customer;
+  const changeListPerPkgList: ReleaseHistoryPerPkg[] = [];
+  while(versionNext) {
+    const { name, indexPrev, changeList, releaseList } = versionNext;
+    console.log(`Version: ${name}. Previous version: ${indexPrev}`);
+    console.group();
+    // Check the current version is released
+    const releaseFound = releaseList.find((release) => {
+      const customerIncluded = release.customerIndexList.includes(customerIndex);
+      if (!customerIncluded) {
+        return false;
+      }
+      const { pkgIndex } = release;
+      const pkgFound = pkgList.find((pkg) => pkg.lineupIndex === lineupIndex && pkg.index === pkgIndex);
+      return !!pkgFound;
+    });
+    console.log(releaseFound);
+    // If the current version is not released, it is not for the given customer
+    if (!releaseFound) {
+      versionNext = undefined;
+    } else {
+      const { pkgIndex } = releaseFound;
+      const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex);
+      if (!pkgFound) {
+        // This is not going to happen
+        break;
+      } else {
+        const { name: pkgName, lineupIndex: pkgLineupIndex } = pkgFound;
         const changeListAccumulated = [
           ...changeList.filter((change) => {
-            const { customerIndexList } = change;
-            return !customerIndexList.length || customerIndexList.includes(customerIndex);
+            const { customerIndexList, lineupIndex: changeLineupIndex } = change;
+            return (!customerIndexList.length || customerIndexList.includes(customerIndex))
+                   && pkgLineupIndex === changeLineupIndex;
           }),
         ];
         // Accumulate unreleased versions and get the second latest released version
         versionNext = accumulateChangeList(changeListAccumulated, customerIndex, versionList, indexPrev);
-        releaseHistoryArrPerCustomer.push({ pkgIndex, changeList: changeListAccumulated });
+        changeListPerPkgList.push({ pkgName, changeList: changeListAccumulated });
       }
-      console.groupEnd();
-    }
-    const releaseHistoryPerCustomer = releaseHistoryArrPerCustomer.join('\n');
-    if (releaseHistoryPerCustomer) {
-      releaseHistoryPerCustomerList.push({
-        customerIndexList: [customerIndex],
-        releaseHistory: releaseHistoryPerCustomer,
-      });
     }
     console.groupEnd();
-  });
-  console.groupEnd();
-  return JSON.stringify(releaseHistoryPerCustomerList, null, 2);
+  }
+  const releaseHistory = changeListPerPkgList.map((changeListPerPkg) => {
+    const { pkgName, changeList } = changeListPerPkg;
+    const changes = changeList.map((change) => {
+      const { description, beforeChange, afterChange } = change;
+      return `Description
+${description}
+Before change
+${beforeChange}
+After change
+${afterChange}`;
+    }).join('\n');
+    return `${pkgName}
+${changes}`
+  }).join('\n');
+  return releaseHistory;
 }
