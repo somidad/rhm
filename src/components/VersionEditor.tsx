@@ -195,6 +195,7 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
                       disabled={versionReferringFound}
                       onClick={() => removeVersion(index)}
                     />
+                    <Button icon='list' size='tiny' />
                   </Table.Cell>
                 </Table.Row>
               )
