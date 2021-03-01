@@ -108,6 +108,8 @@ export default function ChangeTable({
         {
           changeList.map((change) => {
             const { index, description, beforeChange, afterChange, customerIndexList, lineupIndex } = change;
+            const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
+            const lineup = lineupFound ? lineupFound.name : 'Lineup not found';
             return (
               <>
                 <Table.Row key={`${index}-upper`}>
@@ -132,9 +134,7 @@ export default function ChangeTable({
                       </Form.Field>
                     </Form>
                   </Table.Cell>
-                  <Table.Cell>
-                    {lineupIndex}
-                  </Table.Cell>
+                  <Table.Cell>{lineup}</Table.Cell>
                   <Table.Cell rowSpan={ROWSPAN}>
                     <Button icon='edit' size='tiny' />
                     <Button icon='trash' size='tiny' />
