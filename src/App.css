@@ -16,3 +16,7 @@
 .a-like-button:focus {
   text-decoration: none;
 }
+
+.ui.form textarea {
+  resize: none;
+}
