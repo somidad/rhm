@@ -182,12 +182,12 @@ ${indent('- Initial release')}` : changeList.map((change) => {
         indent(description),
       ];
       if (beforeChange) {
-        listToChanges.push('[Before change]');
-        listToChanges.push(indent(beforeChange));
+        listToChanges.push(indent('[Before change]'));
+        listToChanges.push(indent(indent(beforeChange)));
       }
       if (afterChange) {
-        listToChanges.push('[After change]');
-        listToChanges.push(indent(afterChange));
+        listToChanges.push(indent('[After change]'));
+        listToChanges.push(indent(indent(afterChange)));
       }
       return listToChanges.join('\n');
     }).join('\n');
