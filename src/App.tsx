@@ -20,8 +20,9 @@ function App() {
     { index: 2, name: 'V3', indexPrev: 1, changeList: [], releaseList: [] },
   ]);
   const [lineupList, setLineupList] = useState<Enum[]>([
-    { index: 0, name: '4G' },
-    { index: 1, name: '5G' },
+    { index: 0, name: '(None)' },
+    { index: 1, name: '4G' },
+    { index: 2, name: '5G' },
   ]);
   const [pkgList, setPkgList] = useState<Pkg[]>([
     { index: 0, name: 'PKG A', lineupIndex: -1 },

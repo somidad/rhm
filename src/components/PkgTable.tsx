@@ -86,7 +86,6 @@ export default function PkgTable({ pkgList, lineupList, onChange }: Props) {
             <Form>
               <Form.Field disabled={editIndex !== -1}>
                 <select value={lineupIndex} onChange={(e) => setLineupIndex(+e.target.value)}>
-                  <option value={-1}>(None)</option>
                   {
                     lineupList.map((lineup) => {
                       const { index, name} = lineup;
@@ -125,7 +124,6 @@ export default function PkgTable({ pkgList, lineupList, onChange }: Props) {
                   <Form>
                     <Form.Field>
                       <select value={lineupIndexNew} onChange={(e) => setLineupIndexNew(+e.target.value)}>
-                        <option value={-1}>(None)</option>
                         {
                           lineupList.map((lineup) => {
                             const { index, name } = lineup;
