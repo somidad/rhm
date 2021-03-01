@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Form, Table } from "semantic-ui-react";
+import { Button, Form, Icon, Modal, Table, TextArea } from "semantic-ui-react";
 import { Enum, Pkg, Version } from "../types";
 import { findEmptyIndex } from "../utils";
 import VersionComponent from "./VersionComponent";
@@ -18,6 +18,7 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
   const [editIndex, setEditIndex] = useState(-1);
   const [nameNew, setNameNew] = useState('');
   const [indexPrevNew, setIndexPrevNew] = useState(-1);
+  const [releaseHistory, setReleaseHistory] = useState('');
 
   const [index, setIndex] = useState<number>();
 
@@ -211,6 +212,22 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
           />
         ) : <></>
       }
+      <Modal open={false}>
+        <Modal.Header>Release history</Modal.Header>
+        <Modal.Content>
+          <Form>
+            <Form.Field>
+              <TextArea value={releaseHistory} />
+            </Form.Field>
+          </Form>
+        </Modal.Content>
+        <Modal.Actions>
+          <Button icon size='tiny'>
+            <Icon name='clipboard' />
+            Copy to clipboard
+          </Button>
+        </Modal.Actions>
+      </Modal>
     </>
   );
 }
