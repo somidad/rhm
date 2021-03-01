@@ -105,6 +105,55 @@ export default function ChangeTable({
             />
           </Table.Cell>
         </Table.Row>
+        {
+          changeList.map((change) => {
+            const { index, description, beforeChange, afterChange, customerIndexList, lineupIndex } = change;
+            return (
+              <>
+                <Table.Row key={`${index}-upper`}>
+                  <Table.Cell>
+                    <Form>
+                      <Form.Field>
+                        <TextArea value={description} />
+                      </Form.Field>
+                    </Form>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <Form>
+                      <Form.Field>
+                        <TextArea value={beforeChange} />
+                      </Form.Field>
+                    </Form>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <Form>
+                      <Form.Field>
+                        <TextArea value={afterChange} />
+                      </Form.Field>
+                    </Form>
+                  </Table.Cell>
+                  <Table.Cell>
+                    {lineupIndex}
+                  </Table.Cell>
+                  <Table.Cell rowSpan={ROWSPAN}>
+                    <Button icon='edit' size='tiny' />
+                    <Button icon='trash' size='tiny' />
+                  </Table.Cell>
+                </Table.Row>
+                <Table.Row key={`${index}_lower`}>
+                  <Table.Cell colSpan={COLSPAN}>
+                    {
+                      customerList
+                        .filter((customer) => customerIndexList.find((customerIndex) => customer.index === customerIndex) !== undefined)
+                        .map((customer) => customer.name)
+                        .join(', ')
+                    }
+                  </Table.Cell>
+                </Table.Row>
+              </>
+            )
+          })
+        }
       </Table.Body>
       {
         changeList.map((change) => <></>)
