@@ -7,13 +7,15 @@ import PkgTable from './components/PkgTable';
 import VersionEditor from './components/VersionEditor';
 import { Enum, Pkg, Version } from './types';
 
+const UNTITLED = 'Untitled';
+
 const PANE_VERSION = 'version';
 const PANE_LINEUP = 'lineup';
 const PANE_PACKAGE = 'package';
 const PANE_CUSTOMER = 'customer';
 
 function App() {
-  const [featureName, setFeatureName] = useState('Untitled');
+  const [featureName, setFeatureName] = useState(UNTITLED);
   const [versionList, setVersionList] = useState<Version[]>([
     { index: 0, name: 'V1', indexPrev: -1, changeList: [], releaseList: [] },
     { index: 1, name: 'V2', indexPrev: 0, changeList: [], releaseList: [] },
@@ -42,10 +44,20 @@ function App() {
   ]);
   const [pane, setPane] = useState(PANE_VERSION);
 
+  function onClickNew() {
+    setFeatureName(UNTITLED);
+    setVersionList([]);
+    setLineupList([
+      { index: 0, name: '(None)' },
+    ]);
+    setPkgList([]);
+    setCustomerList([]);
+  }
+
   return (
     <div className="App">
       <Menu pointing>
-        <Menu.Item>New</Menu.Item>
+        <Menu.Item onClick={onClickNew}>New</Menu.Item>
         <Menu.Item>
           <Form>
             <Form.Field>
