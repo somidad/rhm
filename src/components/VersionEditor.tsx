@@ -18,6 +18,7 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
   const [editIndex, setEditIndex] = useState(-1);
   const [nameNew, setNameNew] = useState('');
   const [indexPrevNew, setIndexPrevNew] = useState(-1);
+  const [openModal, setOpenModal] = useState(false);
   const [releaseHistory, setReleaseHistory] = useState('');
 
   const [index, setIndex] = useState<number>();
@@ -89,6 +90,11 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
     ];
     onChange(versionListNew);
     setEditIndex(-1);
+  }
+
+  function publish(index: number) {
+    // TODO
+    setOpenModal(true);
   }
 
   function removeVersion(index: number) {
@@ -196,7 +202,7 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
                       disabled={versionReferringFound}
                       onClick={() => removeVersion(index)}
                     />
-                    <Button icon='list' size='tiny' />
+                    <Button icon='list' size='tiny' onClick={() => publish(index)} />
                   </Table.Cell>
                 </Table.Row>
               )
@@ -212,12 +218,12 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
           />
         ) : <></>
       }
-      <Modal open={false}>
+      <Modal open={openModal} onClose={() => setOpenModal(false)}>
         <Modal.Header>Release history</Modal.Header>
         <Modal.Content>
           <Form>
             <Form.Field>
-              <TextArea value={releaseHistory} />
+              <TextArea value={releaseHistory} rows={24} />
             </Form.Field>
           </Form>
         </Modal.Content>
