@@ -93,7 +93,15 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
   }
 
   function publish(index: number) {
-    // TODO
+    const versionFound = versionList.find((version) => version.index === index);
+    if (!versionFound) {
+      return;
+    }
+    const releaseHistoryArr: string[] = [];
+    customerList.forEach((customer) => {
+      // TODO
+    })
+    setReleaseHistory(releaseHistoryArr.join('\n'));
     setOpenModal(true);
   }
 
