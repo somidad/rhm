@@ -229,7 +229,7 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
           </Form>
         </Modal.Content>
         <Modal.Actions>
-          <Button icon size='tiny'>
+          <Button icon size='tiny' onClick={() => navigator.clipboard.writeText(releaseHistory)}>
             <Icon name='clipboard' />
             Copy to clipboard
           </Button>
