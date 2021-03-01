@@ -66,7 +66,7 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
     if (!nameNew) {
       return;
     }
-    const versionFound = versionList.find((version) => version.name === nameNew);
+    const versionFound = versionList.find((version) => version.index !== editIndex && version.name === nameNew);
     if (versionFound) {
       return;
     }

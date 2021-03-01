@@ -44,7 +44,7 @@ export default function EnumTable({ title, enumList, onChange }: Props) {
     if (!nameNew) {
       return;
     }
-    const enumItemFound = enumList.find((enumItem) => enumItem.name === nameNew);
+    const enumItemFound = enumList.find((enumItem) => enumItem.index !== index && enumItem.name === nameNew);
     if (enumItemFound) {
       return;
     }
