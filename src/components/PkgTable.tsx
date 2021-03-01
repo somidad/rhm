@@ -12,9 +12,9 @@ type Props = {
 export default function PkgTable({ pkgList, lineupList, onChange }: Props) {
   const [editIndex, setEditIndex] = useState(-1);
   const [name, setName] = useState('');
-  const [lineupIndex, setLineupIndex] = useState(-1);
+  const [lineupIndex, setLineupIndex] = useState(0);
   const [nameNew, setNameNew] = useState('');
-  const [lineupIndexNew, setLineupIndexNew] = useState(-1);
+  const [lineupIndexNew, setLineupIndexNew] = useState(0);
 
   function addPkg() {
     if (!name) {
