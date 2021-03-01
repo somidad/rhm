@@ -47,7 +47,7 @@ export default function PkgTable({ pkgList, lineupList, onChange }: Props) {
     if (!nameNew) {
       return;
     }
-    const pkgFound = pkgList.find((pkg) => pkg.name === nameNew);
+    const pkgFound = pkgList.find((pkg) => pkg.index !== index && pkg.name === nameNew);
     if (pkgFound) {
       return;
     }
