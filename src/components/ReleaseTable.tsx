@@ -1,3 +1,4 @@
+import React from "react";
 import { useState } from "react";
 import { Button, Form, Icon, Table } from "semantic-ui-react";
 import { Enum, Pkg, Release } from "../types";
@@ -181,42 +182,42 @@ export default function ReleaseTable({
             const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
             const lineup = `- Lineup: ${lineupFound ? lineupFound.name : '(None)'}`;
             return index === editIndex ? (
-              <>
-              <Table.Row key={`${index}-upper`}>
-                <Table.Cell>
-                  <Form>
-                    <Form.Field>
-                      <select value={pkgIndexNew} onChange={(e) => setPkgIndexNew(+e.target.value)}>
-                        {
-                          pkgList.map((pkg) => {
-                            const { index, name, lineupIndex } = pkg;
-                            const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
-                            const lineup = `- Lineup: ${lineupFound ? lineupFound.name : '(None)'}`;
-                            return (
-                              <option key={index} value={index}>{name} {lineup}</option>
-                            )
-                          })
-                        }
-                      </select>
-                    </Form.Field>
-                  </Form>
-                </Table.Cell>
-                <Table.Cell rowSpan={2}>
-                  <Button icon='check' size='tiny' onClick={onSubmitEditRelease} />
-                  <Button icon='cancel' size='tiny' onClick={() => setEditIndex(-1)} />
-                </Table.Cell>
-              </Table.Row>
-              <Table.Row key={`${index}-lower`}>
-                <Table.Cell>
-                  <EnumSelector enumList={customerList} selectedIndexList={customerIndexListNew}
-                    onChange={setCustomerIndexListNew}
-                  />
-                </Table.Cell>
-              </Table.Row>
-              </>
+              <React.Fragment key={index}>
+                <Table.Row>
+                  <Table.Cell>
+                    <Form>
+                      <Form.Field>
+                        <select value={pkgIndexNew} onChange={(e) => setPkgIndexNew(+e.target.value)}>
+                          {
+                            pkgList.map((pkg) => {
+                              const { index, name, lineupIndex } = pkg;
+                              const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
+                              const lineup = `- Lineup: ${lineupFound ? lineupFound.name : '(None)'}`;
+                              return (
+                                <option key={index} value={index}>{name} {lineup}</option>
+                              )
+                            })
+                          }
+                        </select>
+                      </Form.Field>
+                    </Form>
+                  </Table.Cell>
+                  <Table.Cell rowSpan={2}>
+                    <Button icon='check' size='tiny' onClick={onSubmitEditRelease} />
+                    <Button icon='cancel' size='tiny' onClick={() => setEditIndex(-1)} />
+                  </Table.Cell>
+                </Table.Row>
+                <Table.Row key={`${index}-lower`}>
+                  <Table.Cell>
+                    <EnumSelector enumList={customerList} selectedIndexList={customerIndexListNew}
+                      onChange={setCustomerIndexListNew}
+                    />
+                  </Table.Cell>
+                </Table.Row>
+              </React.Fragment>
             ) : (
-              <>
-                <Table.Row key={`${index}-upper`}>
+              <React.Fragment key={index}>
+                <Table.Row>
                   <Table.Cell>
                     {name} {lineup}
                   </Table.Cell>
@@ -233,7 +234,7 @@ export default function ReleaseTable({
                     </Button>
                   </Table.Cell>
                 </Table.Row>
-                <Table.Row key={`${index}-lower`}>
+                <Table.Row>
                   <Table.Cell>
                     {
                       customerList
@@ -243,7 +244,7 @@ export default function ReleaseTable({
                     }
                   </Table.Cell>
                 </Table.Row>
-              </>
+              </React.Fragment>
             )
           })
         }

@@ -1,3 +1,4 @@
+import React from "react";
 import { useState } from "react";
 import { Button, Form, Table, TextArea } from "semantic-ui-react";
 import { Change, Enum } from "../types";
@@ -169,8 +170,8 @@ export default function ChangeTable({
             const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
             const lineup = lineupFound ? lineupFound.name : '(None)';
             return index === editIndex ? (
-              <>
-                <Table.Row key={`${index}-upper`}>
+              <React.Fragment key={index}>
+                <Table.Row>
                   <Table.Cell>
                     <Form>
                       <Form.Field>
@@ -220,17 +221,17 @@ export default function ChangeTable({
                     <Button icon='cancel' size='tiny' onClick={() => setEditIndex(-1)} />
                   </Table.Cell>
                 </Table.Row>
-                <Table.Row key={`${index}_lower`}>
+                <Table.Row>
                   <Table.Cell colSpan={COLSPAN}>
                     <EnumSelector enumList={customerList} selectedIndexList={customerIndexListNew}
                       onChange={setCustomerIndexListNew}
                     />
                   </Table.Cell>
                 </Table.Row>
-              </>
+              </React.Fragment>
             ) : (
-              <>
-                <Table.Row key={`${index}-upper`}>
+              <React.Fragment key={index}>
+                <Table.Row>
                   <Table.Cell>
                     <Form>
                       <Form.Field>
@@ -258,7 +259,7 @@ export default function ChangeTable({
                     <Button icon='trash' size='tiny' onClick={() => removeChange(index)} />
                   </Table.Cell>
                 </Table.Row>
-                <Table.Row key={`${index}_lower`}>
+                <Table.Row>
                   <Table.Cell colSpan={COLSPAN}>
                     {
                       customerList
@@ -268,7 +269,7 @@ export default function ChangeTable({
                     }
                   </Table.Cell>
                 </Table.Row>
-              </>
+              </React.Fragment>
             )
           })
         }
