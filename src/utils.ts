@@ -241,8 +241,7 @@ function publishPerLineup(versionList: Version[], versionIndex: number, lineupIn
   }
   const releaseHistory = changeListPerPkgList.map((changeListPerPkg, index) => {
     const { pkgName, changeList } = changeListPerPkg;
-    const changes = index === 0 ? `[Description]
-${indent('- Initial release')}` : changeList.map((change) => {
+    const changes = index === 0 ? '- Initial release' : changeList.map((change) => {
       const { description, beforeChange, afterChange } = change;
       const listToChanges = [
         '[Description]',
