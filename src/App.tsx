@@ -78,10 +78,10 @@ function App() {
     const featureName = name.substring(0, indexLast);
     const { versionList, lineupList, pkgList, customerList } = load(result);
     setFeatureName(featureName);
-    setVersionList(versionList);
+    setCustomerList(customerList);
     setLineupList(lineupList);
     setPkgList(pkgList);
-    setCustomerList(customerList);
+    setVersionList(versionList);
   }
 
   const usedLineupIndexList = [
