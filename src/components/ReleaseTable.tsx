@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import { Button, Form, Icon, Table } from "semantic-ui-react";
+import { Button, Form, Icon, Label, Table } from "semantic-ui-react";
 import { Enum, Pkg, Release } from "../types";
 import { findEmptyIndex } from "../utils";
 import EnumSelector from "./EnumSelector";
@@ -219,7 +219,7 @@ export default function ReleaseTable({
               <React.Fragment key={index}>
                 <Table.Row>
                   <Table.Cell>
-                    {name} {lineup}
+                    <Label ribbon>{name} {lineup}</Label>
                   </Table.Cell>
                   <Table.Cell rowSpan={2}>
                     <Button icon='edit' size='tiny' onClick={() => onClickEdit(index)} />
