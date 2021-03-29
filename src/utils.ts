@@ -257,8 +257,11 @@ function publishPerLineup(versionList: Version[], versionIndex: number, lineupIn
       }
       return listToChanges.join('\n');
     }).join('\n');
+    if (!changes) {
+      return '';
+    }
     return `${pkgName}
 ${indent(changes)}`
-  }).join('\n');
+  }).join('\n').trim();
   return releaseHistory;
 }
