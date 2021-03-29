@@ -262,6 +262,6 @@ function publishPerLineup(versionList: Version[], versionIndex: number, lineupIn
     }
     return `${pkgName}
 ${indent(changes)}`
-  }).join('\n').trim();
+  }).filter((changes) => !!changes).join('\n').trim();
   return releaseHistory;
 }
