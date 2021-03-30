@@ -178,6 +178,11 @@ export default function ReleaseTable({
           releaseList.map((release) => {
             const { index, pkgIndex, customerIndexList }= release;
             const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex) as Pkg;
+            if (!pkgFound) {
+              return (
+                <React.Fragment key={index} />
+              )
+            }
             const { name, lineupIndex } = pkgFound;
             const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
             const lineup = `- Lineup: ${lineupFound ? lineupFound.name : '(None)'}`;
