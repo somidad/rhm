@@ -33,7 +33,11 @@ export default function EnumSelector({ enumList, selectedIndexList, onChange, di
           const color = selected ? 'blue' : undefined;
           const icon = selected ? 'plus' : 'minus';
           return (
-            <Label key={index} as='a' color={color} onClick={() => toggle(index)}>
+            <Label
+              key={index} as='a'
+              onClick={() => toggle(index)}
+              className='customer-label' color={color}
+            >
               <Icon name={icon} />
               {name}
             </Label>
