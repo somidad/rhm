@@ -184,7 +184,7 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
                         </Form.Field>
                       </Form>
                     </Table.Cell>
-                    <Table.Cell>
+                    <Table.Cell singleLine>
                       <Button icon='check' size='tiny' onClick={onSubmitEditVersion} />
                       <Button icon='cancel' size='tiny' onClick={() => setEditIndex(-1)} />
                     </Table.Cell>
@@ -200,7 +200,7 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
                     <button className='a-like-button' onClick={() => setIndex(index)}>{name}</button>
                     </Table.Cell>
                   <Table.Cell>{namePrev}</Table.Cell>
-                  <Table.Cell>
+                  <Table.Cell singleLine>
                     <Button icon='edit' size='tiny' onClick={() => onClickEdit(index)} />
                     <Button icon='trash' size='tiny'
                       disabled={versionReferringFound}

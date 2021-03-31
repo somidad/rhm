@@ -114,7 +114,7 @@ export default function EnumTable({ title, enumList, onChange, usedIndexList }: 
                     </Form.Field>
                   </Form>
                 </Table.Cell>
-                <Table.Cell>
+                <Table.Cell singleLine>
                   <Button icon='check' size='tiny' onClick={() => onSubmitRename(index)} />
                   <Button icon='cancel' size='tiny' onClick={() => setEditIndex(-1)} />
                 </Table.Cell>
@@ -122,7 +122,7 @@ export default function EnumTable({ title, enumList, onChange, usedIndexList }: 
             ) : (
               <Table.Row key={index}>
                 <Table.Cell>{name}</Table.Cell>
-                <Table.Cell>
+                <Table.Cell singleLine>
                   <Button icon='edit' size='tiny' onClick={() => onClickEdit(index)} />
                   <Button icon='trash' size='tiny' onClick={() => removeEnumItem(index)}
                     disabled={usedIndexList && usedIndexList.includes(index)}

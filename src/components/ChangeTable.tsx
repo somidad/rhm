@@ -216,7 +216,7 @@ export default function ChangeTable({
                       </Form.Field>
                     </Form>
                   </Table.Cell>
-                  <Table.Cell rowSpan={ROWSPAN}>
+                  <Table.Cell rowSpan={ROWSPAN} singleLine>
                     <Button icon='check' size='tiny' onClick={onSubmitEditChange} />
                     <Button icon='cancel' size='tiny' onClick={() => setEditIndex(-1)} />
                   </Table.Cell>
@@ -254,7 +254,7 @@ export default function ChangeTable({
                     </Form>
                   </Table.Cell>
                   <Table.Cell>{lineup}</Table.Cell>
-                  <Table.Cell rowSpan={ROWSPAN}>
+                  <Table.Cell rowSpan={ROWSPAN} singleLine>
                     <Button icon='edit' size='tiny' onClick={() => onClickEdit(index)} />
                     <Button icon='trash' size='tiny' onClick={() => removeChange(index)} />
                   </Table.Cell>

@@ -207,7 +207,7 @@ export default function ReleaseTable({
                       </Form.Field>
                     </Form>
                   </Table.Cell>
-                  <Table.Cell rowSpan={2}>
+                  <Table.Cell rowSpan={2} singleLine>
                     <Button icon='check' size='tiny' onClick={onSubmitEditRelease} />
                     <Button icon='cancel' size='tiny' onClick={() => setEditIndex(-1)} />
                   </Table.Cell>
@@ -226,7 +226,7 @@ export default function ReleaseTable({
                   <Table.Cell>
                     <Label ribbon>{name} {lineup}</Label>
                   </Table.Cell>
-                  <Table.Cell rowSpan={2}>
+                  <Table.Cell rowSpan={2} singleLine>
                     <Button icon='edit' size='tiny' onClick={() => onClickEdit(index)} />
                     <Button icon='trash' size='tiny' onClick={() => removeRelease(index)} />
                     <Button icon size='tiny' onClick={() => moveOlder(index)} disabled={editIndex !== -1}>

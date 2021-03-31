@@ -154,7 +154,7 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
                     </Form.Field>
                   </Form>
                 </Table.Cell>
-                <Table.Cell>
+                <Table.Cell singleLine>
                   <Button icon='check' size='tiny' onClick={() => onSubmitEditPkg(index)} />
                   <Button icon='cancel' size='tiny' onClick={() => setEditIndex(-1)} />
                 </Table.Cell>
@@ -163,7 +163,7 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
               <Table.Row key={index}>
                 <Table.Cell>{name}</Table.Cell>
                 <Table.Cell>{lineup}</Table.Cell>
-                <Table.Cell>
+                <Table.Cell singleLine>
                   <Button icon='edit' size='tiny' onClick={() => onClickEdit(index)} />
                   <Button icon='trash' size='tiny' onClick={() => removePkg(index)}
                     disabled={usedPkgIndexList && usedPkgIndexList.includes(index)}
