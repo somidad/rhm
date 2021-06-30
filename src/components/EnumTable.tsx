@@ -93,31 +93,25 @@ export default function EnumTable({ title, enumList, onChange, usedIndexList }: 
         </Col>
       </Row>
       <Row gutter={GUTTER}>
-          <Col span={SPAN_ENUM}>
-            <Form name='add' onFinish={addEnumItem}>
-              <Form.Item
-                name='name'
-                rules={[{ required: true }]}
-                help={false}
-              >
-                <Input
-                  value={name} onChange={(e) => setName(e.target.value)}
-                  disabled={editIndex !== -1}
-                />
-              </Form.Item>
-            </Form>
-          </Col>
-          <Col span={SPAN_ACTIONS}>
-            <Form name='add'>
-              <Button
-                htmlType='submit'
-                onClick={addEnumItem}
-                disabled={editIndex !== -1}
-              >
-                Add
-              </Button>
-            </Form>
-          </Col>
+        <Col span={SPAN_ENUM}>
+          <Form name='add' onFinish={addEnumItem}>
+            <Input
+              value={name} onChange={(e) => setName(e.target.value)}
+              disabled={editIndex !== -1}
+            />
+          </Form>
+        </Col>
+        <Col span={SPAN_ACTIONS}>
+          <Form name='add'>
+            <Button
+              htmlType='submit'
+              onClick={addEnumItem}
+              disabled={editIndex !== -1}
+            >
+              Add
+            </Button>
+          </Form>
+        </Col>
       </Row>
       {
         enumList.map((enumItem) => {
@@ -126,12 +120,7 @@ export default function EnumTable({ title, enumList, onChange, usedIndexList }: 
             <Row key={index} gutter={GUTTER}>
               <Col span={SPAN_ENUM}>
                 <Form name='edit' onFinish={() => onSubmitRename(index)}>
-                  <Form.Item
-                    name='nameNew'
-                    rules={[{ required: true }]}
-                  >
-                    <Input value={nameNew} onChange={(e) => setNameNew(e.target.value)} />
-                  </Form.Item>
+                  <Input value={nameNew} onChange={(e) => setNameNew(e.target.value)} />
                 </Form>
               </Col>
               <Col span={SPAN_ACTIONS}>
