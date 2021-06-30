@@ -1,20 +1,18 @@
 import { createRef, useState } from 'react';
 import 'antd/dist/antd.css';
 import './App.css';
-import { Input, Menu, Tabs } from 'antd';
-import { Container, Form, Header, Icon, Segment } from 'semantic-ui-react';
+import { Col, Input, Menu, Row, Tabs } from 'antd';
+import { GithubOutlined } from '@ant-design/icons';
+import { Container, Segment } from 'semantic-ui-react';
 import EnumTable from './components/EnumTable';
 import PkgTable from './components/PkgTable';
 import VersionEditor from './components/VersionEditor';
 import { Enum, Pkg, Version } from './types';
 import { load } from './utils';
+import Title from 'antd/lib/typography/Title';
+import Link from 'antd/lib/typography/Link';
 
 const UNTITLED = 'Untitled';
-
-const PANE_VERSION = 'version';
-const PANE_LINEUP = 'lineup';
-const PANE_PACKAGE = 'package';
-const PANE_CUSTOMER = 'customer';
 
 function App() {
   const refLoad = createRef<HTMLInputElement>();
@@ -25,7 +23,6 @@ function App() {
   const [lineupList, setLineupList] = useState<Enum[]>([]);
   const [pkgList, setPkgList] = useState<Pkg[]>([]);
   const [customerList, setCustomerList] = useState<Enum[]>([]);
-  const [pane, setPane] = useState(PANE_VERSION);
 
   function onChangeFile(e: React.ChangeEvent<HTMLInputElement>) {
     const { files } = e.target;
@@ -126,53 +123,59 @@ function App() {
   return (
     <div className="App">
       <Menu mode='horizontal'>
-        <Menu.Item onClick={onClickNew}>New</Menu.Item>
-        <Menu.Item onClick={() => refLoad.current?.click()}>Load</Menu.Item>
-        <Menu.Item disabled>
+        <Menu.Item key='new' onClick={onClickNew}>New</Menu.Item>
+        <Menu.Item key='load' onClick={() => refLoad.current?.click()}>Load</Menu.Item>
+        <Menu.Item key='featureName' disabled>
           <Input value={featureName} onChange={(e) => setFeatureName(e.target.value)} />
         </Menu.Item>
-        <Menu.Item onClick={() => onClickSave()}>Save</Menu.Item>
+        <Menu.Item key='save' onClick={() => onClickSave()}>Save</Menu.Item>
       </Menu>
       <input type='file' accept='.json' hidden ref={refLoad} onChange={onChangeFile} />
       {/* eslint-disable-next-line jsx-a11y/anchor-has-content, jsx-a11y/anchor-is-valid */}
       <a href='#' ref={refSave} hidden />
-      <Tabs defaultActiveKey="history">
-        <Tabs.TabPane tab="History" key="history">
-          <Container as={Segment}>
-            <Header as='h1'>Versions</Header>
-            <VersionEditor versionList={versionList} onChange={setVersionList} lineupList={lineupList} pkgList={pkgList} customerList={customerList} />
-          </Container>
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="Customers" key="customers">
-          <Container as={Segment}>
-            <Header as='h1'>Customers</Header>
-            <EnumTable title='Customer' enumList={customerList} onChange={setCustomerList}
-              usedIndexList={usedCustomerIndexList}
-            />
-          </Container>
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="Lineups" key="lineups">
-          <Container as={Segment}>
-            <Header as='h1'>Lineups</Header>
-            <EnumTable title='Lineup' enumList={lineupList} onChange={setLineupList}
-              usedIndexList={usedLineupIndexList}
-            />
-          </Container>
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="Packages" key="packages">
-          <Container as={Segment}>
-            <Header as='h1'>Packages</Header>
-            <PkgTable pkgList={pkgList} lineupList={lineupList} onChange={setPkgList}
-              usedPkgIndexList={usedPkgIndexList}
-            />
-          </Container>
-        </Tabs.TabPane>
-      </Tabs>
-      <Container textAlign='center'>
-        <a href='https://github.com/gsongsong/rhm' target='_blank' rel='noreferrer'>
-          <Icon name='github' size='large' />
-        </a>
-      </Container>
+      <Row>
+        <Col span={16} offset={4}>
+          <Tabs defaultActiveKey="history">
+            <Tabs.TabPane tab="History" key="history">
+              <Container as={Segment}>
+                <Title level={2}>Versions</Title>
+                <VersionEditor versionList={versionList} onChange={setVersionList} lineupList={lineupList} pkgList={pkgList} customerList={customerList} />
+              </Container>
+            </Tabs.TabPane>
+            <Tabs.TabPane tab="Customers" key="customers">
+              <Container as={Segment}>
+                <Title level={2}>Customers</Title>
+                <EnumTable title='Customer' enumList={customerList} onChange={setCustomerList}
+                  usedIndexList={usedCustomerIndexList}
+                />
+              </Container>
+            </Tabs.TabPane>
+            <Tabs.TabPane tab="Lineups" key="lineups">
+              <Container as={Segment}>
+                <Title level={2}>Lineups</Title>
+                <EnumTable title='Lineup' enumList={lineupList} onChange={setLineupList}
+                  usedIndexList={usedLineupIndexList}
+                />
+              </Container>
+            </Tabs.TabPane>
+            <Tabs.TabPane tab="Packages" key="packages">
+              <Container as={Segment}>
+                <Title level={2}>Packages</Title>
+                <PkgTable pkgList={pkgList} lineupList={lineupList} onChange={setPkgList}
+                  usedPkgIndexList={usedPkgIndexList}
+                />
+              </Container>
+            </Tabs.TabPane>
+          </Tabs>
+        </Col>
+      </Row>
+      <Row>
+        <Col span={2} offset={11}>
+          <Link href='https://github.com/gsongsong/rhm' target='_blank' rel='noreferrer'>
+            <GithubOutlined style={{ fontSize: '2em' }} />
+          </Link>
+        </Col>
+      </Row>
     </div>
   );
 }
