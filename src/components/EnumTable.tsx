@@ -1,5 +1,6 @@
+import { Button, Col, Form, Input, Row, Typography } from "antd";
+import { Gutter } from "antd/lib/grid/row";
 import { useState } from "react";
-import { Button, Form, Table } from "semantic-ui-react";
 import { Enum } from "../types";
 import { findEmptyIndex } from "../utils";
 
@@ -9,6 +10,10 @@ type Props = {
   onChange: (enumList: Enum[]) => void;
   usedIndexList?: number[];
 };
+
+const SPAN_ENUM = 16;
+const SPAN_ACTIONS = 8;
+const GUTTER: [Gutter, Gutter] = [16, 24];
 
 export default function EnumTable({ title, enumList, onChange, usedIndexList }: Props) {
   const [editIndex, setEditIndex] = useState(-1);
@@ -78,61 +83,79 @@ export default function EnumTable({ title, enumList, onChange, usedIndexList }: 
   }
 
   return (
-    <Table celled compact selectable>
-      <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell>{title}</Table.HeaderCell>
-          <Table.HeaderCell>Actions</Table.HeaderCell>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        <Table.Row active>
-          <Table.Cell>
-            <Form onSubmit={addEnumItem}>
-              <Form.Field disabled={editIndex !== -1}>
-                <input value={name} onChange={(e) => setName(e.target.value)} />
-              </Form.Field>
+    <>
+      <Row gutter={GUTTER}>
+        <Col span={SPAN_ENUM}>
+          <Typography.Text strong>{title}</Typography.Text>
+        </Col>
+        <Col span={SPAN_ACTIONS}>
+          <Typography.Text strong>Actions</Typography.Text>
+        </Col>
+      </Row>
+      <Row gutter={GUTTER}>
+          <Col span={SPAN_ENUM}>
+            <Form name='add' onFinish={addEnumItem}>
+              <Form.Item
+                name='name'
+                rules={[{ required: true }]}
+                help={false}
+              >
+                <Input
+                  value={name} onChange={(e) => setName(e.target.value)}
+                  disabled={editIndex !== -1}
+                />
+              </Form.Item>
             </Form>
-          </Table.Cell>
-          <Table.Cell>
-            <Button
-              icon='plus' size='tiny'
-              onClick={addEnumItem}
-              disabled={editIndex !== -1}
-            />
-          </Table.Cell>
-        </Table.Row>
-        {
-          enumList.map((enumItem) => {
-            const { index, name } = enumItem;
-            return index === editIndex ? (
-              <Table.Row key={index}>
-                <Table.Cell>
-                  <Form onSubmit={() => onSubmitRename(index)}>
-                    <Form.Field>
-                      <input value={nameNew} onChange={(e) => setNameNew(e.target.value)} />
-                    </Form.Field>
-                  </Form>
-                </Table.Cell>
-                <Table.Cell singleLine>
-                  <Button icon='check' size='tiny' onClick={() => onSubmitRename(index)} />
-                  <Button icon='cancel' size='tiny' onClick={() => setEditIndex(-1)} />
-                </Table.Cell>
-              </Table.Row>
-            ) : (
-              <Table.Row key={index}>
-                <Table.Cell>{name}</Table.Cell>
-                <Table.Cell singleLine>
-                  <Button icon='edit' size='tiny' onClick={() => onClickEdit(index)} />
-                  <Button icon='trash' size='tiny' onClick={() => removeEnumItem(index)}
-                    disabled={usedIndexList && usedIndexList.includes(index)}
-                  />
-                </Table.Cell>
-              </Table.Row>
-            )
-          })
-        }
-      </Table.Body>
-    </Table>
+          </Col>
+          <Col span={SPAN_ACTIONS}>
+            <Form name='add'>
+              <Button
+                htmlType='submit'
+                onClick={addEnumItem}
+                disabled={editIndex !== -1}
+              >
+                Add
+              </Button>
+            </Form>
+          </Col>
+      </Row>
+      {
+        enumList.map((enumItem) => {
+          const { index, name } = enumItem;
+          return index === editIndex ? (
+            <Row key={index} gutter={GUTTER}>
+              <Col span={SPAN_ENUM}>
+                <Form name='edit' onFinish={() => onSubmitRename(index)}>
+                  <Form.Item
+                    name='nameNew'
+                    rules={[{ required: true }]}
+                  >
+                    <Input value={nameNew} onChange={(e) => setNameNew(e.target.value)} />
+                  </Form.Item>
+                </Form>
+              </Col>
+              <Col span={SPAN_ACTIONS}>
+                <Form name='edit'>
+                  <Button htmlType='submit' onClick={() => onSubmitRename(index)}>Ok</Button>
+                  <Button htmlType='button' onClick={() => setEditIndex(-1)}>Cancel</Button>
+                </Form>
+              </Col>
+            </Row>
+          ) : (
+            <Row key={index} gutter={GUTTER}>
+              <Col span={SPAN_ENUM}>{name}</Col>
+              <Col span={SPAN_ACTIONS}>
+                <Button onClick={() => onClickEdit(index)}>Edit</Button>
+                <Button onClick={() => removeEnumItem(index)}
+                  disabled={usedIndexList && usedIndexList.includes(index)}
+                >
+                  Remove
+                </Button>
+              </Col>
+            </Row>
+          )
+        })
+      }
+    </>
   );
 }
