@@ -1,3 +1,6 @@
+import { Col, Row } from "antd";
+import { Gutter } from "antd/lib/grid/row";
+import Text from 'antd/lib/typography/Text';
 import { useState } from "react";
 import { Button, Form, Table } from "semantic-ui-react";
 import { Enum, Pkg } from "../types";
@@ -9,6 +12,13 @@ type Props = {
   onChange: (pkgList: Pkg[]) => void;
   usedPkgIndexList?: number[];
 };
+
+const SPAN_PKG = 6;
+const SPAN_CUSTOMER = 4;
+const SPAN_LINEUP = 4;
+const SPAN_PREVIOUS = 6;
+const SPAN_ACTIONS=4;
+const GUTTER: [Gutter, Gutter] = [16, 24];
 
 export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexList }: Props) {
   const [editIndex, setEditIndex] = useState(-1);
@@ -81,14 +91,25 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
   }
 
   return (
+    <>
+      <Row gutter={GUTTER}>
+        <Col span={SPAN_PKG}>
+          <Text strong>Package</Text>
+        </Col>
+        <Col span={SPAN_CUSTOMER}>
+          <Text strong>Customer</Text>
+        </Col>
+        <Col span={SPAN_LINEUP}>
+          <Text strong>Lineup</Text>
+        </Col>
+        <Col span={SPAN_PREVIOUS}>
+          <Text strong>Previous</Text>
+        </Col>
+        <Col span={SPAN_ACTIONS}>
+          <Text strong>Actions</Text>
+        </Col>
+      </Row>
     <Table celled compact selectable>
-      <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell>Package</Table.HeaderCell>
-          <Table.HeaderCell>Lineup</Table.HeaderCell>
-          <Table.HeaderCell>Actions</Table.HeaderCell>
-        </Table.Row>
-      </Table.Header>
       <Table.Body>
         <Table.Row active>
           <Table.Cell>
@@ -175,5 +196,6 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
         }
       </Table.Body>
     </Table>
+    </>
   );
 }
