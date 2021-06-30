@@ -1,7 +1,8 @@
 import { createRef, useState } from 'react';
-import 'semantic-ui-css/semantic.min.css';
+import 'antd/dist/antd.css';
 import './App.css';
-import { Container, Form, Header, Icon, Menu, Segment } from 'semantic-ui-react';
+import { Input, Menu, Tabs } from 'antd';
+import { Container, Form, Header, Icon, Segment } from 'semantic-ui-react';
 import EnumTable from './components/EnumTable';
 import PkgTable from './components/PkgTable';
 import VersionEditor from './components/VersionEditor';
@@ -124,89 +125,49 @@ function App() {
 
   return (
     <div className="App">
-      <Menu pointing>
+      <Menu mode='horizontal'>
         <Menu.Item onClick={onClickNew}>New</Menu.Item>
-        <Menu.Item>
-          <Form>
-            <Form.Field>
-              <input value={featureName} onChange={(e) => setFeatureName(e.target.value)} />
-            </Form.Field>
-          </Form>
+        <Menu.Item onClick={() => refLoad.current?.click()}>Load</Menu.Item>
+        <Menu.Item disabled>
+          <Input value={featureName} onChange={(e) => setFeatureName(e.target.value)} />
         </Menu.Item>
-        <Menu.Item onClick={() => refLoad.current?.click()}>
-          Load
-        </Menu.Item>
-        <Menu.Item onClick={() => onClickSave()}>
-          Save
-        </Menu.Item>
-        <Menu.Menu position='right'>
-          <Menu.Item
-            active={pane === PANE_VERSION}
-            onClick={() => setPane(PANE_VERSION)}
-          >
-            Versions
-          </Menu.Item>
-          <Menu.Item
-            active={pane === PANE_LINEUP}
-            onClick={() => setPane(PANE_LINEUP)}
-          >
-            Lineups
-          </Menu.Item>
-          <Menu.Item
-            active={pane === PANE_PACKAGE}
-            onClick={() => setPane(PANE_PACKAGE)}
-          >
-            Packages
-          </Menu.Item>
-          <Menu.Item
-            active={pane === PANE_CUSTOMER}
-            onClick={() => setPane(PANE_CUSTOMER)}
-          >
-            Customers
-          </Menu.Item>
-        </Menu.Menu>
+        <Menu.Item onClick={() => onClickSave()}>Save</Menu.Item>
       </Menu>
       <input type='file' accept='.json' hidden ref={refLoad} onChange={onChangeFile} />
       {/* eslint-disable-next-line jsx-a11y/anchor-has-content, jsx-a11y/anchor-is-valid */}
       <a href='#' ref={refSave} hidden />
-      {
-        pane === PANE_VERSION ? (
+      <Tabs defaultActiveKey="history">
+        <Tabs.TabPane tab="History" key="history">
           <Container as={Segment}>
             <Header as='h1'>Versions</Header>
             <VersionEditor versionList={versionList} onChange={setVersionList} lineupList={lineupList} pkgList={pkgList} customerList={customerList} />
           </Container>
-        ) : <></>
-      }
-      {
-        pane === PANE_LINEUP ? (
-          <Container as={Segment}>
-            <Header as='h1'>Lineups</Header>
-            <EnumTable title='Lineup' enumList={lineupList} onChange={setLineupList}
-              usedIndexList={usedLineupIndexList}
-            />
-          </Container>
-        ) : <></>
-      }
-      {
-        pane === PANE_PACKAGE ? (
-          <Container as={Segment}>
-            <Header as='h1'>Packages</Header>
-            <PkgTable pkgList={pkgList} lineupList={lineupList} onChange={setPkgList}
-              usedPkgIndexList={usedPkgIndexList}
-            />
-          </Container>
-        ) : <></>
-      }
-      {
-        pane === PANE_CUSTOMER ? (
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="Customers" key="customers">
           <Container as={Segment}>
             <Header as='h1'>Customers</Header>
             <EnumTable title='Customer' enumList={customerList} onChange={setCustomerList}
               usedIndexList={usedCustomerIndexList}
             />
           </Container>
-        ) : <></>
-      }
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="Lineups" key="lineups">
+          <Container as={Segment}>
+            <Header as='h1'>Lineups</Header>
+            <EnumTable title='Lineup' enumList={lineupList} onChange={setLineupList}
+              usedIndexList={usedLineupIndexList}
+            />
+          </Container>
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="Packages" key="packages">
+          <Container as={Segment}>
+            <Header as='h1'>Packages</Header>
+            <PkgTable pkgList={pkgList} lineupList={lineupList} onChange={setPkgList}
+              usedPkgIndexList={usedPkgIndexList}
+            />
+          </Container>
+        </Tabs.TabPane>
+      </Tabs>
       <Container textAlign='center'>
         <a href='https://github.com/gsongsong/rhm' target='_blank' rel='noreferrer'>
           <Icon name='github' size='large' />
