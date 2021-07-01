@@ -177,7 +177,7 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
               <Row key={index} gutter={GUTTER}>
                 <Col span={SPAN_VERSION}>
                   <Form name='edit' onFinish={onSubmitEditVersion}>
-                      <Input value={nameNew} onChange={(e) => setNameNew(e.target.value)} />
+                    <Input value={nameNew} onChange={(e) => setNameNew(e.target.value)} />
                   </Form>
                 </Col>
                 <Col span={SPAN_PREVIOUS}>
@@ -206,7 +206,7 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
           return (
             <Row key={index} gutter={GUTTER}>
               <Col span={SPAN_VERSION}>
-                <Typography.Link onClick={() => setIndex(index)}>{name}</Typography.Link>
+                {name}
               </Col>
               <Col span={SPAN_PREVIOUS}>{namePrev}</Col>
               <Col span={SPAN_ACTIONS}>
