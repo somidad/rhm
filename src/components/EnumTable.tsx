@@ -102,14 +102,12 @@ export default function EnumTable({ title, enumList, onChange, usedIndexList }: 
           </Form>
         </Col>
         <Col span={SPAN_ACTIONS}>
-          <Form name='add'>
-            <Button
-              onClick={addEnumItem}
-              disabled={editIndex !== -1}
-            >
-              Add
-            </Button>
-          </Form>
+          <Button
+            onClick={addEnumItem}
+            disabled={editIndex !== -1}
+          >
+            Add
+          </Button>
         </Col>
       </Row>
       {
@@ -123,10 +121,8 @@ export default function EnumTable({ title, enumList, onChange, usedIndexList }: 
                 </Form>
               </Col>
               <Col span={SPAN_ACTIONS}>
-                <Form name='edit'>
-                  <Button htmlType='submit' onClick={() => onSubmitRename(index)}>Ok</Button>
-                  <Button htmlType='button' onClick={() => setEditIndex(-1)}>Cancel</Button>
-                </Form>
+                <Button onClick={() => onSubmitRename(index)}>Ok</Button>
+                <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
               </Col>
             </Row>
           ) : (
