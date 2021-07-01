@@ -21,6 +21,16 @@ const SPAN_VERSION = 12;
 const SPAN_PREVIOUS = 4;
 const SPAN_ACTIONS = 4;
 
+const SPAN_VERSION_IN_RELEASES = 4;
+const SPAN_PKG = 12;
+const SPAN_CUSTOMERS = 4;
+
+const SPAN_VERSION_IN_CHANGES = 4;
+const SPAN_DESCRIPTION = 4;
+const SPAN_BEFORE = 4;
+const SPAN_AFTER = 4;
+const SPAN_CUSTOMERS_IN_CHANGES = 4;
+
 const GUTTER: [Gutter, Gutter] = [16, 24];
 
 export default function VersionEditor({ versionList, onChange, lineupList, pkgList, customerList }: Props) {
@@ -226,9 +236,43 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
       <Title level={3}>
         Releases
       </Title>
+      <Row gutter={GUTTER}>
+        <Col span={SPAN_VERSION_IN_RELEASES}>
+          <Typography.Text strong>Version</Typography.Text>
+        </Col>
+        <Col span={SPAN_PKG}>
+          <Typography.Text strong>Package</Typography.Text>
+        </Col>
+        <Col span={SPAN_CUSTOMERS}>
+          <Typography.Text strong>Customers</Typography.Text>
+        </Col>
+        <Col span={SPAN_ACTIONS}>
+          <Typography.Text strong>Actions</Typography.Text>
+        </Col>
+      </Row>
       <Title level={3}>
         Changes
       </Title>
+      <Row gutter={GUTTER}>
+        <Col span={SPAN_VERSION_IN_CHANGES}>
+          <Typography.Text strong>Version</Typography.Text>
+        </Col>
+        <Col span={SPAN_DESCRIPTION}>
+          <Typography.Text strong>Description</Typography.Text>
+        </Col>
+        <Col span={SPAN_BEFORE}>
+          <Typography.Text strong>Before change</Typography.Text>
+        </Col>
+        <Col span={SPAN_AFTER}>
+          <Typography.Text strong>After change</Typography.Text>
+        </Col>
+        <Col span={SPAN_CUSTOMERS_IN_CHANGES}>
+          <Typography.Text strong>Customers</Typography.Text>
+        </Col>
+        <Col span={SPAN_ACTIONS}>
+          <Typography.Text strong>Actions</Typography.Text>
+        </Col>
+      </Row>
       {/* {
         version ? (
           <VersionComponent version={version} versionList={versionList}
