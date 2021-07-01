@@ -1,7 +1,8 @@
-import { Button, Col, Input, Row, Select, Typography } from "antd";
+import { Button, Col, Form, Input, Row, Select, Typography } from "antd";
 import { Gutter } from "antd/lib/grid/row";
+import Title from "antd/lib/typography/Title";
 import { useState } from "react";
-import { Form, Icon, Modal, Table, TextArea } from "semantic-ui-react";
+import { Modal, TextArea } from "semantic-ui-react";
 import { Enum, Pkg, Version } from "../types";
 import { findEmptyIndex, publish } from "../utils";
 import VersionComponent from "./VersionComponent";
@@ -139,13 +140,18 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
       </Row>
       <Row gutter={GUTTER}>
         <Col span={SPAN_VERSION}>
-          <Input
-            value={name} onChange={(e) => setName(e.target.value)}
-            disabled={editIndex !== -1}
-          />
+          <Form name='add' onFinish={addVersion}>
+            <Input
+              value={name} onChange={(e) => setName(e.target.value)}
+              disabled={editIndex !== -1}
+            />
+          </Form>
         </Col>
         <Col span={SPAN_PREVIOUS}>
-          <Select value={indexPrev} onChange={(value) => setIndexPrev(value)}>
+          <Select
+            value={indexPrev} onChange={(value) => setIndexPrev(value)}
+            disabled={editIndex !== -1}
+          >
             <Option value={-1}>(None)</Option>
             {
               versionList.map((version) => {
@@ -163,90 +169,83 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
           </Button>
         </Col>
       </Row>
-      <Table celled compact selectable>
-        <Table.Body>
-          {
-            versionList.map((version) => {
-              const { index, name, indexPrev } = version;
-              if (index === editIndex) {
-                return (
-                  <Table.Row key={index}>
-                    <Table.Cell>
-                      <Form>
-                        <Form.Field>
-                          <input value={nameNew} onChange={(e) => setNameNew(e.target.value)} />
-                        </Form.Field>
-                      </Form>
-                    </Table.Cell>
-                    <Table.Cell>
-                      <Form>
-                        <Form.Field>
-                          <select value={indexPrevNew} onChange={(e) => setIndexPrevNew(+e.target.value)}>
-                            <option value={-1}>(None)</option>
-                            {
-                              versionList.map((version) => {
-                                const { index, name } = version;
-                                return (
-                                  <option key={index} value={index} disabled={index === editIndex}>{name}</option>
-                                )
-                              })
-                            }
-                          </select>
-                        </Form.Field>
-                      </Form>
-                    </Table.Cell>
-                    <Table.Cell singleLine>
-                      <Button onClick={onSubmitEditVersion}>Ok</Button>
-                      <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
-                    </Table.Cell>
-                  </Table.Row>
-                )
-              }
-              const versionPrevFound = versionList.find((version) => version.index === indexPrev);
-              const namePrev = versionPrevFound ? versionPrevFound.name : '(None)';
-              const versionReferringFound = !!versionList.find((version) => version.indexPrev === index);
-              return (
-                <Table.Row key={index}>
-                  <Table.Cell>
-                    <button className='a-like-button' onClick={() => setIndex(index)}>{name}</button>
-                    </Table.Cell>
-                  <Table.Cell>{namePrev}</Table.Cell>
-                  <Table.Cell singleLine>
-                    <Button onClick={() => onClickEdit(index)}>Edit</Button>
-                    <Button
-                      disabled={versionReferringFound}
-                      onClick={() => removeVersion(index)}
-                    >
-                      Remove
-                    </Button>
-                    <Button onClick={() => onClickPublish(index)} />
-                  </Table.Cell>
-                </Table.Row>
-              )
-            })
-          }
-        </Table.Body>
-      </Table>
       {
+        versionList.map((version) => {
+          const { index, name, indexPrev } = version;
+          if (index === editIndex) {
+            return (
+              <Row key={index} gutter={GUTTER}>
+                <Col span={SPAN_VERSION}>
+                  <Form name='edit' onFinish={onSubmitEditVersion}>
+                      <Input value={nameNew} onChange={(e) => setNameNew(e.target.value)} />
+                  </Form>
+                </Col>
+                <Col span={SPAN_PREVIOUS}>
+                  <Select value={indexPrevNew} onChange={(value) => setIndexPrevNew(value)}>
+                    <Option value={-1}>(None)</Option>
+                    {
+                      versionList.map((version) => {
+                        const { index, name } = version;
+                        return (
+                          <Option key={index} value={index} disabled={index === editIndex}>{name}</Option>
+                        )
+                      })
+                    }
+                  </Select>
+                </Col>
+                <Col span={SPAN_ACTIONS}>
+                  <Button onClick={onSubmitEditVersion}>Ok</Button>
+                  <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
+                </Col>
+              </Row>
+            )
+          }
+          const versionPrevFound = versionList.find((version) => version.index === indexPrev);
+          const namePrev = versionPrevFound ? versionPrevFound.name : '(None)';
+          const versionReferringFound = !!versionList.find((version) => version.indexPrev === index);
+          return (
+            <Row key={index} gutter={GUTTER}>
+              <Col span={SPAN_VERSION}>
+                <Typography.Link onClick={() => setIndex(index)}>{name}</Typography.Link>
+              </Col>
+              <Col span={SPAN_PREVIOUS}>{namePrev}</Col>
+              <Col span={SPAN_ACTIONS}>
+                <Button onClick={() => onClickEdit(index)}>Edit</Button>
+                <Button
+                  disabled={versionReferringFound}
+                  onClick={() => removeVersion(index)}
+                >
+                  Remove
+                </Button>
+                <Button onClick={() => onClickPublish(index)} />
+              </Col>
+            </Row>
+          )
+        })
+      }
+      <Title level={3}>
+        Releases
+      </Title>
+      <Title level={3}>
+        Changes
+      </Title>
+      {/* {
         version ? (
           <VersionComponent version={version} versionList={versionList}
             lineupList={lineupList} pkgList={pkgList} customerList={customerList}
             onChange={onChangeVersion}
           />
         ) : <></>
-      }
+      } */}
       <Modal open={openModal} onClose={() => setOpenModal(false)}>
         <Modal.Header>Release history</Modal.Header>
         <Modal.Content>
           <Form>
-            <Form.Field>
               <TextArea value={releaseHistory} rows={24} />
-            </Form.Field>
           </Form>
         </Modal.Content>
         <Modal.Actions>
           <Button onClick={() => navigator.clipboard.writeText(releaseHistory)}>
-            <Icon name='clipboard' />
             Copy to clipboard
           </Button>
         </Modal.Actions>
