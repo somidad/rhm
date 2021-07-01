@@ -1,10 +1,11 @@
-import { Col, Row } from "antd";
+import { Button, Col, Form, Input, Row, Select } from "antd";
 import { Gutter } from "antd/lib/grid/row";
 import Text from 'antd/lib/typography/Text';
 import { useState } from "react";
-import { Button, Form, Table } from "semantic-ui-react";
 import { Enum, Pkg } from "../types";
 import { findEmptyIndex } from "../utils";
+
+const { Option } = Select;
 
 type Props = {
   pkgList: Pkg[];
@@ -13,11 +14,9 @@ type Props = {
   usedPkgIndexList?: number[];
 };
 
-const SPAN_PKG = 6;
-const SPAN_CUSTOMER = 4;
+const SPAN_PKG = 12;
 const SPAN_LINEUP = 4;
-const SPAN_PREVIOUS = 6;
-const SPAN_ACTIONS=4;
+const SPAN_ACTIONS= 8;
 const GUTTER: [Gutter, Gutter] = [16, 24];
 
 export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexList }: Props) {
@@ -96,106 +95,93 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
         <Col span={SPAN_PKG}>
           <Text strong>Package</Text>
         </Col>
-        <Col span={SPAN_CUSTOMER}>
-          <Text strong>Customer</Text>
-        </Col>
         <Col span={SPAN_LINEUP}>
           <Text strong>Lineup</Text>
-        </Col>
-        <Col span={SPAN_PREVIOUS}>
-          <Text strong>Previous</Text>
         </Col>
         <Col span={SPAN_ACTIONS}>
           <Text strong>Actions</Text>
         </Col>
       </Row>
-    <Table celled compact selectable>
-      <Table.Body>
-        <Table.Row active>
-          <Table.Cell>
-            <Form>
-              <Form.Field disabled={editIndex !== -1}>
-                <input value={name} onChange={(e) => setName(e.target.value)} />
-              </Form.Field>
-            </Form>
-          </Table.Cell>
-          <Table.Cell>
-            <Form>
-              <Form.Field disabled={editIndex !== -1}>
-                <select value={lineupIndex} onChange={(e) => setLineupIndex(+e.target.value)}>
-                  <option value={-1}>(None)</option>
-                  {
-                    lineupList.map((lineup) => {
-                      const { index, name} = lineup;
-                      return (
-                        <option key={index} value={index}>{name}</option>
-                      );
-                    })
-                  }
-                </select>
-              </Form.Field>
-            </Form>
-          </Table.Cell>
-          <Table.Cell>
-            <Button
-              icon='plus' size='tiny'
-              onClick={addPkg}
+      <Row gutter={GUTTER}>
+        <Col span={SPAN_PKG}>
+          <Form name='add' onFinish={addPkg}>
+            <Input
+              value={name} onChange={(e) => setName(e.target.value)}
               disabled={editIndex !== -1}
             />
-          </Table.Cell>
-        </Table.Row>
-        {
-          pkgList.map((pkg) => {
-            const { index, name, lineupIndex } = pkg;
-            const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
-            const lineup = lineupFound ? lineupFound.name : '(None)';
-            return index === editIndex ? (
-              <Table.Row key={index}>
-                <Table.Cell>
-                  <Form>
-                    <Form.Field>
-                      <input value={nameNew} onChange={(e) => setNameNew(e.target.value)} />
-                    </Form.Field>
-                  </Form>
-                </Table.Cell>
-                <Table.Cell>
-                  <Form>
-                    <Form.Field>
-                      <select value={lineupIndexNew} onChange={(e) => setLineupIndexNew(+e.target.value)}>
-                        <option value={-1}>(None)</option>
-                        {
-                          lineupList.map((lineup) => {
-                            const { index, name } = lineup;
-                            return (
-                              <option key={index} value={index}>{name}</option>
-                            )
-                          })
-                        }
-                      </select>
-                    </Form.Field>
-                  </Form>
-                </Table.Cell>
-                <Table.Cell singleLine>
-                  <Button icon='check' size='tiny' onClick={() => onSubmitEditPkg(index)} />
-                  <Button icon='cancel' size='tiny' onClick={() => setEditIndex(-1)} />
-                </Table.Cell>
-              </Table.Row>
-            ) : (
-              <Table.Row key={index}>
-                <Table.Cell>{name}</Table.Cell>
-                <Table.Cell>{lineup}</Table.Cell>
-                <Table.Cell singleLine>
-                  <Button icon='edit' size='tiny' onClick={() => onClickEdit(index)} />
-                  <Button icon='trash' size='tiny' onClick={() => removePkg(index)}
-                    disabled={usedPkgIndexList && usedPkgIndexList.includes(index)}
-                  />
-                </Table.Cell>
-              </Table.Row>
-            )
-          })
-        }
-      </Table.Body>
-    </Table>
+          </Form>
+        </Col>
+        <Col span={SPAN_LINEUP}>
+          <Select
+            value={lineupIndex} onChange={(value) => setLineupIndex(value)}
+            disabled={editIndex !== -1}
+          >
+            <Option value={-1}>(None)</Option>
+            {
+              lineupList.map((lineup) => {
+                const { index, name} = lineup;
+                return (
+                  <Option key={index} value={index}>{name}</Option>
+                );
+              })
+            }
+          </Select>
+        </Col>
+        <Col span={SPAN_ACTIONS}>
+          <Button
+            onClick={addPkg}
+            disabled={editIndex !== -1}
+          >
+            Add
+          </Button>
+        </Col>
+      </Row>
+      {
+        pkgList.map((pkg) => {
+          const { index, name, lineupIndex } = pkg;
+          const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
+          const lineup = lineupFound ? lineupFound.name : '(None)';
+          return index === editIndex ? (
+            <Row gutter={GUTTER} key={index}>
+              <Col span={SPAN_PKG}>
+                <Form name='edit' onFinish={() => onSubmitEditPkg(index)}>
+                  <Input value={nameNew} onChange={(e) => setNameNew(e.target.value)} />
+                </Form>
+              </Col>
+              <Col span={SPAN_LINEUP}>
+                <Select value={lineupIndexNew} onChange={(value) => setLineupIndexNew(value)}>
+                  <Option value={-1}>(None)</Option>
+                  {
+                    lineupList.map((lineup) => {
+                      const { index, name } = lineup;
+                      return (
+                        <Option key={index} value={index}>{name}</Option>
+                      )
+                    })
+                  }
+                </Select>
+              </Col>
+              <Col span={SPAN_ACTIONS}>
+                <Button onClick={() => onSubmitEditPkg(index)}>Ok</Button>
+                <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
+              </Col>
+            </Row>
+          ) : (
+            <Row gutter={GUTTER} key={index}>
+              <Col span={SPAN_PKG}>{name}</Col>
+              <Col span={SPAN_LINEUP}>{lineup}</Col>
+              <Col span={SPAN_ACTIONS}>
+                <Button onClick={() => onClickEdit(index)}>Edit</Button>
+                <Button onClick={() => removePkg(index)}
+                  disabled={usedPkgIndexList && usedPkgIndexList.includes(index)}
+                >
+                  Remove
+                </Button>
+              </Col>
+            </Row>
+          )
+        })
+      }
     </>
   );
 }
