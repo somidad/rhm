@@ -1,8 +1,12 @@
+import { Button, Col, Input, Row, Select, Typography } from "antd";
+import { Gutter } from "antd/lib/grid/row";
 import { useState } from "react";
-import { Button, Form, Icon, Modal, Table, TextArea } from "semantic-ui-react";
+import { Form, Icon, Modal, Table, TextArea } from "semantic-ui-react";
 import { Enum, Pkg, Version } from "../types";
 import { findEmptyIndex, publish } from "../utils";
 import VersionComponent from "./VersionComponent";
+
+const { Option } = Select;
 
 type Props = {
   versionList: Version[];
@@ -11,6 +15,12 @@ type Props = {
   pkgList: Pkg[];
   customerList: Enum[];
 };
+
+const SPAN_VERSION = 12;
+const SPAN_PREVIOUS = 4;
+const SPAN_ACTIONS = 4;
+
+const GUTTER: [Gutter, Gutter] = [16, 24];
 
 export default function VersionEditor({ versionList, onChange, lineupList, pkgList, customerList }: Props) {
   const [name, setName] = useState('');
@@ -116,44 +126,45 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
   const version = index === undefined ? versionList[0] : versionList.find((version) => version.index === index);
   return (
     <>
+      <Row gutter={GUTTER}>
+        <Col span={SPAN_VERSION}>
+          <Typography.Text strong>Version</Typography.Text>
+        </Col>
+        <Col span={SPAN_PREVIOUS}>
+          <Typography.Text strong>Previous version</Typography.Text>
+        </Col>
+        <Col span={SPAN_ACTIONS}>
+          <Typography.Text strong>Actions</Typography.Text>
+        </Col>
+      </Row>
+      <Row gutter={GUTTER}>
+        <Col span={SPAN_VERSION}>
+          <Input
+            value={name} onChange={(e) => setName(e.target.value)}
+            disabled={editIndex !== -1}
+          />
+        </Col>
+        <Col span={SPAN_PREVIOUS}>
+          <Select value={indexPrev} onChange={(value) => setIndexPrev(value)}>
+            <Option value={-1}>(None)</Option>
+            {
+              versionList.map((version) => {
+                const { index, name } = version;
+                return (
+                  <Option key={index} value={index}>{name}</Option>
+                )
+              })
+            }
+          </Select>
+        </Col>
+        <Col span={SPAN_ACTIONS}>
+          <Button onClick={addVersion} disabled={editIndex !== -1}>
+            Add
+          </Button>
+        </Col>
+      </Row>
       <Table celled compact selectable>
-        <Table.Header>
-          <Table.Row>
-            <Table.HeaderCell>Version</Table.HeaderCell>
-            <Table.HeaderCell>Previous version</Table.HeaderCell>
-            <Table.HeaderCell>Actions</Table.HeaderCell>
-          </Table.Row>
-        </Table.Header>
         <Table.Body>
-          <Table.Row active>
-            <Table.Cell>
-              <Form>
-                <Form.Field disabled={editIndex !== -1}>
-                  <input value={name} onChange={(e) => setName(e.target.value)} />
-                </Form.Field>
-              </Form>
-            </Table.Cell>
-            <Table.Cell>
-              <Form>
-                <Form.Field disabled={editIndex !== -1}>
-                  <select value={indexPrev} onChange={(e) => setIndexPrev(+e.target.value)}>
-                    <option value={-1}>(None)</option>
-                    {
-                      versionList.map((version) => {
-                        const { index, name } = version;
-                        return (
-                          <option key={index} value={index}>{name}</option>
-                        )
-                      })
-                    }
-                  </select>
-                </Form.Field>
-              </Form>
-            </Table.Cell>
-            <Table.Cell>
-              <Button icon='plus' size='tiny' onClick={addVersion} disabled={editIndex !== -1} />
-            </Table.Cell>
-          </Table.Row>
           {
             versionList.map((version) => {
               const { index, name, indexPrev } = version;
@@ -185,8 +196,8 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
                       </Form>
                     </Table.Cell>
                     <Table.Cell singleLine>
-                      <Button icon='check' size='tiny' onClick={onSubmitEditVersion} />
-                      <Button icon='cancel' size='tiny' onClick={() => setEditIndex(-1)} />
+                      <Button onClick={onSubmitEditVersion}>Ok</Button>
+                      <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
                     </Table.Cell>
                   </Table.Row>
                 )
@@ -201,12 +212,14 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
                     </Table.Cell>
                   <Table.Cell>{namePrev}</Table.Cell>
                   <Table.Cell singleLine>
-                    <Button icon='edit' size='tiny' onClick={() => onClickEdit(index)} />
-                    <Button icon='trash' size='tiny'
+                    <Button onClick={() => onClickEdit(index)}>Edit</Button>
+                    <Button
                       disabled={versionReferringFound}
                       onClick={() => removeVersion(index)}
-                    />
-                    <Button icon='list' size='tiny' onClick={() => onClickPublish(index)} />
+                    >
+                      Remove
+                    </Button>
+                    <Button onClick={() => onClickPublish(index)} />
                   </Table.Cell>
                 </Table.Row>
               )
@@ -232,7 +245,7 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
           </Form>
         </Modal.Content>
         <Modal.Actions>
-          <Button icon size='tiny' onClick={() => navigator.clipboard.writeText(releaseHistory)}>
+          <Button onClick={() => navigator.clipboard.writeText(releaseHistory)}>
             <Icon name='clipboard' />
             Copy to clipboard
           </Button>
