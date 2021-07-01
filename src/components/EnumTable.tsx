@@ -104,7 +104,6 @@ export default function EnumTable({ title, enumList, onChange, usedIndexList }: 
         <Col span={SPAN_ACTIONS}>
           <Form name='add'>
             <Button
-              htmlType='submit'
               onClick={addEnumItem}
               disabled={editIndex !== -1}
             >
