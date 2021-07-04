@@ -1,4 +1,4 @@
-import { Button, Col, Form, Input, Row, Select, Typography } from "antd";
+import { Button, Col, Form, Row, Select, Typography } from "antd";
 import { Gutter } from "antd/lib/grid/row";
 import Title from "antd/lib/typography/Title";
 import { useState } from "react";
@@ -17,8 +17,6 @@ type Props = {
   customerList: Enum[];
 };
 
-const SPAN_VERSION = 12;
-const SPAN_PREVIOUS = 4;
 const SPAN_ACTIONS = 4;
 
 const SPAN_VERSION_IN_RELEASES = 4;
@@ -137,7 +135,7 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
   const version = index === undefined ? versionList[0] : versionList.find((version) => version.index === index);
   return (
     <>
-      <Row gutter={GUTTER}>
+      {/* <Row gutter={GUTTER}>
         <Col span={SPAN_VERSION}>
           <Typography.Text strong>Version</Typography.Text>
         </Col>
@@ -232,7 +230,7 @@ export default function VersionEditor({ versionList, onChange, lineupList, pkgLi
             </Row>
           )
         })
-      }
+      } */}
       <Title level={3}>
         Releases
       </Title>
