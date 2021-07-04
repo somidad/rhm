@@ -136,7 +136,7 @@ function App() {
         <Col span={16} offset={4}>
           <Tabs defaultActiveKey="history">
             <Tabs.TabPane tab="History" key="history">
-              <Title level={2}>Versions</Title>
+              <Title level={2}>History</Title>
               <VersionEditor versionList={versionList} onChange={setVersionList} lineupList={lineupList} pkgList={pkgList} customerList={customerList} />
             </Tabs.TabPane>
             <Tabs.TabPane tab="Customers" key="customers">
