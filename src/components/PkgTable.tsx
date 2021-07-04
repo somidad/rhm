@@ -26,7 +26,6 @@ const ACTIONS = 'Actions';
 export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexList }: Props) {
   const [form] = useForm();
   const [editIndex, setEditIndex] = useState(-1);
-  const [lineupIndexNew, setLineupIndexNew] = useState(-1);
 
   const columns: any[] = [
     { key: PACKAGE.toLocaleLowerCase(), dataIndex: PACKAGE.toLocaleLowerCase(), title: PACKAGE },
