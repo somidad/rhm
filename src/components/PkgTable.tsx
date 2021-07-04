@@ -1,6 +1,5 @@
-import { Button, Col, Form, Input, Row, Select } from "antd";
-import { Gutter } from "antd/lib/grid/row";
-import Text from 'antd/lib/typography/Text';
+import { Button, Form, Input, Select, Table } from "antd";
+import { useForm } from "antd/lib/form/Form";
 import { useState } from "react";
 import { Enum, Pkg } from "../types";
 import { findEmptyIndex } from "../utils";
@@ -14,33 +13,58 @@ type Props = {
   usedPkgIndexList?: number[];
 };
 
-const SPAN_PKG = 12;
-const SPAN_LINEUP = 4;
-const SPAN_ACTIONS= 8;
-const GUTTER: [Gutter, Gutter] = [16, 24];
+type EditableCellProps = {
+  record: { key: number, name: string; lineup: number; };
+  dataIndex: string;
+  children: any;
+}
+
+const PACKAGE = 'Package';
+const LINEUP = 'Lineup';
+const ACTIONS = 'Actions';
 
 export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexList }: Props) {
+  const [form] = useForm();
   const [editIndex, setEditIndex] = useState(-1);
-  const [name, setName] = useState('');
-  const [lineupIndex, setLineupIndex] = useState(-1);
-  const [nameNew, setNameNew] = useState('');
   const [lineupIndexNew, setLineupIndexNew] = useState(-1);
 
+  const columns: any[] = [
+    { key: PACKAGE.toLocaleLowerCase(), dataIndex: PACKAGE.toLocaleLowerCase(), title: PACKAGE },
+    { key: LINEUP.toLocaleLowerCase(), dataIndex: LINEUP.toLocaleLowerCase(), title: LINEUP },
+    { key: ACTIONS.toLocaleLowerCase(), dataIndex: ACTIONS.toLocaleLowerCase(), title: ACTIONS },
+  ].map((column) => {
+    const { dataIndex } = column;
+    return {
+      ...column,
+      onCell: (record: any) => ({
+        record,
+        dataIndex,
+      }),
+    }
+  });
+
   function addPkg() {
-    if (!name) {
-      return;
-    }
-    const pkgFound = pkgList.find((pkg) => pkg.name === name);
-    if (pkgFound) {
-      return;
-    }
-    const index = findEmptyIndex(pkgList.map((pkg) => pkg.index));
-    const pkgListNew = [
-      ...pkgList,
-      { index, name, lineupIndex },
-    ].sort((a, b) => a.name.localeCompare(b.name));
-    onChange(pkgListNew);
-    setName('');
+    form.validateFields(['name', 'lineup']).then(() => {
+      const { name, lineup: lineupIndex } = form.getFieldsValue(['name', 'lineup']);
+      console.log(name);
+      console.log(lineupIndex);
+      const pkgFound = pkgList.find((pkg) => pkg.name === name);
+      if (pkgFound) {
+        return;
+      }
+      const index = findEmptyIndex(pkgList.map((pkg) => pkg.index));
+      const pkgListNew = [
+        ...pkgList,
+        { index, name, lineupIndex },
+      ].sort((a, b) => a.name.localeCompare(b.name));
+      onChange(pkgListNew);
+      form.setFieldsValue({
+        name: '',
+        lineup: -1,
+      });
+    }).catch((reason) => {
+      console.error(reason);
+    });
   }
 
   function onClickEdit(index: number) {
@@ -48,30 +72,35 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
     if (!pkgFound) {
       return;
     }
-    setNameNew(pkgFound.name);
-    setLineupIndexNew(pkgFound.lineupIndex);
+    const { name, lineupIndex } = pkgFound;
+    form.setFieldsValue({
+      nameNew: name,
+      lineupNew: lineupIndex,
+    });
     setEditIndex(index);
   }
 
   function onSubmitEditPkg(index: number) {
-    if (!nameNew) {
-      return;
-    }
-    const pkgFound = pkgList.find((pkg) => pkg.index !== index && pkg.name === nameNew);
-    if (pkgFound) {
-      return;
-    }
-    const indexFound = pkgList.findIndex((pkg) => pkg.index === index);
-    if (indexFound === -1) {
-      return;
-    }
-    const pkgListNew = [
-      ...pkgList.slice(0, indexFound),
-      { index, name: nameNew, lineupIndex: lineupIndexNew },
-      ...pkgList.slice(indexFound + 1),
-    ];
-    onChange(pkgListNew);
-    setEditIndex(-1);
+    form.validateFields(['nameNew']).then(() => {
+      const { nameNew, lineupNew: lineupIndexNew } = form.getFieldsValue(['nameNew', 'lineupNew']);
+      const pkgFound = pkgList.find((pkg) => pkg.index !== index && pkg.name === nameNew);
+      if (pkgFound) {
+        return;
+      }
+      const indexFound = pkgList.findIndex((pkg) => pkg.index === index);
+      if (indexFound === -1) {
+        return;
+      }
+      const pkgListNew = [
+        ...pkgList.slice(0, indexFound),
+        { index, name: nameNew, lineupIndex: lineupIndexNew },
+        ...pkgList.slice(indexFound + 1),
+      ];
+      onChange(pkgListNew);
+      setEditIndex(-1);
+    }).catch((reason) => {
+      console.error(reason);
+    });
   }
 
   function removePkg(index: number) {
@@ -89,99 +118,117 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
     onChange(enumListNew);
   }
 
+  console.log(pkgList);
+  const dataSource = [
+    { key: -1, package: '', actions: '' },
+    ...pkgList.map((pkg) => {
+      const { index: key, name, lineupIndex: lineup } = pkg;
+      return { key, package: name, lineup, actions: '' };
+    }),
+  ];
+
   return (
-    <>
-      <Row gutter={GUTTER}>
-        <Col span={SPAN_PKG}>
-          <Text strong>Package</Text>
-        </Col>
-        <Col span={SPAN_LINEUP}>
-          <Text strong>Lineup</Text>
-        </Col>
-        <Col span={SPAN_ACTIONS}>
-          <Text strong>Actions</Text>
-        </Col>
-      </Row>
-      <Row gutter={GUTTER}>
-        <Col span={SPAN_PKG}>
-          <Form name='add' onFinish={addPkg}>
-            <Input
-              value={name} onChange={(e) => setName(e.target.value)}
-              disabled={editIndex !== -1}
-            />
-          </Form>
-        </Col>
-        <Col span={SPAN_LINEUP}>
-          <Select
-            value={lineupIndex} onChange={(value) => setLineupIndex(value)}
-            disabled={editIndex !== -1}
-          >
-            <Option value={-1}>(None)</Option>
-            {
-              lineupList.map((lineup) => {
-                const { index, name} = lineup;
-                return (
-                  <Option key={index} value={index}>{name}</Option>
-                );
-              })
-            }
-          </Select>
-        </Col>
-        <Col span={SPAN_ACTIONS}>
-          <Button
-            onClick={addPkg}
-            disabled={editIndex !== -1}
-          >
-            Add
-          </Button>
-        </Col>
-      </Row>
-      {
-        pkgList.map((pkg) => {
-          const { index, name, lineupIndex } = pkg;
-          const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
-          const lineup = lineupFound ? lineupFound.name : '(None)';
-          return index === editIndex ? (
-            <Row gutter={GUTTER} key={index}>
-              <Col span={SPAN_PKG}>
-                <Form name='edit' onFinish={() => onSubmitEditPkg(index)}>
-                  <Input value={nameNew} onChange={(e) => setNameNew(e.target.value)} />
-                </Form>
-              </Col>
-              <Col span={SPAN_LINEUP}>
-                <Select value={lineupIndexNew} onChange={(value) => setLineupIndexNew(value)}>
-                  <Option value={-1}>(None)</Option>
-                  {
-                    lineupList.map((lineup) => {
-                      const { index, name } = lineup;
-                      return (
-                        <Option key={index} value={index}>{name}</Option>
-                      )
-                    })
-                  }
-                </Select>
-              </Col>
-              <Col span={SPAN_ACTIONS}>
-                <Button onClick={() => onSubmitEditPkg(index)}>Ok</Button>
-                <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
-              </Col>
-            </Row>
-          ) : (
-            <Row gutter={GUTTER} key={index}>
-              <Col span={SPAN_PKG}>{name}</Col>
-              <Col span={SPAN_LINEUP}>{lineup}</Col>
-              <Col span={SPAN_ACTIONS}>
-                <Button onClick={() => onClickEdit(index)}>Edit</Button>
-                <Button onClick={() => removePkg(index)}
-                  disabled={usedPkgIndexList && usedPkgIndexList.includes(index)}
-                >
-                  Remove
-                </Button>
-              </Col>
-            </Row>
-          )
-        })
-      }
-    </>
+    <Table
+      columns={columns} dataSource={dataSource}
+      components={{
+        body: {
+          cell: EditableCell,
+        },
+      }}
+      pagination={false}
+    />
   );
+
+  function EditableCell({record, dataIndex, children, ...restProps}: EditableCellProps) {
+    const { key, lineup: lineupIndex } = record;
+    return (
+      <td {...restProps}>
+        {key === -1 && dataIndex === PACKAGE.toLocaleLowerCase() ? (
+          <Form form={form} onFinish={addPkg}>
+            <Form.Item name="name" rules={[{ required: true }]} help={false}>
+              <Input disabled={editIndex !== -1} />
+            </Form.Item>
+          </Form>
+        ) : key === -1 && dataIndex === LINEUP.toLocaleLowerCase() ? (
+          <Form form={form}>
+            <Form.Item
+              name="lineup"
+              initialValue={-1}
+            >
+              <Select disabled={editIndex !== -1}>
+                <Option key={-1} value={-1}>
+                  (None)
+                </Option>
+                {lineupList.map((lineup) => {
+                  const { index, name } = lineup;
+                  return (
+                    <Option key={index} value={index}>
+                      {name}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Form>
+        ) : key === -1 && dataIndex === ACTIONS.toLocaleLowerCase() ? (
+          <Form form={form}>
+            <Form.Item>
+              <Button onClick={addPkg} disabled={editIndex !== -1}>
+                Add
+              </Button>
+            </Form.Item>
+          </Form>
+        ) : editIndex === key && dataIndex === PACKAGE.toLocaleLowerCase() ? (
+          <Form form={form}>
+            <Form.Item
+              name='nameNew'
+              rules={[{ required: true }]}
+              help={false}
+            >
+              <Input />
+            </Form.Item>
+          </Form>
+        ) : editIndex === key && dataIndex === LINEUP.toLocaleLowerCase() ? (
+          <Form form={form}>
+            <Form.Item
+              name='lineupNew'
+            >
+              <Select>
+                <Option key={-1} value={-1}>
+                  (None)
+                </Option>
+                {lineupList.map((lineup) => {
+                  const { index, name } = lineup;
+                  return (
+                    <Option key={index} value={index}>
+                      {name}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Form>
+        ) : editIndex === key && dataIndex === ACTIONS.toLocaleLowerCase() ? (
+          <>
+            <Button onClick={() => onSubmitEditPkg(key)}>Ok</Button>
+            <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
+          </>
+        ) : dataIndex === PACKAGE.toLocaleLowerCase() ? (
+          children
+        ) : dataIndex === LINEUP.toLocaleLowerCase() ? (
+          lineupIndex === -1 ? (
+            "(None)"
+          ) : (
+            lineupList.find((lineup) => lineup.index === lineupIndex)?.name ??
+            "(Error)"
+          )
+        ) : dataIndex === ACTIONS.toLocaleLowerCase() ? (
+          <>
+            <Button onClick={() => onClickEdit(key)}>Edit</Button>
+            <Button onClick={() => removePkg(key)}>Remove</Button>
+          </>
+        ) : null}
+      </td>
+    );
+  }
 }
