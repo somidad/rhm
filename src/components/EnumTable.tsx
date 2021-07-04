@@ -28,11 +28,12 @@ export default function EnumTable({ title, enumList, onChange, usedIndexList }: 
     { key: NAME.toLocaleLowerCase(), dataIndex: NAME.toLocaleLowerCase(), title },
     { key: ACTIONS.toLocaleLowerCase(), dataIndex: ACTIONS.toLocaleLowerCase(), title: 'Actions' },
   ].map((column) => {
+    const { dataIndex } = column;
     return {
       ...column,
       onCell: (record: any) => ({
         record,
-        dataIndex: column.dataIndex,
+        dataIndex,
       }),
     };
   });
@@ -123,8 +124,7 @@ export default function EnumTable({ title, enumList, onChange, usedIndexList }: 
     />
   );
 
-  function EditableCell(props: EditableCellProps) {
-    const { record, dataIndex, children, ...restProps } = props;
+  function EditableCell({ record, dataIndex, children, ...restProps }: EditableCellProps) {
     const { key } = record;
     return (
       <td {...restProps}>
