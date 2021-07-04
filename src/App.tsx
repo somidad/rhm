@@ -121,7 +121,7 @@ function App() {
 
   return (
     <div className="App">
-      <Menu mode='horizontal'>
+      <Menu mode='horizontal' selectable={false}>
         <Menu.Item key='new' onClick={onClickNew}>New</Menu.Item>
         <Menu.Item key='load' onClick={() => refLoad.current?.click()}>Load</Menu.Item>
         <Menu.Item key='featureName' disabled>
@@ -160,7 +160,7 @@ function App() {
           </Tabs>
         </Col>
       </Row>
-      <Row>
+      <Row style={{ marginTop: '1em' }}>
         <Col offset={11}>
           <Link href='https://github.com/gsongsong/rhm' target='_blank' rel='noreferrer'>
             <GithubOutlined style={{ fontSize: '2em' }} />
