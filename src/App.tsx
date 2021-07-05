@@ -3,9 +3,10 @@ import 'antd/dist/antd.css';
 import './App.css';
 import { Col, Input, Menu, Row, Tabs } from 'antd';
 import { GithubOutlined } from '@ant-design/icons';
+import ChangeTable from './components/ChangeTable';
 import EnumTable from './components/EnumTable';
 import PkgTable from './components/PkgTable';
-import VersionEditor from './components/VersionEditor';
+import ReleaseTable from './components/ReleaseTable';
 import { Enum, Pkg, Version } from './types';
 import { load } from './utils';
 import Title from 'antd/lib/typography/Title';
@@ -121,49 +122,86 @@ function App() {
 
   return (
     <div className="App">
-      <Menu mode='horizontal' selectable={false}>
-        <Menu.Item key='new' onClick={onClickNew}>New</Menu.Item>
-        <Menu.Item key='load' onClick={() => refLoad.current?.click()}>Load</Menu.Item>
-        <Menu.Item key='featureName' disabled>
-          <Input value={featureName} onChange={(e) => setFeatureName(e.target.value)} />
+      <Menu mode="horizontal" selectable={false}>
+        <Menu.Item key="new" onClick={onClickNew}>
+          New
         </Menu.Item>
-        <Menu.Item key='save' onClick={() => onClickSave()}>Save</Menu.Item>
+        <Menu.Item key="load" onClick={() => refLoad.current?.click()}>
+          Load
+        </Menu.Item>
+        <Menu.Item key="featureName" disabled>
+          <Input
+            value={featureName}
+            onChange={(e) => setFeatureName(e.target.value)}
+          />
+        </Menu.Item>
+        <Menu.Item key="save" onClick={() => onClickSave()}>
+          Save
+        </Menu.Item>
       </Menu>
-      <input type='file' accept='.json' hidden ref={refLoad} onChange={onChangeFile} />
+      <input
+        type="file"
+        accept=".json"
+        hidden
+        ref={refLoad}
+        onChange={onChangeFile}
+      />
       {/* eslint-disable-next-line jsx-a11y/anchor-has-content, jsx-a11y/anchor-is-valid */}
-      <a href='#' ref={refSave} hidden />
+      <a href="#" ref={refSave} hidden />
       <Row>
         <Col span={16} offset={4}>
           <Tabs defaultActiveKey="history">
             <Tabs.TabPane tab="History" key="history">
               <Title level={2}>History</Title>
-              <VersionEditor versionList={versionList} onChange={setVersionList} lineupList={lineupList} pkgList={pkgList} customerList={customerList} />
+              <ReleaseTable
+                versionList={versionList}
+                releaseList={[]}
+                lineupList={lineupList}
+                pkgList={pkgList}
+                customerList={customerList}
+                onChange={() => {}}
+                onChangeVersionList={setVersionList}
+              />
+              {/* <ChangeTable changeList={[]} lineupList={lineupList} customerList={customerList} onChange={() => {}} /> */}
             </Tabs.TabPane>
             <Tabs.TabPane tab="Customers" key="customers">
               <Title level={2}>Customers</Title>
-              <EnumTable title='Customer' enumList={customerList} onChange={setCustomerList}
+              <EnumTable
+                title="Customer"
+                enumList={customerList}
+                onChange={setCustomerList}
                 usedIndexList={usedCustomerIndexList}
               />
             </Tabs.TabPane>
             <Tabs.TabPane tab="Lineups" key="lineups">
               <Title level={2}>Lineups</Title>
-              <EnumTable title='Lineup' enumList={lineupList} onChange={setLineupList}
+              <EnumTable
+                title="Lineup"
+                enumList={lineupList}
+                onChange={setLineupList}
                 usedIndexList={usedLineupIndexList}
               />
             </Tabs.TabPane>
             <Tabs.TabPane tab="Packages" key="packages">
               <Title level={2}>Packages</Title>
-              <PkgTable pkgList={pkgList} lineupList={lineupList} onChange={setPkgList}
+              <PkgTable
+                pkgList={pkgList}
+                lineupList={lineupList}
+                onChange={setPkgList}
                 usedPkgIndexList={usedPkgIndexList}
               />
             </Tabs.TabPane>
           </Tabs>
         </Col>
       </Row>
-      <Row style={{ marginTop: '1em' }}>
+      <Row style={{ marginTop: "1em" }}>
         <Col offset={11}>
-          <Link href='https://github.com/gsongsong/rhm' target='_blank' rel='noreferrer'>
-            <GithubOutlined style={{ fontSize: '2em' }} />
+          <Link
+            href="https://github.com/gsongsong/rhm"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <GithubOutlined style={{ fontSize: "2em" }} />
           </Link>
         </Col>
       </Row>
