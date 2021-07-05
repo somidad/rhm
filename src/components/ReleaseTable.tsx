@@ -20,7 +20,7 @@ type Props ={
 }
 
 type EditableCellProps = {
-  record: { key: number; version: string; package: Pkg[]; };
+  record: { key: number; version: string; previous: number; package: Pkg[]; };
   dataIndex: string;
   children: any;
 };
@@ -47,8 +47,8 @@ export default function ReleaseTable({
     { key: VERSION.toLocaleLowerCase(), dataIndex: VERSION.toLocaleLowerCase(), title: VERSION, width: '15%' },
     { key: PREVIOUS.toLocaleLowerCase(), dataIndex: PREVIOUS.toLocaleLowerCase(), title: PREVIOUS, width: '15%' },
     { key: PACKAGES.toLocaleLowerCase(), dataIndex: PACKAGES.toLocaleLowerCase(), title: PACKAGES, width: '20%' },
-    { key: CUSTOMERS.toLocaleLowerCase(), dataIndex: CUSTOMERS.toLocaleLowerCase(), title: CUSTOMERS, width: '40%' },
-    { key: ACTIONS.toLocaleLowerCase(), dataIndex: ACTIONS.toLocaleLowerCase(), title: ACTIONS, width: '10%' },
+    { key: CUSTOMERS.toLocaleLowerCase(), dataIndex: CUSTOMERS.toLocaleLowerCase(), title: CUSTOMERS, width: '30%' },
+    { key: ACTIONS.toLocaleLowerCase(), dataIndex: ACTIONS.toLocaleLowerCase(), title: ACTIONS, width: '20%' },
   ].map((column) => {
     const { dataIndex } = column;
     return {
@@ -193,6 +193,18 @@ export default function ReleaseTable({
     onChange(releaseListNew);
   }
 
+  function removeVersion(index: number) {
+    const indexFound = versionList.findIndex((version) => version.index === index);
+    if (indexFound === -1) {
+      return;
+    }
+    const versionListNew = [
+      ...versionList.slice(0, indexFound),
+      ...versionList.slice(indexFound + 1),
+    ];
+    onChangeVersionList(versionListNew);
+  }
+
   const dataSource = [
     { key: -1 },
     ...versionList.map((version) => {
@@ -309,7 +321,7 @@ export default function ReleaseTable({
   )
 
   function EditableCell({ record, dataIndex, children, ...restProps }: EditableCellProps) {
-    const { key } = record;
+    const { key, previous: indexPrev } = record;
     return (
       <td {...restProps}>
         {
@@ -352,6 +364,15 @@ export default function ReleaseTable({
                 <Button onClick={addVersion}>Add</Button>
               </Form.Item>
             </Form>
+          ) : dataIndex === VERSION.toLocaleLowerCase() ? (
+            children
+          ) : dataIndex === PREVIOUS.toLocaleLowerCase() ? (
+            indexPrev === -1 ? '(None)' : lineupList.find((lineup) => lineup.index === indexPrev) ?? '(Error)'
+          ) : dataIndex === ACTIONS.toLocaleLowerCase() ? (
+            <>
+              <Button>Edit</Button>
+              <Button onClick={() => removeVersion(key)}>Remove</Button>
+            </>
           ) : (
             children
           )
