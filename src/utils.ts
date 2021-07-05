@@ -247,6 +247,9 @@ function publishPerLineup(versionList: Version[], versionIndex: number, lineupIn
         '[Description]',
         indent(description),
       ];
+      if (beforeChange || afterChange) {
+        listToChanges.push(('[Enhancement]'));
+      }
       if (beforeChange) {
         listToChanges.push(indent('[Before change]'));
         listToChanges.push(indent(indent(beforeChange)));
