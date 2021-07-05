@@ -16,7 +16,6 @@ type Props ={
   pkgList: Pkg[];
   customerList: Enum[];
   onChange: (releaseList: Release[]) => void;
-  onChangeVersionList: (versionList: Version[]) => void;
 }
 
 type EditableCellProps = {
@@ -33,7 +32,7 @@ const ACTIONS = 'Actions';
 
 export default function ReleaseTable({
   versionList, releaseList, lineupList, pkgList, customerList,
-  onChange, onChangeVersionList,
+  onChange,
 }: Props) {
   const [form] = useForm();
 
@@ -79,32 +78,6 @@ export default function ReleaseTable({
     onChange(releaseListNew);
     setPkgIndex(-1);
     setCustomerIndexList([]);
-  }
-
-  function addVersion() {
-    form.validateFields(['version']).then(() => {
-      const {
-        version: versionName,
-        previous: indexPrev,
-      } = form.getFieldsValue([
-        VERSION.toLocaleLowerCase(),
-        PREVIOUS.toLocaleLowerCase(),
-      ]);
-      const versionFound = versionList.find((version) => version.name === versionName);
-      if (versionFound) {
-        return;
-      }
-      const index = findEmptyIndex(versionList.map((version) => version.index));
-      const versionListNew: Version[] = [
-        ...versionList,
-        { index, name: versionName, indexPrev, changeList: [], releaseList: [] },
-      ];
-      form.setFieldsValue({ version: '' });
-      onChangeVersionList(versionListNew);
-    }).catch((reason) => {
-      console.error(reason);
-    });
-
   }
 
   function moveNewer(index: number) {
@@ -202,7 +175,7 @@ export default function ReleaseTable({
       ...versionList.slice(0, indexFound),
       ...versionList.slice(indexFound + 1),
     ];
-    onChangeVersionList(versionListNew);
+    // onChangeVersionList(versionListNew);
   }
 
   const dataSource = [
@@ -361,7 +334,7 @@ export default function ReleaseTable({
           ) : key === -1 && dataIndex === ACTIONS.toLocaleLowerCase() ? (
             <Form>
               <Form.Item>
-                <Button onClick={addVersion}>Add</Button>
+                <Button onClick={() => {}}>Add</Button>
               </Form.Item>
             </Form>
           ) : dataIndex === VERSION.toLocaleLowerCase() ? (

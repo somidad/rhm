@@ -1,7 +1,7 @@
 import { createRef, useState } from 'react';
 import 'antd/dist/antd.css';
 import './App.css';
-import { Col, Input, Menu, Row, Tabs } from 'antd';
+import { Col, Collapse, Input, Menu, Row, Tabs } from 'antd';
 import { GithubOutlined } from '@ant-design/icons';
 import ChangeTable from './components/ChangeTable';
 import EnumTable from './components/EnumTable';
@@ -11,6 +11,8 @@ import { Enum, Pkg, Version } from './types';
 import { load } from './utils';
 import Title from 'antd/lib/typography/Title';
 import Link from 'antd/lib/typography/Link';
+import FormAddVersion from './components/FormAddVersion';
+const { Panel } = Collapse;
 
 const UNTITLED = 'Untitled';
 
@@ -153,15 +155,23 @@ function App() {
           <Tabs defaultActiveKey="history">
             <Tabs.TabPane tab="History" key="history">
               <Title level={2}>History</Title>
-              <ReleaseTable
-                versionList={versionList}
-                releaseList={[]}
-                lineupList={lineupList}
-                pkgList={pkgList}
-                customerList={customerList}
-                onChange={() => {}}
-                onChangeVersionList={setVersionList}
-              />
+              <Collapse>
+                <Panel key='versions' header='Versions'>
+                  <FormAddVersion versionList={versionList} onChange={setVersionList} />
+                </Panel>
+                <Panel key='releases' header='Releases'>
+                  <ReleaseTable
+                    versionList={versionList}
+                    releaseList={[]}
+                    lineupList={lineupList}
+                    pkgList={pkgList}
+                    customerList={customerList}
+                    onChange={() => {}}
+                    // onChangeVersionList={setVersionList}
+                  />
+                </Panel>
+                <Panel key='changes' header='Changes'></Panel>
+              </Collapse>
               {/* <ChangeTable changeList={[]} lineupList={lineupList} customerList={customerList} onChange={() => {}} /> */}
             </Tabs.TabPane>
             <Tabs.TabPane tab="Customers" key="customers">
