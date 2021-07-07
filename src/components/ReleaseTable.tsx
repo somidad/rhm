@@ -1,13 +1,9 @@
-import { Button, Form, Input, Select, Skeleton, Table } from "antd";
+import { Button, Checkbox, Form, Input, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import Title from "antd/lib/typography/Title";
-import React from "react";
 import { useState } from "react";
 import { Enum, Pkg, Release, Version } from "../types";
 import { findEmptyIndex } from "../utils";
-import EnumSelector from "./EnumSelector";
-
-const { Option } = Select;
 
 type Props ={ 
   versionList: Version[];
@@ -24,8 +20,6 @@ type EditableCellProps = {
   children: any;
 };
 
-const VERSION = 'Version';
-const PREVIOUS = 'Previous';
 const PACKAGES = 'Packages';
 const CUSTOMERS = 'Customers';
 const ACTIONS = 'Actions';
@@ -43,11 +37,9 @@ export default function ReleaseTable({
   const [customerIndexListNew, setCustomerIndexListNew] = useState<number[]>([]);
 
   const columns: any[] = [
-    { key: VERSION.toLocaleLowerCase(), dataIndex: VERSION.toLocaleLowerCase(), title: VERSION, width: '15%' },
-    { key: PREVIOUS.toLocaleLowerCase(), dataIndex: PREVIOUS.toLocaleLowerCase(), title: PREVIOUS, width: '15%' },
-    { key: PACKAGES.toLocaleLowerCase(), dataIndex: PACKAGES.toLocaleLowerCase(), title: PACKAGES, width: '20%' },
-    { key: CUSTOMERS.toLocaleLowerCase(), dataIndex: CUSTOMERS.toLocaleLowerCase(), title: CUSTOMERS, width: '30%' },
-    { key: ACTIONS.toLocaleLowerCase(), dataIndex: ACTIONS.toLocaleLowerCase(), title: ACTIONS, width: '20%' },
+    { key: PACKAGES.toLocaleLowerCase(), dataIndex: PACKAGES.toLocaleLowerCase(), title: PACKAGES },
+    { key: CUSTOMERS.toLocaleLowerCase(), dataIndex: CUSTOMERS.toLocaleLowerCase(), title: CUSTOMERS, },
+    { key: ACTIONS.toLocaleLowerCase(), dataIndex: ACTIONS.toLocaleLowerCase(), title: ACTIONS },
   ].map((column) => {
     const { dataIndex } = column;
     return {
@@ -166,26 +158,8 @@ export default function ReleaseTable({
     onChange(releaseListNew);
   }
 
-  function removeVersion(index: number) {
-    const indexFound = versionList.findIndex((version) => version.index === index);
-    if (indexFound === -1) {
-      return;
-    }
-    const versionListNew = [
-      ...versionList.slice(0, indexFound),
-      ...versionList.slice(indexFound + 1),
-    ];
-    // onChangeVersionList(versionListNew);
-  }
-
   const dataSource = [
     { key: -1 },
-    ...versionList.map((version) => {
-      const { index, name, indexPrev: previous, releaseList } = version;
-      return (
-        { key: index, version: name, previous }
-      );
-    }),
   ];
   return (
     <>
@@ -294,57 +268,44 @@ export default function ReleaseTable({
   )
 
   function EditableCell({ record, dataIndex, children, ...restProps }: EditableCellProps) {
-    const { key, previous: indexPrev } = record;
+    const { key } = record;
     return (
       <td {...restProps}>
         {
-          key === -1 && dataIndex === VERSION.toLocaleLowerCase() ? (
+          key === -1 && dataIndex === PACKAGES.toLocaleLowerCase() ? (
             <Form form={form}>
               <Form.Item
-                name='version'
+                name='name'
                 rules={[{ required: true }]}
-                help={false}
               >
                 <Input disabled={editIndex !== -1} />
               </Form.Item>
             </Form>
-          ) : key === -1 && dataIndex === PREVIOUS.toLocaleLowerCase() ? (
+          ) : key === -1 && dataIndex === CUSTOMERS.toLocaleLowerCase() ? (
             <Form form={form}>
               <Form.Item
-                name='previous'
-                initialValue={-1}
+                name='customerList'
               >
-                <Select>
-                  <Option key={-1} value={-1}>(None)</Option>
-                  {
-                    versionList.map((version) => {
-                      const { index, name, indexPrev } = version;
-                      return (
-                        <Option key={index} value={index}>{name}</Option>
-                      );
-                    })
-                  }
-                </Select>
+                <Checkbox.Group
+                  options={customerList.map((customer) => {
+                    const { index: value, name: label } = customer;
+                    return { value, label };
+                  })}
+                  disabled={editIndex !== -1}
+                >
+                </Checkbox.Group>
               </Form.Item>
             </Form>
-          ) : key === -1 && dataIndex === PACKAGES.toLocaleLowerCase() ? (
-            null
-          ) : key === -1 && dataIndex === CUSTOMERS.toLocaleLowerCase() ? (
-            null
           ) : key === -1 && dataIndex === ACTIONS.toLocaleLowerCase() ? (
             <Form>
               <Form.Item>
-                <Button onClick={() => {}}>Add</Button>
+                <Button onClick={() => addRelease}>Add</Button>
               </Form.Item>
             </Form>
-          ) : dataIndex === VERSION.toLocaleLowerCase() ? (
-            children
-          ) : dataIndex === PREVIOUS.toLocaleLowerCase() ? (
-            indexPrev === -1 ? '(None)' : lineupList.find((lineup) => lineup.index === indexPrev)?.name ?? '(Error)'
           ) : dataIndex === ACTIONS.toLocaleLowerCase() ? (
             <>
               <Button>Edit</Button>
-              <Button onClick={() => removeVersion(key)}>Remove</Button>
+              <Button onClick={() => removeRelease(key)}>Remove</Button>
             </>
           ) : (
             children

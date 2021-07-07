@@ -10,6 +10,7 @@ import Title from 'antd/lib/typography/Title';
 import Link from 'antd/lib/typography/Link';
 import VersionTable from './components/VersionTable';
 import AppMenu from './components/AppMenu';
+import ReleaseTable from './components/ReleaseTable';
 const { Panel } = Collapse;
 
 function App() {
@@ -21,7 +22,7 @@ function App() {
 
   function onChangeVersionList(versionList: Version[]) {
     const versionFound = versionList.find((version) => version.index === versionIndex);
-    if (versionFound) {
+    if (!versionFound) {
       setVersionIndex(-1);
     }
     setVersionList(versionList);
@@ -69,7 +70,13 @@ function App() {
     }, []),
   ];
 
-  const versionName = versionList.find((version) => version.index === versionIndex)?.name;
+  const versionCurr = versionList.find((version) => version.index === versionIndex);
+  const versionPrev =
+    !versionCurr || versionCurr.indexPrev === -1
+      ? undefined
+      : versionList.find(
+          (version) => version.index === versionCurr.indexPrev
+        ) ?? -1;
   return (
     <div className="App">
       <AppMenu
@@ -96,13 +103,20 @@ function App() {
                   />
                 </Panel>
               </Collapse>
-              {!versionName ? null : (
+              {
+              !versionCurr ? null : (
                 <>
-                  <Title level={3}>{versionName}</Title>
-                  <Tag>Previous</Tag>
-                  <Collapse>
+                  <Title level={3}>{versionCurr.name}</Title>
+                  {
+                    !versionPrev ? null : (
+                      <>
+                        Previous <Tag>{versionPrev === -1 ? '(Error)' : versionPrev.name}</Tag>
+                      </>
+                    )
+                  }
+                  <Collapse defaultActiveKey={['releases', 'changes']}>
                     <Panel key='releases' header='Releases'>
-                      {/* <ReleaseTable
+                      <ReleaseTable
                           versionList={versionList}
                           releaseList={[]}
                           lineupList={lineupList}
@@ -110,14 +124,15 @@ function App() {
                           customerList={customerList}
                           onChange={() => {}}
                           // onChangeVersionList={setVersionList}
-                        /> */}
+                        />
                     </Panel>
                     <Panel key='changes' header='Changes'>
                       {/* <ChangeTable changeList={[]} lineupList={lineupList} customerList={customerList} onChange={() => {}} /> */}
                     </Panel>
                   </Collapse>
                 </>
-              )}
+              )
+              }
             </Tabs.TabPane>
             <Tabs.TabPane tab="Customers" key="customers">
               <Title level={2}>Customers</Title>
