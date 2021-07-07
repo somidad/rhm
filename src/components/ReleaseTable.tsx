@@ -340,7 +340,7 @@ export default function ReleaseTable({
           ) : dataIndex === VERSION.toLocaleLowerCase() ? (
             children
           ) : dataIndex === PREVIOUS.toLocaleLowerCase() ? (
-            indexPrev === -1 ? '(None)' : lineupList.find((lineup) => lineup.index === indexPrev) ?? '(Error)'
+            indexPrev === -1 ? '(None)' : lineupList.find((lineup) => lineup.index === indexPrev)?.name ?? '(Error)'
           ) : dataIndex === ACTIONS.toLocaleLowerCase() ? (
             <>
               <Button>Edit</Button>
