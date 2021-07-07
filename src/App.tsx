@@ -1,41 +1,23 @@
-import { createRef, useState } from 'react';
+import { useState } from 'react';
 import 'antd/dist/antd.css';
 import './App.css';
-import { Col, Collapse, Input, Menu, Row, Tabs, Tag } from 'antd';
+import { Col, Collapse, Row, Tabs, Tag } from 'antd';
 import { GithubOutlined } from '@ant-design/icons';
 import EnumTable from './components/EnumTable';
 import PkgTable from './components/PkgTable';
 import { Enum, Pkg, Version } from './types';
-import { load } from './utils';
 import Title from 'antd/lib/typography/Title';
 import Link from 'antd/lib/typography/Link';
 import VersionTable from './components/VersionTable';
+import AppMenu from './components/AppMenu';
 const { Panel } = Collapse;
 
-const UNTITLED = 'Untitled';
-
 function App() {
-  const refLoad = createRef<HTMLInputElement>();
-  let file: File | undefined;
-  const refSave = createRef<HTMLAnchorElement>();
-  const [featureName, setFeatureName] = useState(UNTITLED);
   const [versionList, setVersionList] = useState<Version[]>([]);
   const [versionIndex, setVersionIndex] = useState(-1);
   const [lineupList, setLineupList] = useState<Enum[]>([]);
   const [pkgList, setPkgList] = useState<Pkg[]>([]);
   const [customerList, setCustomerList] = useState<Enum[]>([]);
-
-  function onChangeFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const { files } = e.target;
-    if (!files) {
-      return;
-    }
-    file = files[0];
-    if (!file) {
-      return;
-    }
-    reader.readAsText(file);
-  }
 
   function onChangeVersionList(versionList: Version[]) {
     const versionFound = versionList.find((version) => version.index === versionIndex);
@@ -45,54 +27,8 @@ function App() {
     setVersionList(versionList);
   }
 
-  function onClickNew() {
-    setFeatureName(UNTITLED);
-    setVersionList([]);
-    setLineupList([
-      { index: 0, name: '(None)' },
-    ]);
-    setPkgList([]);
-    setCustomerList([]);
-  }
-
-  function onClickSave() {
-    if (refSave.current === null) {
-      return;
-    }
-    const blob = new Blob(
-      [JSON.stringify({ versionList, lineupList, pkgList, customerList })],
-      { type: 'application/json' },
-    );
-    refSave.current.download = `${featureName}.json`;
-    refSave.current.href=window.URL.createObjectURL(blob);
-    refSave.current.click();
-  }
-
   function onSelectVersion(index: number) {
     setVersionIndex(index);
-  }
-
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    if (!file) {
-      return;
-    }
-    if (!e.target) {
-      return;
-    }
-    const { result } = e.target;
-    if (result === null || result instanceof ArrayBuffer) {
-      return;
-    }
-    const { name } = file;
-    const indexLast = name.lastIndexOf('.');
-    const featureName = name.substring(0, indexLast);
-    const { versionList, lineupList, pkgList, customerList } = load(result);
-    setFeatureName(featureName);
-    setCustomerList(customerList);
-    setLineupList(lineupList);
-    setPkgList(pkgList);
-    setVersionList(versionList);
   }
 
   const usedLineupIndexList = [
@@ -136,55 +72,37 @@ function App() {
   const versionName = versionList.find((version) => version.index === versionIndex)?.name;
   return (
     <div className="App">
-      <Menu mode="horizontal" selectable={false}>
-        <Menu.Item key="new" onClick={onClickNew}>
-          New
-        </Menu.Item>
-        <Menu.Item key="load" onClick={() => refLoad.current?.click()}>
-          Load
-        </Menu.Item>
-        <Menu.Item key="featureName" disabled>
-          <Input
-            value={featureName}
-            onChange={(e) => setFeatureName(e.target.value)}
-          />
-        </Menu.Item>
-        <Menu.Item key="save" onClick={() => onClickSave()}>
-          Save
-        </Menu.Item>
-      </Menu>
-      <input
-        type="file"
-        accept=".json"
-        hidden
-        ref={refLoad}
-        onChange={onChangeFile}
+      <AppMenu
+        customerList={customerList}
+        lineupList={lineupList}
+        pkgList={pkgList}
+        versionList={versionList}
+        onChangeCustomerList={setCustomerList}
+        onChangeLineupList={setLineupList}
+        onChangePkgList={setPkgList}
+        onChangeVersionList={setVersionList}
       />
-      {/* eslint-disable-next-line jsx-a11y/anchor-has-content, jsx-a11y/anchor-is-valid */}
-      <a href="#" ref={refSave} hidden />
       <Row>
         <Col span={16} offset={4}>
           <Tabs defaultActiveKey="history">
             <Tabs.TabPane tab="History" key="history">
               <Title level={2}>History</Title>
-                <Collapse defaultActiveKey='versions'>
-                  <Panel key='versions' header='Versions'>
-                    <VersionTable versionList={versionList} onChange={onChangeVersionList} onSelect={onSelectVersion} />
-                  </Panel>
-                </Collapse>
-                {
-                  !versionName ? null : (
-                    <>
-                      <Title level={3}>
-                        {versionName}
-                      </Title>
-                      <Tag>
-                        Previous
-                      </Tag>
-                    </>
-                  )
-                }
-                {/* <ReleaseTable
+              <Collapse defaultActiveKey="versions">
+                <Panel key="versions" header="Versions">
+                  <VersionTable
+                    versionList={versionList}
+                    onChange={onChangeVersionList}
+                    onSelect={onSelectVersion}
+                  />
+                </Panel>
+              </Collapse>
+              {!versionName ? null : (
+                <>
+                  <Title level={3}>{versionName}</Title>
+                  <Tag>Previous</Tag>
+                </>
+              )}
+              {/* <ReleaseTable
                   versionList={versionList}
                   releaseList={[]}
                   lineupList={lineupList}
