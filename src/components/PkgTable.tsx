@@ -208,10 +208,12 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
             </Form.Item>
           </Form>
         ) : editIndex === key && dataIndex === ACTIONS.toLocaleLowerCase() ? (
-          <>
-            <Button onClick={() => onSubmitEditPkg(key)}>Ok</Button>
-            <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
-          </>
+          <Form form={form}>
+            <Form.Item>
+              <Button onClick={() => onSubmitEditPkg(key)}>Ok</Button>
+              <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
+            </Form.Item>
+          </Form>
         ) : dataIndex === PACKAGE.toLocaleLowerCase() ? (
           children
         ) : dataIndex === LINEUP.toLocaleLowerCase() ? (
