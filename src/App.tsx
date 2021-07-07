@@ -1,17 +1,15 @@
 import { createRef, useState } from 'react';
 import 'antd/dist/antd.css';
 import './App.css';
-import { Col, Collapse, Input, Menu, Row, Tabs } from 'antd';
+import { Col, Collapse, Input, Menu, Row, Tabs, Tag } from 'antd';
 import { GithubOutlined } from '@ant-design/icons';
-import ChangeTable from './components/ChangeTable';
 import EnumTable from './components/EnumTable';
 import PkgTable from './components/PkgTable';
-import ReleaseTable from './components/ReleaseTable';
 import { Enum, Pkg, Version } from './types';
 import { load } from './utils';
 import Title from 'antd/lib/typography/Title';
 import Link from 'antd/lib/typography/Link';
-import FormAddVersion from './components/FormAddVersion';
+import VersionTable from './components/VersionTable';
 const { Panel } = Collapse;
 
 const UNTITLED = 'Untitled';
@@ -22,6 +20,7 @@ function App() {
   const refSave = createRef<HTMLAnchorElement>();
   const [featureName, setFeatureName] = useState(UNTITLED);
   const [versionList, setVersionList] = useState<Version[]>([]);
+  const [versionIndex, setVersionIndex] = useState(-1);
   const [lineupList, setLineupList] = useState<Enum[]>([]);
   const [pkgList, setPkgList] = useState<Pkg[]>([]);
   const [customerList, setCustomerList] = useState<Enum[]>([]);
@@ -36,6 +35,14 @@ function App() {
       return;
     }
     reader.readAsText(file);
+  }
+
+  function onChangeVersionList(versionList: Version[]) {
+    const versionFound = versionList.find((version) => version.index === versionIndex);
+    if (versionFound) {
+      setVersionIndex(-1);
+    }
+    setVersionList(versionList);
   }
 
   function onClickNew() {
@@ -59,6 +66,10 @@ function App() {
     refSave.current.download = `${featureName}.json`;
     refSave.current.href=window.URL.createObjectURL(blob);
     refSave.current.click();
+  }
+
+  function onSelectVersion(index: number) {
+    setVersionIndex(index);
   }
 
   const reader = new FileReader();
@@ -122,6 +133,7 @@ function App() {
     }, []),
   ];
 
+  const versionName = versionList.find((version) => version.index === versionIndex)?.name;
   return (
     <div className="App">
       <Menu mode="horizontal" selectable={false}>
@@ -155,23 +167,32 @@ function App() {
           <Tabs defaultActiveKey="history">
             <Tabs.TabPane tab="History" key="history">
               <Title level={2}>History</Title>
-              <Collapse>
-                <Panel key='versions' header='Versions'>
-                  <FormAddVersion versionList={versionList} onChange={setVersionList} />
-                </Panel>
-                <Panel key='releases' header='Releases'>
-                  <ReleaseTable
-                    versionList={versionList}
-                    releaseList={[]}
-                    lineupList={lineupList}
-                    pkgList={pkgList}
-                    customerList={customerList}
-                    onChange={() => {}}
-                    // onChangeVersionList={setVersionList}
-                  />
-                </Panel>
-                <Panel key='changes' header='Changes'></Panel>
-              </Collapse>
+                <Collapse defaultActiveKey='versions'>
+                  <Panel key='versions' header='Versions'>
+                    <VersionTable versionList={versionList} onChange={onChangeVersionList} onSelect={onSelectVersion} />
+                  </Panel>
+                </Collapse>
+                {
+                  !versionName ? null : (
+                    <>
+                      <Title level={3}>
+                        {versionName}
+                      </Title>
+                      <Tag>
+                        Previous
+                      </Tag>
+                    </>
+                  )
+                }
+                {/* <ReleaseTable
+                  versionList={versionList}
+                  releaseList={[]}
+                  lineupList={lineupList}
+                  pkgList={pkgList}
+                  customerList={customerList}
+                  onChange={() => {}}
+                  // onChangeVersionList={setVersionList}
+                /> */}
               {/* <ChangeTable changeList={[]} lineupList={lineupList} customerList={customerList} onChange={() => {}} /> */}
             </Tabs.TabPane>
             <Tabs.TabPane tab="Customers" key="customers">
