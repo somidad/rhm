@@ -100,18 +100,24 @@ function App() {
                 <>
                   <Title level={3}>{versionName}</Title>
                   <Tag>Previous</Tag>
+                  <Collapse>
+                    <Panel key='releases' header='Releases'>
+                      {/* <ReleaseTable
+                          versionList={versionList}
+                          releaseList={[]}
+                          lineupList={lineupList}
+                          pkgList={pkgList}
+                          customerList={customerList}
+                          onChange={() => {}}
+                          // onChangeVersionList={setVersionList}
+                        /> */}
+                    </Panel>
+                    <Panel key='changes' header='Changes'>
+                      {/* <ChangeTable changeList={[]} lineupList={lineupList} customerList={customerList} onChange={() => {}} /> */}
+                    </Panel>
+                  </Collapse>
                 </>
               )}
-              {/* <ReleaseTable
-                  versionList={versionList}
-                  releaseList={[]}
-                  lineupList={lineupList}
-                  pkgList={pkgList}
-                  customerList={customerList}
-                  onChange={() => {}}
-                  // onChangeVersionList={setVersionList}
-                /> */}
-              {/* <ChangeTable changeList={[]} lineupList={lineupList} customerList={customerList} onChange={() => {}} /> */}
             </Tabs.TabPane>
             <Tabs.TabPane tab="Customers" key="customers">
               <Title level={2}>Customers</Title>
@@ -145,13 +151,15 @@ function App() {
       </Row>
       <Row style={{ marginTop: "1em" }}>
         <Col offset={11}>
-          <Link
-            href="https://github.com/gsongsong/rhm"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <GithubOutlined style={{ fontSize: "2em" }} />
-          </Link>
+          <Title level={1}>
+            <Link
+              href="https://github.com/gsongsong/rhm"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <GithubOutlined />
+            </Link>
+          </Title>
         </Col>
       </Row>
     </div>
