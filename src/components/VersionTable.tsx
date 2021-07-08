@@ -213,6 +213,7 @@ export default function VersionTable({ versionList, onChange, onSelect }: Props)
             <>
               <Button onClick={() => onClickEdit(key)}>Edit</Button>
               <Button onClick={() => removeVersion(key)}>Remove</Button>
+              <Button>Publish</Button>
             </>
           ) : (children)
         }
