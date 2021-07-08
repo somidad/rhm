@@ -20,7 +20,7 @@ type EditableCellProps = {
   children: any;
 };
 
-const PACKAGES = 'Packages';
+const PACKAGE = 'Package';
 const CUSTOMERS = 'Customers';
 const ACTIONS = 'Actions';
 
@@ -37,9 +37,10 @@ export default function ReleaseTable({
   const [customerIndexListNew, setCustomerIndexListNew] = useState<number[]>([]);
 
   const columns: any[] = [
-    { key: PACKAGES.toLocaleLowerCase(), dataIndex: PACKAGES.toLocaleLowerCase(), title: PACKAGES },
-    { key: CUSTOMERS.toLocaleLowerCase(), dataIndex: CUSTOMERS.toLocaleLowerCase(), title: CUSTOMERS, },
-    { key: ACTIONS.toLocaleLowerCase(), dataIndex: ACTIONS.toLocaleLowerCase(), title: ACTIONS },
+    { key: PACKAGE.toLocaleLowerCase(), dataIndex: PACKAGE.toLocaleLowerCase(), title: PACKAGE, width: '25%' },
+    { key: CUSTOMERS.toLocaleLowerCase(), dataIndex: CUSTOMERS.toLocaleLowerCase(), title: CUSTOMERS, width: '25%' },
+    { key: 'lineup', dataIndex: 'lineup', title: 'Lineup', width: '25%' },
+    { key: ACTIONS.toLocaleLowerCase(), dataIndex: ACTIONS.toLocaleLowerCase(), title: ACTIONS, width: '25%' },
   ].map((column) => {
     const { dataIndex } = column;
     return {
@@ -272,7 +273,7 @@ export default function ReleaseTable({
     return (
       <td {...restProps}>
         {
-          key === -1 && dataIndex === PACKAGES.toLocaleLowerCase() ? (
+          key === -1 && dataIndex === PACKAGE.toLocaleLowerCase() ? (
             <Form form={form}>
               <Form.Item
                 name='name'
