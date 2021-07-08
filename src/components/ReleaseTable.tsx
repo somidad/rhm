@@ -1,9 +1,11 @@
-import { Button, Checkbox, Form, Input, Table } from "antd";
+import { Button, Checkbox, Form, Select, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import Title from "antd/lib/typography/Title";
 import { useState } from "react";
 import { Enum, Pkg, Release, Version } from "../types";
 import { findEmptyIndex } from "../utils";
+
+const { Option } = Select;
 
 type Props ={ 
   versionList: Version[];
@@ -30,16 +32,13 @@ export default function ReleaseTable({
 }: Props) {
   const [form] = useForm();
 
-  const [pkgIndex, setPkgIndex] = useState(-1);
-  const [customerIndexList, setCustomerIndexList] = useState<number[]>([]);
   const [editIndex, setEditIndex] = useState(-1);
   const [pkgIndexNew, setPkgIndexNew] = useState(-1);
   const [customerIndexListNew, setCustomerIndexListNew] = useState<number[]>([]);
 
   const columns: any[] = [
     { key: PACKAGE.toLocaleLowerCase(), dataIndex: PACKAGE.toLocaleLowerCase(), title: PACKAGE, width: '25%' },
-    { key: CUSTOMERS.toLocaleLowerCase(), dataIndex: CUSTOMERS.toLocaleLowerCase(), title: CUSTOMERS, width: '25%' },
-    { key: 'lineup', dataIndex: 'lineup', title: 'Lineup', width: '25%' },
+    { key: CUSTOMERS.toLocaleLowerCase(), dataIndex: CUSTOMERS.toLocaleLowerCase(), title: CUSTOMERS, width: '50%' },
     { key: ACTIONS.toLocaleLowerCase(), dataIndex: ACTIONS.toLocaleLowerCase(), title: ACTIONS, width: '25%' },
   ].map((column) => {
     const { dataIndex } = column;
@@ -53,24 +52,24 @@ export default function ReleaseTable({
   });
 
   function addRelease() {
-    if (pkgIndex === -1) {
-      return;
-    }
-    if (!customerIndexList.length) {
-      return;
-    }
-    const releaseFound = releaseList.find((release) => release.pkgIndex === pkgIndex);
-    if (releaseFound) {
-      return;
-    }
-    const index = findEmptyIndex(releaseList.map((release) => release.index));
-    const releaseListNew = [
-      ...releaseList,
-      { index, pkgIndex, customerIndexList },
-    ];
-    onChange(releaseListNew);
-    setPkgIndex(-1);
-    setCustomerIndexList([]);
+    form.validateFields(['pkgIndex']).then(() => {
+      const { pkgIndex, customerList: customerIndexList } = form.getFieldsValue(['pkgIndex', 'customerList']);
+      if (pkgIndex === -1) {
+        return;
+      }
+      const releaseFound = releaseList.find((release) => release.pkgIndex === pkgIndex);
+      if (releaseFound) {
+        return;
+      }
+      const index = findEmptyIndex(releaseList.map((release) => release.index));
+      const releaseListNew = [
+        ...releaseList,
+        { index, pkgIndex, customerIndexList },
+      ];
+      onChange(releaseListNew);
+    }).catch((reason) => {
+      console.error(reason);
+    });
   }
 
   function moveNewer(index: number) {
@@ -161,6 +160,10 @@ export default function ReleaseTable({
 
   const dataSource = [
     { key: -1 },
+    ...releaseList.map((release) => {
+      const { index: key, pkgIndex, customerIndexList: customers } = release;
+      return { key, package: pkgIndex, customers };
+    }),
   ];
   return (
     <>
@@ -276,10 +279,26 @@ export default function ReleaseTable({
           key === -1 && dataIndex === PACKAGE.toLocaleLowerCase() ? (
             <Form form={form}>
               <Form.Item
-                name='name'
-                rules={[{ required: true }]}
+                name='pkgIndex'
+                initialValue={-1}
               >
-                <Input disabled={editIndex !== -1} />
+                <Select>
+                  <Option key={-1} value={-1}> </Option>
+                  {
+                    pkgList.map((pkg) => {
+                      const { index, name, lineupIndex } = pkg;
+                      const lineup =
+                        lineupIndex === -1
+                          ? "(None)"
+                          : lineupList.find(
+                              (lineup) => lineup.index === lineupIndex
+                            )?.name ?? "(Error)";
+                      return (
+                        <Option key={index} value={index}>{`${name} - ${lineup}`}</Option>
+                      )
+                    })
+                  }
+                </Select>
               </Form.Item>
             </Form>
           ) : key === -1 && dataIndex === CUSTOMERS.toLocaleLowerCase() ? (
@@ -300,7 +319,7 @@ export default function ReleaseTable({
           ) : key === -1 && dataIndex === ACTIONS.toLocaleLowerCase() ? (
             <Form>
               <Form.Item>
-                <Button onClick={() => addRelease}>Add</Button>
+                <Button onClick={addRelease}>Add</Button>
               </Form.Item>
             </Form>
           ) : dataIndex === ACTIONS.toLocaleLowerCase() ? (
