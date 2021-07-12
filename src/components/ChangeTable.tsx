@@ -120,27 +120,7 @@ export default function ChangeTable({
       setEditIndex(-1);
     }).catch((reason) => {
       console.error(reason);
-    })
-    const indexFound = changeList.findIndex(
-      (change) => change.index === editIndex
-    );
-    if (indexFound === -1) {
-      return;
-    }
-    const changeListNew = [
-      ...changeList.slice(0, indexFound),
-      {
-        index: editIndex,
-        // description: descriptionNew,
-        // beforeChange: beforeChangeNew,
-        // afterChange: afterChangeNew,
-        // customerIndexList: customerIndexListNew,
-        // lineupIndex: lineupIndexNew,
-      },
-      ...changeList.slice(indexFound + 1),
-    ];
-    // onChange(changeListNew);
-    setEditIndex(-1);
+    });
   }
 
   function removeChange(index: number) {
