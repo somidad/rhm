@@ -81,10 +81,12 @@ function App() {
   return (
     <div className="App">
       <AppMenu
+        changeList={changeList}
         customerList={customerList}
         lineupList={lineupList}
         pkgList={pkgList}
         versionList={versionList}
+        onChangeChangeList={setChangeList}
         onChangeCustomerList={setCustomerList}
         onChangeLineupList={setLineupList}
         onChangePkgList={setPkgList}

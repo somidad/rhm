@@ -1,13 +1,15 @@
 import { Input, Menu } from 'antd';
 import { createRef, useState } from 'react';
-import { Enum, Pkg, VersionV2 } from '../types';
+import { ChangeV2, Enum, Pkg, VersionV2 } from '../types';
 import { load } from '../utils';
 
 type Props = {
+  changeList: ChangeV2[];
   customerList: Enum[];
   lineupList: Enum[];
   pkgList: Pkg[];
   versionList: VersionV2[];
+  onChangeChangeList: (changeList: ChangeV2[]) => void;
   onChangeCustomerList: (customerList: Enum[]) => void;
   onChangeLineupList: (lineupList: Enum[]) => void;
   onChangePkgList: (pkgList: Pkg[]) => void;
@@ -17,10 +19,12 @@ type Props = {
 const UNTITLED = 'Untitled';
 
 export default function AppMenu({
+  changeList,
   customerList,
   lineupList,
   pkgList,
   versionList,
+  onChangeChangeList,
   onChangeCustomerList,
   onChangeLineupList,
   onChangePkgList,
@@ -49,6 +53,7 @@ export default function AppMenu({
     onChangeVersionList([]);
     onChangeLineupList([{ index: 0, name: "(None)" }]);
     onChangePkgList([]);
+    onChangeChangeList([]);
     onChangeCustomerList([]);
   }
 
@@ -57,7 +62,7 @@ export default function AppMenu({
       return;
     }
     const blob = new Blob(
-      [JSON.stringify({ versionList, lineupList, pkgList, customerList })],
+      [JSON.stringify({ versionList, lineupList, pkgList, changeList, customerList })],
       { type: "application/json" }
     );
     refSave.current.download = `${featureName}.json`;
@@ -84,6 +89,7 @@ export default function AppMenu({
     setFeatureName(featureName);
     onChangeCustomerList(customerList);
     onChangeLineupList(lineupList);
+    onChangeChangeList(changeList);
     onChangePkgList(pkgList);
     onChangeVersionList(versionList);
   };
