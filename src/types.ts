@@ -3,9 +3,18 @@ export type Change = {
   description: string;
   beforeChange: string;
   afterChange: string;
-  customerIndexList: number[];
+  customerIndexList: number[]; // Shall be support historical
   lineupIndex: number;
 }
+
+export type ChangeV2 = {
+  index: number;
+  description: string;
+  beforeChange: string;
+  afterChange: string;
+  lineupIndex: number;
+  versionIndex: number;
+};
 
 export type Enum = {
   index: number;
@@ -29,6 +38,18 @@ export type Version = {
   name: string;
   indexPrev: number;
   changeList: Change[];
+  releaseList: Release[];
+};
+
+export type VersionV2 = {
+  index: number;
+  name: string;
+  indexPrev: number;
+  changeWithCustomersList: {
+    index: number;
+    changeIndex: number;
+    customerIndexList: number[];
+  }[];
   releaseList: Release[];
 };
 
