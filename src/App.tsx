@@ -14,17 +14,6 @@ import ReleaseTable from './components/ReleaseTable';
 import ChangeTable from './components/ChangeTable';
 const { Panel } = Collapse;
 
-function getPreviousVersionIndexList(versionList: VersionV2[], versionIndex: number): number[] {
-  const previousVersionIndexList: number[] = [];
-  const versionFound = versionList.find((version) => version.index === versionIndex);
-  console.log(versionFound);
-  if (!versionFound) {
-    return previousVersionIndexList;
-  }
-  const { index, indexPrev } = versionFound;
-  return [index, ...getPreviousVersionIndexList(versionList, indexPrev)];
-}
-
 function App() {
   const [versionList, setVersionList] = useState<VersionV2[]>([]);
   const [versionIndex, setVersionIndex] = useState(-1);
