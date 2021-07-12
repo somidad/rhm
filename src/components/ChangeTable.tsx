@@ -1,14 +1,16 @@
-import { Button, Form, Table } from "antd";
+import { Button, Form, Select, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import TextArea from "antd/lib/input/TextArea";
 import { useState } from "react";
-import { Change, Enum } from "../types";
+import { ChangeV2, Enum, VersionV2 } from "../types";
 import { findEmptyIndex } from "../utils";
 
 type Props = {
-  changeList: Change[];
+  versionList: VersionV2[];
+  versionIndex: number;
+  changeList: ChangeV2[];
   lineupList: Enum[];
-  onChange: (changeList: Change[]) => void;
+  onChange: (changeList: ChangeV2[]) => void;
 };
 
 type EditableCellProps = {
@@ -18,28 +20,23 @@ type EditableCellProps = {
 };
 
 export default function ChangeTable({
-  changeList, lineupList,
+  versionList,
+  versionIndex,
+  changeList,
+  lineupList,
   onChange,
 }: Props) {
   const [form] = useForm();
 
-  const [description, setDescription] = useState('');
-  const [beforeChange, setBeforeChange] = useState('');
-  const [afterChange, setAfterChange] = useState('');
-  const [customerIndexList, setCustomerIndexList] = useState<number[]>([]);
-  const [lineupIndex, setLineupIndex] = useState(-1);
   const [editIndex, setEditIndex] = useState(-1);
-  const [descriptionNew, setDescriptionNew] = useState('');
-  const [beforeChangeNew, setBeforeChangeNew] = useState('');
-  const [afterChangeNew, setAfterChangeNew] = useState('');
-  const [customerIndexListNew, setCustomerIndexListNew] = useState<number[]>([]);
-  const [lineupIndexNew, setLineupIndexNew] = useState(-1);
 
   const columns: any[] = [
-    { key: 'description', dataIndex: 'description', title: 'Description' },
-    { key: 'beforeChange', dataIndex: 'beforeChange', title: 'Before change', },
-    { key: 'afterChange', dataIndex: 'afterChange', title: 'After change' },
-    { key: 'actions', dataIndex: 'actions', title: 'Actions' },
+    { key: "description", dataIndex: "description", title: "Description" },
+    { key: "beforeChange", dataIndex: "beforeChange", title: "Before change" },
+    { key: "afterChange", dataIndex: "afterChange", title: "After change" },
+    { key: 'lineup', dataIndex: 'lineup', title: 'Lineup' },
+    { key: 'version', dataIndex: 'version', title: 'Version' },
+    { key: "actions", dataIndex: "actions", title: "Actions" },
   ].map((column) => {
     const { dataIndex } = column;
     return {
@@ -52,20 +49,31 @@ export default function ChangeTable({
   });
 
   function addChange() {
-    if (!description) {
-      return;
-    }
-    const index = findEmptyIndex(changeList.map((change) => change.index));
-    const changeListNew = [
-      ...changeList,
-      { index, description, beforeChange, afterChange, customerIndexList, lineupIndex },
-    ];
-    onChange(changeListNew);
-    setDescription('');
-    setBeforeChange('');
-    setAfterChange('');
-    setCustomerIndexList([]);
-    setLineupIndex(-1);
+    form
+      .validateFields(["description", "beforeChange", "afterChange", 'lineup'])
+      .then(() => {
+        const { description, beforeChange, afterChange, lineup: lineupIndex } = form.getFieldsValue([
+          "description",
+          "beforeChange",
+          "afterChange",
+          "lineup",
+        ]);
+        const index = findEmptyIndex(changeList.map((change) => change.index));
+        const changeListNew: ChangeV2[] = [
+          ...changeList,
+          { index, description, beforeChange, afterChange, lineupIndex, versionIndex },
+        ];
+        onChange(changeListNew);
+        form.setFieldsValue({
+          description: "",
+          beforeChange: "",
+          afterChange: "",
+          lineup: -1,
+        });
+      })
+      .catch((reason) => {
+        console.error(reason);
+      });
   }
 
   function onClickEdit(index: number) {
@@ -73,17 +81,19 @@ export default function ChangeTable({
     if (!changeFound) {
       return;
     }
-    const { description, beforeChange, afterChange, lineupIndex, customerIndexList } = changeFound;
-    setDescriptionNew(description);
-    setBeforeChangeNew(beforeChange);
-    setAfterChangeNew(afterChange);
-    setLineupIndexNew(lineupIndex);
-    setCustomerIndexListNew(customerIndexList);
+    const {
+      description,
+      beforeChange,
+      afterChange,
+      versionIndex,
+    } = changeFound;
     setEditIndex(index);
   }
 
   function onSubmitEditChange() {
-    const indexFound = changeList.findIndex((change) => change.index === editIndex);
+    const indexFound = changeList.findIndex(
+      (change) => change.index === editIndex
+    );
     if (indexFound === -1) {
       return;
     }
@@ -91,15 +101,15 @@ export default function ChangeTable({
       ...changeList.slice(0, indexFound),
       {
         index: editIndex,
-        description: descriptionNew,
-        beforeChange: beforeChangeNew,
-        afterChange: afterChangeNew,
-        customerIndexList: customerIndexListNew,
-        lineupIndex: lineupIndexNew,
+        // description: descriptionNew,
+        // beforeChange: beforeChangeNew,
+        // afterChange: afterChangeNew,
+        // customerIndexList: customerIndexListNew,
+        // lineupIndex: lineupIndexNew,
       },
       ...changeList.slice(indexFound + 1),
     ];
-    onChange(changeListNew);
+    // onChange(changeListNew);
     setEditIndex(-1);
   }
 
@@ -112,12 +122,18 @@ export default function ChangeTable({
     onChange(changeListNew);
   }
 
+  const versionFound = versionList.find((version) => version.index === versionIndex);
   const dataSource: any[] = [
     { key: -1 },
+    ...changeList.map((change) => {
+      const { index: key, description, beforeChange, afterChange, lineupIndex: lineup, versionIndex: version } = change;
+      return { key, description, beforeChange, afterChange, lineup, version };
+    }),
   ];
   return (
     <Table
-      columns={columns} dataSource={dataSource}
+      columns={columns}
+      dataSource={dataSource}
       components={{
         body: {
           cell: EditableCell,
@@ -126,68 +142,7 @@ export default function ChangeTable({
       pagination={false}
     />
     // <Table celled compact selectable>
-    //   <Table.Header>
-    //     <Table.Row>
-    //       <Table.HeaderCell>Description</Table.HeaderCell>
-    //       <Table.HeaderCell>Before change</Table.HeaderCell>
-    //       <Table.HeaderCell>After change</Table.HeaderCell>
-    //       <Table.HeaderCell>Lineup</Table.HeaderCell>
-    //       <Table.HeaderCell rowSpan={ROWSPAN}>Actions</Table.HeaderCell>
-    //     </Table.Row>
-    //     <Table.Row>
-    //       <Table.HeaderCell colSpan={COLSPAN}>Customers</Table.HeaderCell>
-    //     </Table.Row>
-    //   </Table.Header>
     //   <Table.Body>
-    //     <Table.Row active>
-    //       <Table.Cell>
-    //         <Form>
-    //           <Form.Field disabled={editIndex !== -1}>
-    //             <TextArea value={description} onChange={(e) => setDescription(e.target.value)}
-    //               className='no-resize-textarea'
-    //             />
-    //           </Form.Field>
-    //         </Form>
-    //       </Table.Cell>
-    //       <Table.Cell>
-    //         <Form>
-    //           <Form.Field disabled={editIndex !== -1}>
-    //             <TextArea value={beforeChange} onChange={(e) => setBeforeChange(e.target.value)}
-    //               className='no-resize-textarea'
-    //             />
-    //           </Form.Field>
-    //         </Form>
-    //       </Table.Cell>
-    //       <Table.Cell>
-    //         <Form>
-    //           <Form.Field disabled={editIndex !== -1}>
-    //             <TextArea value={afterChange} onChange={(e) => setAfterChange(e.target.value)}
-    //               className='no-resize-textarea'
-    //             />
-    //           </Form.Field>
-    //         </Form>
-    //       </Table.Cell>
-    //       <Table.Cell>
-    //         <Form>
-    //           <Form.Field disabled={editIndex !== -1}>
-    //             <select value={lineupIndex} onChange={(e) => setLineupIndex(+e.target.value)}>
-    //               <option value={-1}>(None)</option>
-    //               {
-    //                 lineupList.map((lineup) => {
-    //                   const { index, name } = lineup;
-    //                   return (
-    //                     <option key={index} value={index}>{name}</option>
-    //                   )
-    //                 })
-    //               }
-    //             </select>
-    //           </Form.Field>
-    //         </Form>
-    //       </Table.Cell>
-    //       <Table.Cell rowSpan={ROWSPAN}>
-    //         <Button icon='plus' size='tiny' onClick={addChange} disabled={editIndex !== -1} />
-    //       </Table.Cell>
-    //     </Table.Row>
     //     {
     //       changeList.map((change) => {
     //         const { index, description, beforeChange, afterChange, customerIndexList, lineupIndex } = change;
@@ -285,49 +240,80 @@ export default function ChangeTable({
     //     changeList.map((change) => <></>)
     //   }
     // </Table>
-  )
+  );
 
-  function EditableCell({ record, dataIndex, children, ...restProps }: EditableCellProps) {
+  function EditableCell({
+    record,
+    dataIndex,
+    children,
+    ...restProps
+  }: EditableCellProps) {
     const { key } = record;
     return (
       <td {...restProps}>
-        {
-          key === -1 && dataIndex === 'description' ? (
-            <Form form={form}>
-              <Form.Item
-                name='description'
-                rules={[{ required: true }]}
-              >
-                <TextArea />
-              </Form.Item>
-            </Form>
-          ) : key === -1 && dataIndex === 'beforeChange' ? (
-            <Form form={form}>
-              <Form.Item
-                name='beforeChange'
-                rules={[{ required: true }]}
-              >
-                <TextArea />
-              </Form.Item>
-            </Form>
-          ): key === -1 && dataIndex === 'afterChange' ? (
-            <Form form={form}>
-              <Form.Item
-                name='afterChange'
-                rules={[{ required: true }]}
-              >
-                <TextArea />
-              </Form.Item>
-            </Form>
-          ) : key === -1 && dataIndex === 'actions' ? (
-            <Form>
-              <Form.Item>
-                <Button>Add</Button>
-              </Form.Item>
-            </Form>
-          ) : (null)
-        }
+        {key === -1 && dataIndex === "description" ? (
+          <Form form={form}>
+            <Form.Item
+              name="description"
+              rules={[{ required: true }]}
+              help={false}
+            >
+              <TextArea />
+            </Form.Item>
+          </Form>
+        ) : key === -1 && dataIndex === "beforeChange" ? (
+          <Form form={form}>
+            <Form.Item
+              name="beforeChange"
+              rules={[{ required: true }]}
+              help={false}
+            >
+              <TextArea />
+            </Form.Item>
+          </Form>
+        ) : key === -1 && dataIndex === "afterChange" ? (
+          <Form form={form}>
+            <Form.Item
+              name="afterChange"
+              rules={[{ required: true }]}
+              help={false}
+            >
+              <TextArea />
+            </Form.Item>
+          </Form>
+        ) : key === -1 && dataIndex === 'lineup' ? (
+          <Form form={form}>
+            <Form.Item
+              name='lineup'
+              initialValue={-1}
+            >
+              <Select />
+            </Form.Item>
+          </Form>
+        ) : key === -1 && dataIndex === "version" ? (
+          <Form>
+            <Form.Item>{versionFound?.name ?? "(Error)"}</Form.Item>
+          </Form>
+        ) : key === -1 && dataIndex === "actions" ? (
+          <Form>
+            <Form.Item>
+              <Button onClick={addChange}>Add</Button>
+            </Form.Item>
+          </Form>
+        ) : dataIndex === 'description' ? (
+          children
+        ) : dataIndex === 'beforeChange' ? (
+          children
+        ) : dataIndex === 'afterChange' ? (
+          children
+        ) : dataIndex === 'lineup' ? (
+          children
+        ) :dataIndex === 'version' ? (
+          children
+        ) : (
+          children
+        )}
       </td>
-    )
+    );
   }
 }
