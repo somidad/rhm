@@ -5,7 +5,7 @@ import { Col, Collapse, Row, Tabs, Tag } from 'antd';
 import { GithubOutlined } from '@ant-design/icons';
 import EnumTable from './components/EnumTable';
 import PkgTable from './components/PkgTable';
-import { Enum, Pkg, Release, Version } from './types';
+import { ChangeV2, Enum, Pkg, Release, VersionV2 } from './types';
 import Title from 'antd/lib/typography/Title';
 import Link from 'antd/lib/typography/Link';
 import VersionTable from './components/VersionTable';
@@ -14,14 +14,26 @@ import ReleaseTable from './components/ReleaseTable';
 import ChangeTable from './components/ChangeTable';
 const { Panel } = Collapse;
 
+function getPreviousVersionIndexList(versionList: VersionV2[], versionIndex: number): number[] {
+  const previousVersionIndexList: number[] = [];
+  const versionFound = versionList.find((version) => version.index === versionIndex);
+  console.log(versionFound);
+  if (!versionFound) {
+    return previousVersionIndexList;
+  }
+  const { index, indexPrev } = versionFound;
+  return [index, ...getPreviousVersionIndexList(versionList, indexPrev)];
+}
+
 function App() {
-  const [versionList, setVersionList] = useState<Version[]>([]);
+  const [versionList, setVersionList] = useState<VersionV2[]>([]);
   const [versionIndex, setVersionIndex] = useState(-1);
+  const [changeList, setChangeList] = useState<ChangeV2[]>([]);
   const [lineupList, setLineupList] = useState<Enum[]>([]);
   const [pkgList, setPkgList] = useState<Pkg[]>([]);
   const [customerList, setCustomerList] = useState<Enum[]>([]);
 
-  function onChangeVersionList(versionList: Version[]) {
+  function onChangeVersionList(versionList: VersionV2[]) {
     const versionFound = versionList.find((version) => version.index === versionIndex);
     if (!versionFound) {
       setVersionIndex(-1);
@@ -29,16 +41,25 @@ function App() {
     setVersionList(versionList);
   }
 
+  function onChangeReleaseList(releaseList: Release[]) {
+    if (versionIndex === -1) {
+      return;
+    }
+    const indexFound = versionList.findIndex((version) => version.index === versionIndex);
+    if (indexFound === -1) {
+      return;
+    }
+    // TODO
+  }
+
   function onSelectVersion(index: number) {
     setVersionIndex(index);
   }
 
   const usedLineupIndexList = [
-    ...versionList.map((version) => {
-      return version.changeList.map((change) => change.lineupIndex);
-    }).reduce((indexPrevList, indexList) => {
-      return [...indexPrevList, ...indexList];
-    }, []),
+    ...changeList.map((change) => {
+      return change.lineupIndex;
+    }),
     ...pkgList.map((pkg) => pkg.lineupIndex),
   ];
   const usedPkgIndexList = [
@@ -49,16 +70,6 @@ function App() {
     }, []),
   ];
   const usedCustomerIndexList = [
-    ...versionList.map((version) => {
-      return version.changeList.map((change) => change.customerIndexList).reduce((indexListPrev, indexList) => {
-        return [
-          ...indexListPrev,
-          ...indexList,
-        ];
-      }, []);
-    }).reduce((indexPrevList, indexList) => {
-      return [...indexPrevList, ...indexList];
-    }, []),
     ...versionList.map((version) => {
       return version.releaseList.map((release) => release.customerIndexList).reduce((indexListPrev, indexList) => {
         return [
@@ -104,36 +115,40 @@ function App() {
                   />
                 </Panel>
               </Collapse>
-              {
-              !versionCurr ? null : (
+              {!versionCurr ? null : (
                 <>
                   <Title level={3}>{versionCurr.name}</Title>
-                  {
-                    !versionPrev ? null : (
-                      <>
-                        Previous <Tag>{versionPrev === -1 ? '(Error)' : versionPrev.name}</Tag>
-                      </>
-                    )
-                  }
-                  <Collapse defaultActiveKey={['changes', 'releases']}>
-                    <Panel key='releases' header='Releases'>
+                  {!versionPrev ? null : (
+                    <>
+                      Previous{" "}
+                      <Tag>
+                        {versionPrev === -1 ? "(Error)" : versionPrev.name}
+                      </Tag>
+                    </>
+                  )}
+                  <Collapse defaultActiveKey={["changes", "releases"]}>
+                    <Panel key="releases" header="Releases">
                       <ReleaseTable
-                          versionList={versionList}
-                          releaseList={[]}
-                          lineupList={lineupList}
-                          pkgList={pkgList}
-                          customerList={customerList}
-                          onChange={onChangeReleaseList}
-                          // onChangeVersionList={setVersionList}
-                        />
+                        versionList={versionList}
+                        releaseList={[]}
+                        lineupList={lineupList}
+                        pkgList={pkgList}
+                        customerList={customerList}
+                        onChange={onChangeReleaseList}
+                        // onChangeVersionList={setVersionList}
+                      />
                     </Panel>
-                    <Panel key='changes' header='Changes'>
-                      <ChangeTable changeList={[]} lineupList={lineupList} onChange={() => {}} />
+                    <Panel key="changes" header="Changes">
+                      <ChangeTable
+                        versionIndex={versionIndex}
+                        changeList={changeList}
+                        lineupList={lineupList}
+                        onChange={setChangeList}
+                      />
                     </Panel>
                   </Collapse>
                 </>
-              )
-              }
+              )}
             </Tabs.TabPane>
             <Tabs.TabPane tab="Customers" key="customers">
               <Title level={2}>Customers</Title>
