@@ -170,11 +170,18 @@ export default function ReleaseTable({
           cell: EditableCell,
         },
       }}
+      expandable={{
+        expandedRowRender,
+        rowExpandable: (record) => record.key !== -1,
+      }}
       pagination={false}
     />
   )
 
   function EditableCell({ record, dataIndex, children, ...restProps }: EditableCellProps) {
+    if (!record) {
+      return children;
+    }
     const { key, package: pkgIndex } = record;
     return (
       <td {...restProps}>
@@ -236,6 +243,15 @@ export default function ReleaseTable({
           )
         }
       </td>
+    )
+  }
+
+  function expandedRowRender(props: any) {
+    return (
+      <>
+        <td />
+        <td colSpan={columns.length}>asdf</td>
+      </>
     )
   }
 }
