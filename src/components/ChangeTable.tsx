@@ -79,12 +79,13 @@ export default function ChangeTable({
     if (!changeFound) {
       return;
     }
-    const {
+    const { description, beforeChange, afterChange, lineupIndex: lineup } = changeFound;
+    form.setFieldsValue({
       description,
       beforeChange,
       afterChange,
-      versionIndex,
-    } = changeFound;
+      lineup,
+    });
     setEditIndex(index);
   }
 
@@ -255,7 +256,7 @@ export default function ChangeTable({
               rules={[{ required: true }]}
               help={false}
             >
-              <TextArea autoSize />
+              <TextArea autoSize disabled={editIndex !== -1} />
             </Form.Item>
           </Form>
         ) : key === -1 && dataIndex === "beforeChange" ? (
@@ -265,7 +266,7 @@ export default function ChangeTable({
               rules={[{ required: true }]}
               help={false}
             >
-              <TextArea autoSize />
+              <TextArea autoSize disabled={editIndex !== -1} />
             </Form.Item>
           </Form>
         ) : key === -1 && dataIndex === "afterChange" ? (
@@ -275,7 +276,7 @@ export default function ChangeTable({
               rules={[{ required: true }]}
               help={false}
             >
-              <TextArea autoSize />
+              <TextArea autoSize disabled={editIndex !== -1} />
             </Form.Item>
           </Form>
         ) : key === -1 && dataIndex === 'lineup' ? (
@@ -284,7 +285,7 @@ export default function ChangeTable({
               name='lineup'
               initialValue={-1}
             >
-              <Select>
+              <Select disabled={editIndex !== -1}>
                 <Option key={-1} value={-1}>(None)</Option>
                 {
                   lineupList.map((lineup) => {
@@ -300,7 +301,14 @@ export default function ChangeTable({
         ) : key === -1 && dataIndex === "actions" ? (
           <Form>
             <Form.Item>
-              <Button onClick={addChange}>Add</Button>
+              <Button onClick={addChange} disabled={editIndex !== -1}>Add</Button>
+            </Form.Item>
+          </Form>
+        ) : editIndex === key && dataIndex === 'actions' ? (
+          <Form>
+            <Form.Item>
+              <Button>Ok</Button>
+              <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
             </Form.Item>
           </Form>
         ) : dataIndex === 'description' ? (
@@ -314,8 +322,8 @@ export default function ChangeTable({
         ) : dataIndex === 'actions' ? (
           <Form>
             <Form.Item>
-              <Button>Edit</Button>
-              <Button>Remove</Button>
+              <Button onClick={() => onClickEdit(key)}>Edit</Button>
+              <Button onClick={() => removeChange(key)}>Remove</Button>
             </Form.Item>
           </Form>
         ) : (
