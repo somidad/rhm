@@ -250,7 +250,7 @@ export default function ChangeTable({
   }: EditableCellProps) {
     const { key } = record;
     return (
-      <td {...restProps}>
+      <td {...restProps} style={{ verticalAlign: 'top' }}>
         {key === -1 && dataIndex === "description" ? (
           <Form form={form}>
             <Form.Item
@@ -258,7 +258,7 @@ export default function ChangeTable({
               rules={[{ required: true }]}
               help={false}
             >
-              <TextArea />
+              <TextArea autoSize />
             </Form.Item>
           </Form>
         ) : key === -1 && dataIndex === "beforeChange" ? (
@@ -268,7 +268,7 @@ export default function ChangeTable({
               rules={[{ required: true }]}
               help={false}
             >
-              <TextArea />
+              <TextArea autoSize />
             </Form.Item>
           </Form>
         ) : key === -1 && dataIndex === "afterChange" ? (
@@ -278,7 +278,7 @@ export default function ChangeTable({
               rules={[{ required: true }]}
               help={false}
             >
-              <TextArea />
+              <TextArea autoSize />
             </Form.Item>
           </Form>
         ) : key === -1 && dataIndex === 'lineup' ? (
