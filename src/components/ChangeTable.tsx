@@ -2,7 +2,7 @@ import { Button, Form, Select, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import TextArea from "antd/lib/input/TextArea";
 import { useState } from "react";
-import { ChangeV2, Enum, VersionV2 } from "../types";
+import { ChangeV2, Enum } from "../types";
 import { findEmptyIndex } from "../utils";
 const { Option } = Select;
 
@@ -79,12 +79,17 @@ export default function ChangeTable({
     if (!changeFound) {
       return;
     }
-    const { description, beforeChange, afterChange, lineupIndex: lineup } = changeFound;
+    const {
+      description: descriptionNew,
+      beforeChange: beforeChangeNew,
+      afterChange: afterChangeNew,
+      lineupIndex: lineupNew,
+    } = changeFound;
     form.setFieldsValue({
-      description,
-      beforeChange,
-      afterChange,
-      lineup,
+      descriptionNew,
+      beforeChangeNew,
+      afterChangeNew,
+      lineupNew,
     });
     setEditIndex(index);
   }
@@ -139,105 +144,6 @@ export default function ChangeTable({
       }}
       pagination={false}
     />
-    // <Table celled compact selectable>
-    //   <Table.Body>
-    //     {
-    //       changeList.map((change) => {
-    //         const { index, description, beforeChange, afterChange, customerIndexList, lineupIndex } = change;
-    //         const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
-    //         const lineup = lineupFound ? lineupFound.name : '(None)';
-    //         return index === editIndex ? (
-    //           <React.Fragment key={index}>
-    //             <Table.Row>
-    //               <Table.Cell>
-    //                 <Form>
-    //                   <Form.Field>
-    //                     <TextArea value={descriptionNew} onChange={(e) => setDescriptionNew(e.target.value)}
-    //                       className='no-resize-textarea'
-    //                     />
-    //                   </Form.Field>
-    //                 </Form>
-    //               </Table.Cell>
-    //               <Table.Cell>
-    //                 <Form>
-    //                   <Form.Field>
-    //                     <TextArea value={beforeChangeNew} onChange={(e) => setBeforeChangeNew(e.target.value)}
-    //                       className='no-resize-textarea'
-    //                     />
-    //                   </Form.Field>
-    //                 </Form>
-    //               </Table.Cell>
-    //               <Table.Cell>
-    //                 <Form>
-    //                   <Form.Field>
-    //                     <TextArea value={afterChangeNew} onChange={(e) => setAfterChangeNew(e.target.value)}
-    //                       className='no-resize-textarea'
-    //                     />
-    //                   </Form.Field>
-    //                 </Form>
-    //               </Table.Cell>
-    //               <Table.Cell>
-    //                 <Form>
-    //                   <Form.Field>
-    //                     <select value={lineupIndexNew} onChange={(e) => setLineupIndexNew(+e.target.value)}>
-    //                       <option value={-1}>(None)</option>
-    //                       {
-    //                         lineupList.map((lineup) => {
-    //                           const { index, name } = lineup;
-    //                           return (
-    //                             <option key={index} value={index}>{name}</option>
-    //                           )
-    //                         })
-    //                       }
-    //                     </select>
-    //                   </Form.Field>
-    //                 </Form>
-    //               </Table.Cell>
-    //               <Table.Cell rowSpan={ROWSPAN} singleLine>
-    //                 <Button icon='check' size='tiny' onClick={onSubmitEditChange} />
-    //                 <Button icon='cancel' size='tiny' onClick={() => setEditIndex(-1)} />
-    //               </Table.Cell>
-    //             </Table.Row>
-    //           </React.Fragment>
-    //         ) : (
-    //           <React.Fragment key={index}>
-    //             <Table.Row>
-    //               <Table.Cell>
-    //                 <Form>
-    //                   <Form.Field>
-    //                     <TextArea value={description} className='no-border-textarea no-resize-textarea' />
-    //                   </Form.Field>
-    //                 </Form>
-    //               </Table.Cell>
-    //               <Table.Cell>
-    //                 <Form>
-    //                   <Form.Field>
-    //                     <TextArea value={beforeChange} className='no-border-textarea no-resize-textarea' />
-    //                   </Form.Field>
-    //                 </Form>
-    //               </Table.Cell>
-    //               <Table.Cell>
-    //                 <Form>
-    //                   <Form.Field>
-    //                     <TextArea value={afterChange} className='no-border-textarea no-resize-textarea' />
-    //                   </Form.Field>
-    //                 </Form>
-    //               </Table.Cell>
-    //               <Table.Cell>{lineup}</Table.Cell>
-    //               <Table.Cell rowSpan={ROWSPAN} singleLine>
-    //                 <Button icon='edit' size='tiny' onClick={() => onClickEdit(index)} />
-    //                 <Button icon='trash' size='tiny' onClick={() => removeChange(index)} />
-    //               </Table.Cell>
-    //             </Table.Row>
-    //           </React.Fragment>
-    //         )
-    //       })
-    //     }
-    //   </Table.Body>
-    //   {
-    //     changeList.map((change) => <></>)
-    //   }
-    // </Table>
   );
 
   function EditableCell({
@@ -302,6 +208,54 @@ export default function ChangeTable({
           <Form>
             <Form.Item>
               <Button onClick={addChange} disabled={editIndex !== -1}>Add</Button>
+            </Form.Item>
+          </Form>
+        ) : editIndex === key && dataIndex === 'description' ? (
+          <Form form={form}>
+            <Form.Item
+              name='descriptionNew'
+              rules={[{ required: true }]}
+              help={false}
+            >
+              <TextArea autoSize />
+            </Form.Item>
+          </Form>
+        ) : editIndex === key && dataIndex === 'beforeChange' ? (
+          <Form form={form}>
+            <Form.Item
+              name='beforeChangeNew'
+              rules={[{ required: true }]}
+              help={false}
+            >
+              <TextArea autoSize />
+            </Form.Item>
+          </Form>
+        ) : editIndex === key && dataIndex === 'afterChange' ? (
+          <Form form={form}>
+            <Form.Item
+              name='afterChangeNew'
+              rules={[{ required: true }]}
+              help={false}
+            >
+              <TextArea autoSize />
+            </Form.Item>
+          </Form>
+        ) : editIndex === key && dataIndex === 'lineup' ? (
+          <Form form={form}>
+            <Form.Item
+              name='lineupNew'
+            >
+              <Select>
+                <Option key={-1} value={-1}>(None)</Option>
+                {
+                  lineupList.map((lineup) => {
+                    const { index, name } = lineup;
+                    return (
+                      <Option key={index} value={index}>{name}</Option>
+                    )
+                  })
+                }
+              </Select>
             </Form.Item>
           </Form>
         ) : editIndex === key && dataIndex === 'actions' ? (
