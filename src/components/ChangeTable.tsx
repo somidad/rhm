@@ -94,7 +94,29 @@ export default function ChangeTable({
     setEditIndex(index);
   }
 
-  function onSubmitEditChange() {
+  function onSubmitEditChange(index: number) {
+    form.validateFields(['descriptionNew', 'beforeChangeNew', 'afterChangeNew', 'lineupNew']).then(() => {
+      const { descriptionNew: description, beforeChangeNew: beforeChange, afterChangeNew: afterChange, lineupNew: lineupIndex } =
+        form.getFieldsValue([
+          "descriptionNew",
+          "beforeChangeNew",
+          "afterChangeNew",
+          "lineupNew",
+        ]);
+      const indexFound = changeList.findIndex((change) => change.index === index);
+      if (indexFound === -1) {
+        return;
+      }
+      const changeListNew: ChangeV2[] = [
+        ...changeList.slice(0, indexFound),
+        { index, description, beforeChange, afterChange, lineupIndex, versionIndex },
+        ...changeList.slice(indexFound + 1),
+      ];
+      onChange(changeListNew);
+      setEditIndex(-1);
+    }).catch((reason) => {
+      console.error(reason);
+    })
     const indexFound = changeList.findIndex(
       (change) => change.index === editIndex
     );
@@ -261,7 +283,7 @@ export default function ChangeTable({
         ) : editIndex === key && dataIndex === 'actions' ? (
           <Form>
             <Form.Item>
-              <Button>Ok</Button>
+              <Button onClick={() => onSubmitEditChange(key)}>Ok</Button>
               <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
             </Form.Item>
           </Form>
