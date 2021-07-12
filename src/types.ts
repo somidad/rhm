@@ -33,6 +33,16 @@ export type Release = {
   customerIndexList: number[];
 }
 
+export type ReleaseV2 = {
+  index: number;
+  pkgIndex: number;
+  customerIndexList: number[];
+  changeIndexListWithCustomerIndexList: {
+    changeIndex: number;
+    customerIndexList: number[];
+  }[];
+}
+
 export type Version = {
   index: number;
   name: string;
@@ -45,12 +55,7 @@ export type VersionV2 = {
   index: number;
   name: string;
   indexPrev: number;
-  changeWithCustomersList: {
-    index: number;
-    changeIndex: number;
-    customerIndexList: number[];
-  }[];
-  releaseList: Release[];
+  releaseList: ReleaseV2[];
 };
 
 export type OldChange = {
