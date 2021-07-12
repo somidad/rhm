@@ -1,7 +1,7 @@
 import { Button, Form, Select, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import TextArea from "antd/lib/input/TextArea";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChangeV2, Enum } from "../types";
 import { findEmptyIndex } from "../utils";
 const { Option } = Select;
@@ -28,6 +28,10 @@ export default function ChangeTable({
   const [form] = useForm();
 
   const [editIndex, setEditIndex] = useState(-1);
+
+  useEffect(() => {
+    setEditIndex(-1);
+  }, [versionIndex]);
 
   const columns: any[] = [
     { key: "description", dataIndex: "description", title: "Description" },
@@ -150,10 +154,18 @@ export default function ChangeTable({
 
   const dataSource: any[] = [
     { key: -1 },
-    ...changeList.map((change) => {
-      const { index: key, description, beforeChange, afterChange, lineupIndex: lineup } = change;
-      return { key, description, beforeChange, afterChange, lineup };
-    }),
+    ...changeList
+      .filter((change) => change.versionIndex === versionIndex)
+      .map((change) => {
+        const {
+          index: key,
+          description,
+          beforeChange,
+          afterChange,
+          lineupIndex: lineup,
+        } = change;
+        return { key, description, beforeChange, afterChange, lineup };
+      }),
   ];
   return (
     <Table
