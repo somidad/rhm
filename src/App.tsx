@@ -5,7 +5,7 @@ import { Col, Collapse, Row, Tabs, Tag } from 'antd';
 import { GithubOutlined } from '@ant-design/icons';
 import EnumTable from './components/EnumTable';
 import PkgTable from './components/PkgTable';
-import { ChangeV2, Enum, Pkg, Release, VersionV2 } from './types';
+import { ChangeV2, Enum, Pkg, ReleaseV2, VersionV2 } from './types';
 import Title from 'antd/lib/typography/Title';
 import Link from 'antd/lib/typography/Link';
 import VersionTable from './components/VersionTable';
@@ -30,7 +30,7 @@ function App() {
     setVersionList(versionList);
   }
 
-  function onChangeReleaseList(releaseList: Release[]) {
+  function onChangeReleaseList(releaseList: ReleaseV2[]) {
     if (versionIndex === -1) {
       return;
     }
@@ -38,7 +38,14 @@ function App() {
     if (indexFound === -1) {
       return;
     }
-    // TODO
+    const version = versionList[indexFound];
+    version.releaseList = releaseList;
+    const versionListNew = [
+      ...versionList.slice(0, indexFound),
+      version,
+      ...versionList.slice(indexFound + 1),
+    ];
+    setVersionList(versionListNew);
   }
 
   function onSelectVersion(index: number) {
@@ -78,6 +85,7 @@ function App() {
       : versionList.find(
           (version) => version.index === versionCurr.indexPrev
         ) ?? -1;
+  const releaseList = versionCurr?.releaseList ?? [];
   return (
     <div className="App">
       <AppMenu
@@ -120,8 +128,7 @@ function App() {
                   <Collapse defaultActiveKey={["changes", "releases"]}>
                     <Panel key="releases" header="Releases">
                       <ReleaseTable
-                        versionList={versionList}
-                        releaseList={[]}
+                        releaseList={releaseList}
                         lineupList={lineupList}
                         pkgList={pkgList}
                         customerList={customerList}

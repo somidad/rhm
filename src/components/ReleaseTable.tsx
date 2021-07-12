@@ -1,18 +1,17 @@
 import { Button, Checkbox, Form, Select, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { useState } from "react";
-import { Enum, Pkg, Release, VersionV2 } from "../types";
+import { Enum, Pkg, ReleaseV2, VersionV2 } from "../types";
 import { findEmptyIndex } from "../utils";
 
 const { Option } = Select;
 
 type Props ={ 
-  versionList: VersionV2[];
-  releaseList: Release[];
+  releaseList: ReleaseV2[];
   lineupList: Enum[];
   pkgList: Pkg[];
   customerList: Enum[];
-  onChange: (releaseList: Release[]) => void;
+  onChange: (releaseList: ReleaseV2[]) => void;
 }
 
 type EditableCellProps = {
@@ -26,7 +25,7 @@ const CUSTOMERS = 'Customers';
 const ACTIONS = 'Actions';
 
 export default function ReleaseTable({
-  versionList, releaseList, lineupList, pkgList, customerList,
+  releaseList, lineupList, pkgList, customerList,
   onChange,
 }: Props) {
   const [form] = useForm();
@@ -52,7 +51,8 @@ export default function ReleaseTable({
 
   function addRelease() {
     form.validateFields(['pkgIndex']).then(() => {
-      const { pkgIndex, customerList: customerIndexList } = form.getFieldsValue(['pkgIndex', 'customerList']);
+      const { pkgIndex, customerList } = form.getFieldsValue(['pkgIndex', 'customerList']);
+      const customerIndexList = customerList ?? [];
       console.log(pkgIndex, customerIndexList);
       if (pkgIndex === -1) {
         return;
@@ -62,9 +62,9 @@ export default function ReleaseTable({
         return;
       }
       const index = findEmptyIndex(releaseList.map((release) => release.index));
-      const releaseListNew = [
+      const releaseListNew: ReleaseV2[] = [
         ...releaseList,
-        { index, pkgIndex, customerIndexList },
+        { index, pkgIndex, customerIndexList, changeIndexListWithCustomerIndexList: [] },
       ];
       onChange(releaseListNew);
     }).catch((reason) => {
@@ -133,12 +133,13 @@ export default function ReleaseTable({
     if (indexFound === -1) {
       return;
     }
-    const releaseListNew = [
+    const releaseListNew: ReleaseV2[] = [
       ...releaseList.slice(0, indexFound),
       {
         index: editIndex,
         pkgIndex: pkgIndexNew,
         customerIndexList: customerIndexListNew,
+        changeIndexListWithCustomerIndexList: [], // FIXME
       },
       ...releaseList.slice(indexFound + 1),
     ];
@@ -175,97 +176,6 @@ export default function ReleaseTable({
       }}
       pagination={false}
     />
-    // <Table celled compact selectable>
-    //   <Table.Body>
-    //     <Table.Row active>
-    //       <Table.Cell>
-    //         <EnumSelector enumList={customerList} selectedIndexList={customerIndexList}
-    //           onChange={setCustomerIndexList}
-    //           disabled={editIndex !== -1}
-    //         />
-    //       </Table.Cell>
-    //     </Table.Row>
-    //     {
-    //       releaseList.map((release) => {
-    //         const { index, pkgIndex, customerIndexList }= release;
-    //         const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex) as Pkg;
-    //         if (!pkgFound) {
-    //           return (
-    //             <React.Fragment key={index} />
-    //           )
-    //         }
-    //         const { name, lineupIndex } = pkgFound;
-    //         const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
-    //         const lineup = `- Lineup: ${lineupFound ? lineupFound.name : '(None)'}`;
-    //         return index === editIndex ? (
-    //           <React.Fragment key={index}>
-    //             <Table.Row>
-    //               <Table.Cell>
-    //                 <Form>
-    //                   <Form.Field>
-    //                     <select value={pkgIndexNew} onChange={(e) => setPkgIndexNew(+e.target.value)}>
-    //                       {
-    //                         pkgList.map((pkg) => {
-    //                           const { index, name, lineupIndex } = pkg;
-    //                           const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
-    //                           const lineup = `- Lineup: ${lineupFound ? lineupFound.name : '(None)'}`;
-    //                           return (
-    //                             <option key={index} value={index}>{name} {lineup}</option>
-    //                           )
-    //                         })
-    //                       }
-    //                     </select>
-    //                   </Form.Field>
-    //                 </Form>
-    //               </Table.Cell>
-    //               <Table.Cell rowSpan={2} singleLine>
-    //                 <Button icon='check' size='tiny' onClick={onSubmitEditRelease} />
-    //                 <Button icon='cancel' size='tiny' onClick={() => setEditIndex(-1)} />
-    //               </Table.Cell>
-    //             </Table.Row>
-    //             <Table.Row key={`${index}-lower`}>
-    //               <Table.Cell>
-    //                 <EnumSelector enumList={customerList} selectedIndexList={customerIndexListNew}
-    //                   onChange={setCustomerIndexListNew}
-    //                 />
-    //               </Table.Cell>
-    //             </Table.Row>
-    //           </React.Fragment>
-    //         ) : (
-    //           <React.Fragment key={index}>
-    //             <Table.Row>
-    //               <Table.Cell>
-    //                 <Label ribbon>{name} {lineup}</Label>
-    //               </Table.Cell>
-    //               <Table.Cell rowSpan={2} singleLine>
-    //                 <Button icon='edit' size='tiny' onClick={() => onClickEdit(index)} />
-    //                 <Button icon='trash' size='tiny' onClick={() => removeRelease(index)} />
-    //                 <Button icon size='tiny' onClick={() => moveOlder(index)} disabled={editIndex !== -1}>
-    //                   <Icon name='angle up' />
-    //                   Older
-    //                 </Button>
-    //                 <Button icon size='tiny' onClick={() => moveNewer(index)} disabled={editIndex !== -1}>
-    //                   <Icon name='angle down' />
-    //                   Newer
-    //                 </Button>
-    //               </Table.Cell>
-    //             </Table.Row>
-    //             <Table.Row>
-    //               <Table.Cell>
-    //                 {
-    //                   customerList
-    //                     .filter((customer) => customerIndexList.find((customerIndex) => customer.index === customerIndex) !== undefined)
-    //                     .map((customer) => customer.name)
-    //                     .join(', ')
-    //                 }
-    //               </Table.Cell>
-    //             </Table.Row>
-    //           </React.Fragment>
-    //         )
-    //       })
-    //     }
-    //   </Table.Body>
-    // </Table>
   )
 
   function EditableCell({ record, dataIndex, children, ...restProps }: EditableCellProps) {
@@ -277,10 +187,8 @@ export default function ReleaseTable({
             <Form form={form}>
               <Form.Item
                 name='pkgIndex'
-                initialValue={-1}
               >
                 <Select>
-                  <Option key={-1} value={-1}> </Option>
                   {
                     pkgList.map((pkg) => {
                       const { index, name, lineupIndex } = pkg;
