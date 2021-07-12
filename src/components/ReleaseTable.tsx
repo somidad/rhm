@@ -1,6 +1,5 @@
 import { Button, Checkbox, Form, Select, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
-import Title from "antd/lib/typography/Title";
 import { useState } from "react";
 import { Enum, Pkg, Release, Version } from "../types";
 import { findEmptyIndex } from "../utils";
