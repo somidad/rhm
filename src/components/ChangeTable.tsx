@@ -4,9 +4,9 @@ import TextArea from "antd/lib/input/TextArea";
 import { useState } from "react";
 import { ChangeV2, Enum, VersionV2 } from "../types";
 import { findEmptyIndex } from "../utils";
+const { Option } = Select;
 
 type Props = {
-  versionList: VersionV2[];
   versionIndex: number;
   changeList: ChangeV2[];
   lineupList: Enum[];
@@ -14,13 +14,12 @@ type Props = {
 };
 
 type EditableCellProps = {
-  record: { key: number, name: string; };
+  record: { key: number, descriptoin: string; beforeChange: string; afterChange: string; lineup: number };
   dataIndex: string;
   children: any;
 };
 
 export default function ChangeTable({
-  versionList,
   versionIndex,
   changeList,
   lineupList,
@@ -35,7 +34,6 @@ export default function ChangeTable({
     { key: "beforeChange", dataIndex: "beforeChange", title: "Before change" },
     { key: "afterChange", dataIndex: "afterChange", title: "After change" },
     { key: 'lineup', dataIndex: 'lineup', title: 'Lineup' },
-    { key: 'version', dataIndex: 'version', title: 'Version' },
     { key: "actions", dataIndex: "actions", title: "Actions" },
   ].map((column) => {
     const { dataIndex } = column;
@@ -122,12 +120,11 @@ export default function ChangeTable({
     onChange(changeListNew);
   }
 
-  const versionFound = versionList.find((version) => version.index === versionIndex);
   const dataSource: any[] = [
     { key: -1 },
     ...changeList.map((change) => {
-      const { index: key, description, beforeChange, afterChange, lineupIndex: lineup, versionIndex: version } = change;
-      return { key, description, beforeChange, afterChange, lineup, version };
+      const { index: key, description, beforeChange, afterChange, lineupIndex: lineup } = change;
+      return { key, description, beforeChange, afterChange, lineup };
     }),
   ];
   return (
@@ -248,7 +245,7 @@ export default function ChangeTable({
     children,
     ...restProps
   }: EditableCellProps) {
-    const { key } = record;
+    const { key, lineup: lineupIndex } = record;
     return (
       <td {...restProps} style={{ verticalAlign: 'top' }}>
         {key === -1 && dataIndex === "description" ? (
@@ -287,12 +284,18 @@ export default function ChangeTable({
               name='lineup'
               initialValue={-1}
             >
-              <Select />
+              <Select>
+                <Option key={-1} value={-1}>(None)</Option>
+                {
+                  lineupList.map((lineup) => {
+                    const { index, name } = lineup;
+                    return (
+                      <Option key={index} value={index}>{name}</Option>
+                    )
+                  })
+                }
+              </Select>
             </Form.Item>
-          </Form>
-        ) : key === -1 && dataIndex === "version" ? (
-          <Form>
-            <Form.Item>{versionFound?.name ?? "(Error)"}</Form.Item>
           </Form>
         ) : key === -1 && dataIndex === "actions" ? (
           <Form>
@@ -307,9 +310,14 @@ export default function ChangeTable({
         ) : dataIndex === 'afterChange' ? (
           children
         ) : dataIndex === 'lineup' ? (
-          children
-        ) :dataIndex === 'version' ? (
-          children
+          lineupIndex === -1 ? '(None)' : lineupList.find((lineup) => lineup.index === lineupIndex)?.name ?? '(Error)'
+        ) : dataIndex === 'actions' ? (
+          <Form>
+            <Form.Item>
+              <Button>Edit</Button>
+              <Button>Remove</Button>
+            </Form.Item>
+          </Form>
         ) : (
           children
         )}
