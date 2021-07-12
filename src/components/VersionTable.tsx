@@ -48,7 +48,7 @@ export default function VersionTable({ versionList, onChange, onSelect }: Props)
       const index = findEmptyIndex(versionList.map((version) => version.index));
       const versionListNew: VersionV2[] = [
         ...versionList,
-        { index, name, indexPrev, changeWithCustomersList: [], releaseList: [] },
+        { index, name, indexPrev, releaseList: [] },
       ];
       form.setFieldsValue({ version: '' });
       onChange(versionListNew);
@@ -80,7 +80,7 @@ export default function VersionTable({ versionList, onChange, onSelect }: Props)
       }
       const versionListNew: VersionV2[] = [
         ...versionList.slice(0, indexFound),
-        { index: key, name, indexPrev, changeWithCustomersList: [], releaseList: [] },
+        { index: key, name, indexPrev, releaseList: [] },
         ...versionList.slice(indexFound + 1),
       ];
       onChange(versionListNew);
