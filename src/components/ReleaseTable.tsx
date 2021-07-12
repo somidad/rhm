@@ -54,6 +54,7 @@ export default function ReleaseTable({
   function addRelease() {
     form.validateFields(['pkgIndex']).then(() => {
       const { pkgIndex, customerList: customerIndexList } = form.getFieldsValue(['pkgIndex', 'customerList']);
+      console.log(pkgIndex, customerIndexList);
       if (pkgIndex === -1) {
         return;
       }
@@ -166,18 +167,15 @@ export default function ReleaseTable({
     }),
   ];
   return (
-    <>
-      <Title level={3}>Releases</Title>
-      <Table
-        columns={columns} dataSource={dataSource}
-        components={{
-          body: {
-            cell: EditableCell,
-          },
-        }}
-        pagination={false}
-      />
-    </>
+    <Table
+      columns={columns} dataSource={dataSource}
+      components={{
+        body: {
+          cell: EditableCell,
+        },
+      }}
+      pagination={false}
+    />
     // <Table celled compact selectable>
     //   <Table.Body>
     //     <Table.Row active>

@@ -5,12 +5,13 @@ import { Col, Collapse, Row, Tabs, Tag } from 'antd';
 import { GithubOutlined } from '@ant-design/icons';
 import EnumTable from './components/EnumTable';
 import PkgTable from './components/PkgTable';
-import { Enum, Pkg, Version } from './types';
+import { Enum, Pkg, Release, Version } from './types';
 import Title from 'antd/lib/typography/Title';
 import Link from 'antd/lib/typography/Link';
 import VersionTable from './components/VersionTable';
 import AppMenu from './components/AppMenu';
 import ReleaseTable from './components/ReleaseTable';
+import ChangeTable from './components/ChangeTable';
 const { Panel } = Collapse;
 
 function App() {
@@ -114,7 +115,7 @@ function App() {
                       </>
                     )
                   }
-                  <Collapse defaultActiveKey={['releases', 'changes']}>
+                  <Collapse defaultActiveKey={['changes', 'releases']}>
                     <Panel key='releases' header='Releases'>
                       <ReleaseTable
                           versionList={versionList}
@@ -122,12 +123,12 @@ function App() {
                           lineupList={lineupList}
                           pkgList={pkgList}
                           customerList={customerList}
-                          onChange={() => {}}
+                          onChange={onChangeReleaseList}
                           // onChangeVersionList={setVersionList}
                         />
                     </Panel>
                     <Panel key='changes' header='Changes'>
-                      {/* <ChangeTable changeList={[]} lineupList={lineupList} customerList={customerList} onChange={() => {}} /> */}
+                      <ChangeTable changeList={[]} lineupList={lineupList} onChange={() => {}} />
                     </Panel>
                   </Collapse>
                 </>
