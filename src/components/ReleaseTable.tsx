@@ -1,7 +1,7 @@
 import { Button, Checkbox, Form, Select, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { useState } from "react";
-import { Enum, Pkg, ReleaseV2, VersionV2 } from "../types";
+import { Enum, Pkg, ReleaseV2 } from "../types";
 import { findEmptyIndex } from "../utils";
 
 const { Option } = Select;
@@ -15,14 +15,10 @@ type Props ={
 }
 
 type EditableCellProps = {
-  record: { key: number; version: string; previous: number; package: Pkg[]; };
+  record: { key: number; version: string; previous: number; package: number; };
   dataIndex: string;
   children: any;
 };
-
-const PACKAGE = 'Package';
-const CUSTOMERS = 'Customers';
-const ACTIONS = 'Actions';
 
 export default function ReleaseTable({
   releaseList, lineupList, pkgList, customerList,
@@ -35,9 +31,9 @@ export default function ReleaseTable({
   const [customerIndexListNew, setCustomerIndexListNew] = useState<number[]>([]);
 
   const columns: any[] = [
-    { key: PACKAGE.toLocaleLowerCase(), dataIndex: PACKAGE.toLocaleLowerCase(), title: PACKAGE, width: '25%' },
-    { key: CUSTOMERS.toLocaleLowerCase(), dataIndex: CUSTOMERS.toLocaleLowerCase(), title: CUSTOMERS, width: '50%' },
-    { key: ACTIONS.toLocaleLowerCase(), dataIndex: ACTIONS.toLocaleLowerCase(), title: ACTIONS, width: '25%' },
+    { key: 'package', dataIndex: 'package', title: 'Package', width: '25%' },
+    { key: 'customers', dataIndex: 'customers', title: 'Customers', width: '50%' },
+    { key: 'actions', dataIndex: 'actions', title: 'Actions', width: '25%' },
   ].map((column) => {
     const { dataIndex } = column;
     return {
@@ -179,11 +175,11 @@ export default function ReleaseTable({
   )
 
   function EditableCell({ record, dataIndex, children, ...restProps }: EditableCellProps) {
-    const { key } = record;
+    const { key, package: pkgIndex } = record;
     return (
       <td {...restProps}>
         {
-          key === -1 && dataIndex === PACKAGE.toLocaleLowerCase() ? (
+          key === -1 && dataIndex === 'package' ? (
             <Form form={form}>
               <Form.Item
                 name='pkgIndex'
@@ -206,7 +202,7 @@ export default function ReleaseTable({
                 </Select>
               </Form.Item>
             </Form>
-          ) : key === -1 && dataIndex === CUSTOMERS.toLocaleLowerCase() ? (
+          ) : key === -1 && dataIndex === 'customers' ? (
             <Form form={form}>
               <Form.Item
                 name='customerList'
@@ -221,13 +217,16 @@ export default function ReleaseTable({
                 </Checkbox.Group>
               </Form.Item>
             </Form>
-          ) : key === -1 && dataIndex === ACTIONS.toLocaleLowerCase() ? (
+          ) : key === -1 && dataIndex === 'actions' ? (
             <Form>
               <Form.Item>
                 <Button onClick={addRelease}>Add</Button>
               </Form.Item>
             </Form>
-          ) : dataIndex === ACTIONS.toLocaleLowerCase() ? (
+          ) : dataIndex === 'package' ? (
+            // JSON.stringify(record)
+            pkgList.find((pkg) => pkg.index === pkgIndex)?.name ?? '(Error)'
+          ) : dataIndex === 'actions' ? (
             <>
               <Button>Edit</Button>
               <Button onClick={() => removeRelease(key)}>Remove</Button>
