@@ -1,17 +1,17 @@
 import { Input, Menu } from 'antd';
 import { createRef, useState } from 'react';
-import { Enum, Pkg, Version } from '../types';
+import { Enum, Pkg, VersionV2 } from '../types';
 import { load } from '../utils';
 
 type Props = {
   customerList: Enum[];
   lineupList: Enum[];
   pkgList: Pkg[];
-  versionList: Version[];
+  versionList: VersionV2[];
   onChangeCustomerList: (customerList: Enum[]) => void;
   onChangeLineupList: (lineupList: Enum[]) => void;
   onChangePkgList: (pkgList: Pkg[]) => void;
-  onChangeVersionList: (versionList: Version[]) => void;
+  onChangeVersionList: (versionList: VersionV2[]) => void;
 };
 
 const UNTITLED = 'Untitled';

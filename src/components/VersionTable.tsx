@@ -2,14 +2,14 @@ import { Button, Form, Input, Select, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import Link from "antd/lib/typography/Link";
 import { useState } from "react";
-import { Version } from "../types";
+import { VersionV2 } from "../types";
 import { findEmptyIndex } from "../utils";
 
 const { Option } = Select;
 
 type Props = {
-  versionList: Version[];
-  onChange: (versionList: Version[]) => void;
+  versionList: VersionV2[];
+  onChange: (versionList: VersionV2[]) => void;
   onSelect: (index: number) => void;
 };
 
@@ -46,9 +46,9 @@ export default function VersionTable({ versionList, onChange, onSelect }: Props)
         return;
       }
       const index = findEmptyIndex(versionList.map((version) => version.index));
-      const versionListNew: Version[] = [
+      const versionListNew: VersionV2[] = [
         ...versionList,
-        { index, name, indexPrev, changeList: [], releaseList: [] },
+        { index, name, indexPrev, changeWithCustomersList: [], releaseList: [] },
       ];
       form.setFieldsValue({ version: '' });
       onChange(versionListNew);
@@ -78,9 +78,9 @@ export default function VersionTable({ versionList, onChange, onSelect }: Props)
       if (indexFound === -1) {
         return;
       }
-      const versionListNew: Version[] = [
+      const versionListNew: VersionV2[] = [
         ...versionList.slice(0, indexFound),
-        { index: key, name, indexPrev, changeList: [], releaseList: [] },
+        { index: key, name, indexPrev, changeWithCustomersList: [], releaseList: [] },
         ...versionList.slice(indexFound + 1),
       ];
       onChange(versionListNew);

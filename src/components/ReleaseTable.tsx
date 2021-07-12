@@ -1,13 +1,13 @@
 import { Button, Checkbox, Form, Select, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { useState } from "react";
-import { Enum, Pkg, Release, Version } from "../types";
+import { Enum, Pkg, Release, VersionV2 } from "../types";
 import { findEmptyIndex } from "../utils";
 
 const { Option } = Select;
 
 type Props ={ 
-  versionList: Version[];
+  versionList: VersionV2[];
   releaseList: Release[];
   lineupList: Enum[];
   pkgList: Pkg[];
