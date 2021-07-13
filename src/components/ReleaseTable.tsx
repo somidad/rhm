@@ -1,3 +1,4 @@
+import { MenuOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Form, Select, Table, Tag } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { useState } from "react";
@@ -34,6 +35,7 @@ export default function ReleaseTable({
     { key: 'package', dataIndex: 'package', title: 'Package' },
     { key: 'customers', dataIndex: 'customers', title: 'Customers', width: '50%' },
     { key: 'actions', dataIndex: 'actions', title: 'Actions' },
+    { key: 'dragHandle', dataIndex: 'dragHandle', title: '', },
   ].map((column) => {
     const { dataIndex } = column;
     return {
@@ -244,10 +246,9 @@ export default function ReleaseTable({
             <>
               <Button>Edit</Button>
               <Button onClick={() => removeRelease(key)}>Remove</Button>
-              {' '}
-              <Button>Older</Button>
-              <Button>Newer</Button>
             </>
+          ) : dataIndex === 'dragHandle' ? (
+            <MenuOutlined style={{ cursor: 'grab' }} />
           ) : (
             children
           )
