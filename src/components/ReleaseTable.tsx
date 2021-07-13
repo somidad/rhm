@@ -228,6 +228,8 @@ export default function ReleaseTable({
                 <Button onClick={addRelease} disabled={editIndex !== -1}>Add</Button>
               </Form.Item>
             </Form>
+          ) : key === -1 && dataIndex === keyDragHandle ? (
+            null
           ) : editIndex === key && dataIndex === keyPackage ? (
             <Form form={form}>
               <Form.Item
