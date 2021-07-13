@@ -79,20 +79,20 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
     setEditIndex(index);
   }
 
-  function onSubmitEditPkg(index: number) {
+  function onSubmitEditPkg() {
     form.validateFields(['nameNew']).then(() => {
       const { nameNew, lineupNew: lineupIndexNew } = form.getFieldsValue(['nameNew', 'lineupNew']);
-      const pkgFound = pkgList.find((pkg) => pkg.index !== index && pkg.name === nameNew);
+      const pkgFound = pkgList.find((pkg) => pkg.index !== editIndex && pkg.name === nameNew);
       if (pkgFound) {
         return;
       }
-      const indexFound = pkgList.findIndex((pkg) => pkg.index === index);
+      const indexFound = pkgList.findIndex((pkg) => pkg.index === editIndex);
       if (indexFound === -1) {
         return;
       }
       const pkgListNew = [
         ...pkgList.slice(0, indexFound),
-        { index, name: nameNew, lineupIndex: lineupIndexNew },
+        { index: editIndex, name: nameNew, lineupIndex: lineupIndexNew },
         ...pkgList.slice(indexFound + 1),
       ];
       onChange(pkgListNew);
@@ -210,7 +210,7 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
         ) : editIndex === key && dataIndex === ACTIONS.toLocaleLowerCase() ? (
           <Form form={form}>
             <Form.Item>
-              <Button onClick={() => onSubmitEditPkg(key)}>Ok</Button>
+              <Button onClick={onSubmitEditPkg}>Ok</Button>
               <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
             </Form.Item>
           </Form>

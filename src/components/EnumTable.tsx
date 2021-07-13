@@ -66,20 +66,20 @@ export default function EnumTable({ title, enumList, onChange, usedIndexList }: 
     setEditIndex(index);
   }
 
-  function onSubmitRename(index: number) {
+  function onSubmitRename() {
     form.validateFields(['nameNew']).then(() => {
       const nameNew = form.getFieldValue('nameNew');
-      const enumItemFound = enumList.find((enumItem) => enumItem.index !== index && enumItem.name === nameNew);
+      const enumItemFound = enumList.find((enumItem) => enumItem.index !== editIndex && enumItem.name === nameNew);
       if (enumItemFound) {
         return;
       }
-      const indexFound = enumList.findIndex((enumItem) => enumItem.index === index);
+      const indexFound = enumList.findIndex((enumItem) => enumItem.index === editIndex);
       if (indexFound === -1) {
         return;
       }
       const enumListNew = [
         ...enumList.slice(0, indexFound),
-        { index, name: nameNew },
+        { index: editIndex, name: nameNew },
         ...enumList.slice(indexFound + 1),
       ];
       onChange(enumListNew);
@@ -146,7 +146,7 @@ export default function EnumTable({ title, enumList, onChange, usedIndexList }: 
               </Form.Item>
             </Form>
           ) : editIndex === key && dataIndex === NAME.toLocaleLowerCase() ? (
-            <Form form={form} onFinish={() => onSubmitRename(key)}>
+            <Form form={form} onFinish={onSubmitRename}>
               <Form.Item
                 name='nameNew'
                 rules={[{ required: true }]}
@@ -158,7 +158,7 @@ export default function EnumTable({ title, enumList, onChange, usedIndexList }: 
           ) : editIndex === key && dataIndex === ACTIONS.toLocaleLowerCase() ? (
             <Form form={form}>
               <Form.Item>
-                <Button onClick={() => onSubmitRename(key)}>Ok</Button>
+                <Button onClick={onSubmitRename}>Ok</Button>
                 <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
               </Form.Item>
             </Form>

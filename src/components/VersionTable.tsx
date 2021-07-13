@@ -67,20 +67,20 @@ export default function VersionTable({ versionList, onChange, onSelect }: Props)
     setEditIndex(key);
   }
 
-  function onSubmitEditVersion(key: number) {
+  function onSubmitEditVersion() {
     form.validateFields(['nameNew']).then(() => {
       const { nameNew: name, previousNew: indexPrev } = form.getFieldsValue(['nameNew', 'previousNew']);
-      const versionFound = versionList.find((version) => version.index !== key && version.name === name);
+      const versionFound = versionList.find((version) => version.index !== editIndex && version.name === name);
       if (versionFound) {
         return;
       }
-      const indexFound = versionList.findIndex((version) => version.index === key);
+      const indexFound = versionList.findIndex((version) => version.index === editIndex);
       if (indexFound === -1) {
         return;
       }
       const versionListNew: VersionV2[] = [
         ...versionList.slice(0, indexFound),
-        { index: key, name, indexPrev, releaseList: [] },
+        { index: editIndex, name, indexPrev, releaseList: [] },
         ...versionList.slice(indexFound + 1),
       ];
       onChange(versionListNew);
@@ -201,7 +201,7 @@ export default function VersionTable({ versionList, onChange, onSelect }: Props)
           ) : editIndex === key && dataIndex === 'actions' ? (
             <Form form={form}>
               <Form.Item>
-                <Button onClick={() => onSubmitEditVersion(key)}>Ok</Button>
+                <Button onClick={onSubmitEditVersion}>Ok</Button>
                 <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
               </Form.Item>
             </Form>
