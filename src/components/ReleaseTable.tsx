@@ -5,6 +5,7 @@ import { useState } from "react";
 import { keyActions, keyCustomers, keyDragHandle, keyPackage, parenError, parenNone, titleActions, titleCustomers, titlePackage } from "../constants";
 import { Enum, Pkg, ReleaseV2 } from "../types";
 import { findEmptyIndex } from "../utils";
+import ChangePerReleaseTable from "./ChangePerReleaseTable";
 
 const { Option } = Select;
 
@@ -301,10 +302,9 @@ export default function ReleaseTable({
 
   function expandedRowRender(props: any) {
     return (
-      <>
-        <td />
-        <td colSpan={columns.length}>asdf</td>
-      </>
+      <td colSpan={columns.length}>
+        <ChangePerReleaseTable />
+      </td>
     )
   }
 }
