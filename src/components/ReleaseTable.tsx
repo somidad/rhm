@@ -2,6 +2,7 @@ import { MenuOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Form, Select, Table, Tag } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { useState } from "react";
+import { keyActions, keyCustomers, keyDragHandle, keyPackage, parenError, parenNone, titleActions, titleCustomers, titlePackage } from "../constants";
 import { Enum, Pkg, ReleaseV2 } from "../types";
 import { findEmptyIndex } from "../utils";
 
@@ -32,10 +33,10 @@ export default function ReleaseTable({
   const [customerIndexListNew, setCustomerIndexListNew] = useState<number[]>([]);
 
   const columns: any[] = [
-    { key: 'package', dataIndex: 'package', title: 'Package' },
-    { key: 'customers', dataIndex: 'customers', title: 'Customers', width: '50%' },
-    { key: 'actions', dataIndex: 'actions', title: 'Actions' },
-    { key: 'dragHandle', dataIndex: 'dragHandle', title: '', },
+    { key: keyPackage, dataIndex: keyPackage, title: titlePackage },
+    { key: keyCustomers, dataIndex: keyCustomers, title: titleCustomers, width: '50%' },
+    { key: keyActions, dataIndex: keyActions, title: titleActions },
+    { key: keyDragHandle, dataIndex: keyDragHandle, title: '', },
   ].map((column) => {
     const { dataIndex } = column;
     return {
@@ -188,7 +189,7 @@ export default function ReleaseTable({
     return (
       <td {...restProps}>
         {
-          key === -1 && dataIndex === 'package' ? (
+          key === -1 && dataIndex === keyPackage ? (
             <Form form={form}>
               <Form.Item
                 name='pkgIndex'
@@ -199,10 +200,10 @@ export default function ReleaseTable({
                       const { index, name, lineupIndex } = pkg;
                       const lineup =
                         lineupIndex === -1
-                          ? "(None)"
+                          ? parenNone
                           : lineupList.find(
                               (lineup) => lineup.index === lineupIndex
-                            )?.name ?? "(Error)";
+                            )?.name ?? parenError;
                       return (
                         <Option key={index} value={index}>{`${name} - ${lineup}`}</Option>
                       )
@@ -211,7 +212,7 @@ export default function ReleaseTable({
                 </Select>
               </Form.Item>
             </Form>
-          ) : key === -1 && dataIndex === 'customers' ? (
+          ) : key === -1 && dataIndex === keyCustomers ? (
             <Form form={form}>
               <Form.Item
                 name='customerList'
@@ -226,7 +227,7 @@ export default function ReleaseTable({
                 </Checkbox.Group>
               </Form.Item>
             </Form>
-          ) : key === -1 && dataIndex === 'actions' ? (
+          ) : key === -1 && dataIndex === keyActions ? (
             <Form>
               <Form.Item>
                 <Button onClick={addRelease}>Add</Button>
@@ -234,20 +235,20 @@ export default function ReleaseTable({
             </Form>
           ) : dataIndex === 'package' ? (
             // JSON.stringify(record)
-            pkgList.find((pkg) => pkg.index === pkgIndex)?.name ?? '(Error)'
-          ) : dataIndex === 'customers' ? (
+            pkgList.find((pkg) => pkg.index === pkgIndex)?.name ?? parenError
+          ) : dataIndex === keyCustomers ? (
             customerIndexList.map((customerIndex) => {
               const customerFound = customerList.find((customer) => customer.index === customerIndex);
               return customerFound && (
                 <Tag key={customerFound.index}>{customerFound.name}</Tag>
               );
             }).filter((customerTag) => !!customerTag)
-          ) : dataIndex === 'actions' ? (
+          ) : dataIndex === keyActions ? (
             <>
               <Button>Edit</Button>
               <Button onClick={() => removeRelease(key)}>Remove</Button>
             </>
-          ) : dataIndex === 'dragHandle' ? (
+          ) : dataIndex === keyDragHandle ? (
             <MenuOutlined style={{ cursor: 'grab' }} />
           ) : (
             children
