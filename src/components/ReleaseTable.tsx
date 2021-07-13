@@ -244,6 +244,9 @@ export default function ReleaseTable({
             <>
               <Button>Edit</Button>
               <Button onClick={() => removeRelease(key)}>Remove</Button>
+              {' '}
+              <Button>Older</Button>
+              <Button>Newer</Button>
             </>
           ) : (
             children
