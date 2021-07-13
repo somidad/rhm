@@ -29,8 +29,6 @@ export default function ReleaseTable({
   const [form] = useForm();
 
   const [editIndex, setEditIndex] = useState(-1);
-  const [pkgIndexNew, setPkgIndexNew] = useState(-1);
-  const [customerIndexListNew, setCustomerIndexListNew] = useState<number[]>([]);
 
   const columns: any[] = [
     { key: keyPackage, dataIndex: keyPackage, title: titlePackage },
