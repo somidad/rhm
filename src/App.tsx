@@ -128,10 +128,13 @@ function App() {
                   <Collapse defaultActiveKey={["changes", "releases"]}>
                     <Panel key="releases" header="Releases">
                       <ReleaseTable
+                        changeList={changeList}
                         releaseList={releaseList}
                         lineupList={lineupList}
                         pkgList={pkgList}
                         customerList={customerList}
+                        versionList={versionList}
+                        versionIndex={versionIndex}
                         onChange={onChangeReleaseList}
                         // onChangeVersionList={setVersionList}
                       />

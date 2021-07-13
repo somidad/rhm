@@ -3,17 +3,20 @@ import { Button, Checkbox, Form, Select, Table, Tag } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { useState } from "react";
 import { keyActions, keyCustomers, keyDragHandle, keyPackage, parenError, parenNone, titleActions, titleCustomers, titlePackage } from "../constants";
-import { Enum, Pkg, ReleaseV2 } from "../types";
+import { ChangeV2, Enum, Pkg, ReleaseV2, VersionV2 } from "../types";
 import { findEmptyIndex } from "../utils";
 import ChangePerReleaseTable from "./ChangePerReleaseTable";
 
 const { Option } = Select;
 
 type Props ={ 
+  changeList: ChangeV2[];
   releaseList: ReleaseV2[];
   lineupList: Enum[];
   pkgList: Pkg[];
   customerList: Enum[];
+  versionList: VersionV2[];
+  versionIndex: number;
   onChange: (releaseList: ReleaseV2[]) => void;
 }
 
@@ -24,7 +27,9 @@ type EditableCellProps = {
 };
 
 export default function ReleaseTable({
+  changeList,
   releaseList, lineupList, pkgList, customerList,
+  versionList, versionIndex,
   onChange,
 }: Props) {
   const [form] = useForm();

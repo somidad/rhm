@@ -6,6 +6,7 @@ export const keyDescription = 'description';
 export const keyDragHandle = 'dragHandle';
 export const keyLineup = 'lineup';
 export const keyPackage = 'package';
+export const keyVersion = 'version';
 
 export const parenNone = '(None)';
 export const parenError = '(Error)';
@@ -17,3 +18,4 @@ export const titleCustomers = 'Customers';
 export const titleDescription = 'Description';
 export const titleLineup = 'Lineup';
 export const titlePackage = 'Package';
+export const titleVersion = 'Version';
