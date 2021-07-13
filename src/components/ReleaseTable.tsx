@@ -118,9 +118,7 @@ export default function ReleaseTable({
   }
 
   function onSubmitEditRelease() {
-    if (!customerIndexListNew.length) {
-      return;
-    }
+    const { pkgIndexNew, customerIndexListNew } = form.getFieldsValue(['pkgIndexNew', 'customerIndexListNew']);
     const releaseFound = releaseList.find((release) => release.index !== editIndex && release.pkgIndex === pkgIndexNew);
     if (releaseFound) {
       return;
@@ -263,7 +261,6 @@ export default function ReleaseTable({
                     const { index: value, name: label } = customer;
                     return { value, label };
                   })}
-                  disabled={editIndex !== -1}
                 >
                 </Checkbox.Group>
               </Form.Item>
@@ -271,7 +268,7 @@ export default function ReleaseTable({
           ) : editIndex === key && dataIndex === keyActions ? (
             <Form form={form}>
               <Form.Item>
-                <Button>Ok</Button>
+                <Button onClick={onSubmitEditRelease}>Ok</Button>
                 <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
               </Form.Item>
             </Form>
