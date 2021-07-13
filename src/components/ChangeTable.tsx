@@ -34,11 +34,11 @@ export default function ChangeTable({
   }, [versionIndex]);
 
   const columns: any[] = [
-    { key: "description", dataIndex: "description", title: "Description" },
-    { key: "beforeChange", dataIndex: "beforeChange", title: "Before change" },
-    { key: "afterChange", dataIndex: "afterChange", title: "After change" },
-    { key: 'lineup', dataIndex: 'lineup', title: 'Lineup' },
-    { key: "actions", dataIndex: "actions", title: "Actions" },
+    { key: "description", dataIndex: "description", title: "Description", width: '25%' },
+    { key: "beforeChange", dataIndex: "beforeChange", title: "Before change", width: '25%' },
+    { key: "afterChange", dataIndex: "afterChange", title: "After change", width: '25%' },
+    { key: 'lineup', dataIndex: 'lineup', title: 'Lineup', width: '12.5%' },
+    { key: "actions", dataIndex: "actions", title: "Actions", width: '12.5%' },
   ].map((column) => {
     const { dataIndex } = column;
     return {
