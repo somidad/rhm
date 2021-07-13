@@ -31,9 +31,9 @@ export default function ReleaseTable({
   const [customerIndexListNew, setCustomerIndexListNew] = useState<number[]>([]);
 
   const columns: any[] = [
-    { key: 'package', dataIndex: 'package', title: 'Package', width: '25%' },
+    { key: 'package', dataIndex: 'package', title: 'Package' },
     { key: 'customers', dataIndex: 'customers', title: 'Customers', width: '50%' },
-    { key: 'actions', dataIndex: 'actions', title: 'Actions', width: '25%' },
+    { key: 'actions', dataIndex: 'actions', title: 'Actions' },
   ].map((column) => {
     const { dataIndex } = column;
     return {
