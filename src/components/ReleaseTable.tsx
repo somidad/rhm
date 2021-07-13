@@ -1,4 +1,4 @@
-import { Button, Checkbox, Form, Select, Table } from "antd";
+import { Button, Checkbox, Form, Select, Table, Tag } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { useState } from "react";
 import { Enum, Pkg, ReleaseV2 } from "../types";
@@ -15,7 +15,7 @@ type Props ={
 }
 
 type EditableCellProps = {
-  record: { key: number; version: string; previous: number; package: number; };
+  record: { key: number; package: number; customers: number[] };
   dataIndex: string;
   children: any;
 };
@@ -182,7 +182,7 @@ export default function ReleaseTable({
     if (!record) {
       return children;
     }
-    const { key, package: pkgIndex } = record;
+    const { key, package: pkgIndex, customers: customerIndexList } = record;
     return (
       <td {...restProps}>
         {
@@ -233,6 +233,13 @@ export default function ReleaseTable({
           ) : dataIndex === 'package' ? (
             // JSON.stringify(record)
             pkgList.find((pkg) => pkg.index === pkgIndex)?.name ?? '(Error)'
+          ) : dataIndex === 'customers' ? (
+            customerIndexList.map((customerIndex) => {
+              const customerFound = customerList.find((customer) => customer.index === customerIndex);
+              return customerFound && (
+                <Tag key={customerFound.index}>{customerFound.name}</Tag>
+              );
+            }).filter((customerTag) => !!customerTag)
           ) : dataIndex === 'actions' ? (
             <>
               <Button>Edit</Button>
