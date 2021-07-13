@@ -1,5 +1,5 @@
 import { Table } from "antd";
-import { keyActions, keyAfterChange, keyBeforeChange, keyCustomers, keyDescription, keyLineup, keyVersion, titleActions, titleAfterChange, titleBeforeChange, titleCustomers, titleDescription, titleLineup, titleVersion } from "../constants";
+import { keyActions, keyCustomers, keyDescription, keyLineup, keyVersion, titleActions, titleCustomers, titleDescription, titleLineup, titleVersion } from "../constants";
 
 export default function ChangePerReleaseTable() {
   const columns: any[] = [
