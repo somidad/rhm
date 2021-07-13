@@ -110,13 +110,12 @@ export default function ReleaseTable({
     if (!releaseFound) {
       return;
     }
-    const { pkgIndex, customerIndexList } = releaseFound;
-    const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex);
+    const { pkgIndex: pkgIndexNew, customerIndexList: customerIndexListNew } = releaseFound;
+    const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndexNew);
     if (!pkgFound) {
       return;
     }
-    setPkgIndexNew(pkgIndex);
-    setCustomerIndexListNew(customerIndexList);
+    form.setFieldsValue({ pkgIndexNew, customerIndexListNew });
     setEditIndex(index);
   }
 
@@ -194,7 +193,7 @@ export default function ReleaseTable({
               <Form.Item
                 name='pkgIndex'
               >
-                <Select>
+                <Select disabled={editIndex !== -1}>
                   {
                     pkgList.map((pkg) => {
                       const { index, name, lineupIndex } = pkg;
@@ -230,10 +229,55 @@ export default function ReleaseTable({
           ) : key === -1 && dataIndex === keyActions ? (
             <Form>
               <Form.Item>
-                <Button onClick={addRelease}>Add</Button>
+                <Button onClick={addRelease} disabled={editIndex !== -1}>Add</Button>
               </Form.Item>
             </Form>
-          ) : dataIndex === 'package' ? (
+          ) : editIndex === key && dataIndex === keyPackage ? (
+            <Form form={form}>
+              <Form.Item
+                name='pkgIndexNew'
+              >
+                <Select>
+                  {
+                    pkgList.map((pkg) => {
+                      const { index, name, lineupIndex } = pkg;
+                      const lineup =
+                        lineupIndex === -1
+                          ? parenNone
+                          : lineupList.find(
+                              (lineup) => lineup.index === lineupIndex
+                            )?.name ?? parenError;
+                      return (
+                        <Option key={index} value={index}>{`${name} - ${lineup}`}</Option>
+                      )
+                    })
+                  }
+                </Select>
+              </Form.Item>
+            </Form>
+          ) : editIndex === key && dataIndex === keyCustomers ? (
+            <Form form={form}>
+              <Form.Item
+                name='customerIndexListNew'
+              >
+                <Checkbox.Group
+                  options={customerList.map((customer) => {
+                    const { index: value, name: label } = customer;
+                    return { value, label };
+                  })}
+                  disabled={editIndex !== -1}
+                >
+                </Checkbox.Group>
+              </Form.Item>
+            </Form>
+          ) : editIndex === key && dataIndex === keyActions ? (
+            <Form form={form}>
+              <Form.Item>
+                <Button>Ok</Button>
+                <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
+              </Form.Item>
+            </Form>
+          ) : dataIndex === keyPackage ? (
             // JSON.stringify(record)
             pkgList.find((pkg) => pkg.index === pkgIndex)?.name ?? parenError
           ) : dataIndex === keyCustomers ? (
@@ -245,7 +289,7 @@ export default function ReleaseTable({
             }).filter((customerTag) => !!customerTag)
           ) : dataIndex === keyActions ? (
             <>
-              <Button>Edit</Button>
+              <Button onClick={() => onClickEdit(key)}>Edit</Button>
               <Button onClick={() => removeRelease(key)}>Remove</Button>
             </>
           ) : dataIndex === keyDragHandle ? (
