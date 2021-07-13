@@ -21,7 +21,7 @@ type Props ={
 }
 
 type EditableCellProps = {
-  record: { key: number; package: number; customers: number[] };
+  record: { key: number; package: number; pkgName: string; customers: number[], lineup: string };
   dataIndex: string;
   children: any;
 };
@@ -163,7 +163,11 @@ export default function ReleaseTable({
     { key: -1 },
     ...releaseList.map((release) => {
       const { index: key, pkgIndex, customerIndexList: customers } = release;
-      return { key, package: pkgIndex, customers };
+      const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex);
+      const pkgName = pkgFound?.name;
+      const lineupIndex = pkgFound?.lineupIndex;
+      const lineup = lineupIndex === -1 ? '(None)' : lineupList.find((lineup) => lineup.index === lineupIndex)?.name ?? '(Error)';
+      return { key, package: pkgIndex, pkgName, customers, lineup };
     }),
   ];
   return (
@@ -186,7 +190,7 @@ export default function ReleaseTable({
     if (!record) {
       return children;
     }
-    const { key, package: pkgIndex, customers: customerIndexList } = record;
+    const { key, pkgName, customers: customerIndexList, lineup } = record;
     return (
       <td {...restProps}>
         {
@@ -281,8 +285,7 @@ export default function ReleaseTable({
               </Form.Item>
             </Form>
           ) : dataIndex === keyPackage ? (
-            // JSON.stringify(record)
-            pkgList.find((pkg) => pkg.index === pkgIndex)?.name ?? parenError
+            `${pkgName} - ${lineup}`
           ) : dataIndex === keyCustomers ? (
             customerIndexList.map((customerIndex) => {
               const customerFound = customerList.find((customer) => customer.index === customerIndex);
