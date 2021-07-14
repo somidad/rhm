@@ -1,5 +1,7 @@
-import { Button, Popover, Table, Typography } from "antd";
-import { keyActions, keyCustomers, keyDescription, keyLineup, keyVersion, parenError, parenNone, titleActions, titleCustomers, titleDescription, titleLineup, titleVersion } from "../constants";
+import { Button, Form, Popover, Select, Table, Typography } from "antd";
+import { useForm } from "antd/lib/form/Form";
+import { useState } from "react";
+import { keyActions, keyCustomers, keyDescription, keyLineup, keyVersion, parenError, titleActions, titleCustomers, titleDescription, titleLineup, titleVersion } from "../constants";
 import { ChangeV2, Enum, Pkg, ReleaseV2, VersionV2 } from "../types";
 const { Text } = Typography;
 
@@ -40,10 +42,12 @@ export default function ChangePerReleaseTable({
   versionIndex,
   versionList,
 }: ChangePerReleaseTableProps) {
+  const [form] = useForm();
+  const [editIndex, setEditIndex] = useState(-1);
+
   const columns: any[] = [
     { key: keyVersion, dataIndex: keyVersion, title: titleVersion },
     { key: keyDescription, dataIndex: keyDescription, title: titleDescription },
-    { key: keyLineup, dataIndex: keyLineup, title: titleLineup },
     { key: keyCustomers, dataIndex: keyCustomers, title: titleCustomers },
     { key: keyActions, dataIndex: keyActions, title: titleActions },
   ].map((column) => {
@@ -57,6 +61,12 @@ export default function ChangePerReleaseTable({
     };
   });
 
+  function onClickEdit(index: number) {
+    // TODO
+    setEditIndex(index);
+  }
+
+  // TODO: Gather only changes of the current and previous versions
   const dataSource = [
     ...changeList.map((change) => {
       const { description, beforeChange, afterChange, lineupIndex, versionIndex } = change;
@@ -93,16 +103,33 @@ export default function ChangePerReleaseTable({
     return (
       <td {...restProps}>
         {
-          dataIndex === keyVersion ? (
+          editIndex === key && dataIndex === keyCustomers ? (
+            <Form form={form}>
+              <Form.Item
+                name='customerIndexList'
+              >
+                <Select
+                  mode='multiple'
+                  allowClear
+                >
+                </Select>
+              </Form.Item>
+            </Form>
+          ) : editIndex === key && dataIndex === keyActions ? (
+            <Form form={form}>
+              <Form.Item>
+                <Button>Ok</Button>
+                <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
+              </Form.Item>
+            </Form>
+          ) : dataIndex === keyVersion ? (
             versionFound?.name ?? parenError
           ) : dataIndex === keyDescription ? (
             <Popover content={() => <PopoverContent beforeChange={beforeChange} afterChange={afterChange} />}>
               {children}
             </Popover>
-          ) : dataIndex === keyLineup ? (
-            lineupIndex === -1 ? parenNone : lineupList.find((lineup) => lineup.index === lineupIndex)?.name ?? parenError
           ) : dataIndex === keyActions ? (
-            <Button>Edit</Button>
+            <Button onClick={() => onClickEdit(key)}>Edit</Button>
           ) : (
             children
           )
