@@ -15,6 +15,7 @@ type Props ={
   lineupList: Enum[];
   pkgList: Pkg[];
   customerList: Enum[];
+  usedPkgIndexList: number[];
   versionList: VersionV2[];
   versionIndex: number;
   onChange: (releaseList: ReleaseV2[]) => void;
@@ -29,6 +30,7 @@ type EditableCellProps = {
 export default function ReleaseTable({
   changeList,
   releaseList, lineupList, pkgList, customerList,
+  usedPkgIndexList,
   versionList, versionIndex,
   onChange,
 }: Props) {
@@ -212,7 +214,10 @@ export default function ReleaseTable({
                               (lineup) => lineup.index === lineupIndex
                             )?.name ?? parenError;
                       return (
-                        <Option key={index} value={index}>
+                        <Option
+                          key={index} value={index}
+                          disabled={usedPkgIndexList.includes(index)}
+                        >
                           {name}
                           {' '}
                           <Tag>{lineup}</Tag>

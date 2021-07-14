@@ -107,6 +107,7 @@ function App() {
                         lineupList={lineupList}
                         pkgList={pkgList}
                         customerList={customerList}
+                        usedPkgIndexList={usedPkgIndexList}
                         versionList={versionList}
                         versionIndex={versionIndex}
                         onChange={setReleaseList}

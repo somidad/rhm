@@ -226,7 +226,10 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
         ) : dataIndex === ACTIONS.toLocaleLowerCase() ? (
           <>
             <Button onClick={() => onClickEdit(key)}>Edit</Button>
-            <Button onClick={() => removePkg(key)}>Remove</Button>
+            <Button
+              onClick={() => removePkg(key)}
+              disabled={usedPkgIndexList?.includes(key)}
+            >Remove</Button>
           </>
         ) : null}
       </td>
