@@ -1,5 +1,5 @@
 import { MenuOutlined } from "@ant-design/icons";
-import { Button, Checkbox, Form, Select, Table, Tag } from "antd";
+import { Button, Form, Select, Table, Tag } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { useState } from "react";
 import { keyActions, keyCustomers, keyDragHandle, keyPackage, parenError, parenNone, titleActions, titleCustomers, titlePackage } from "../constants";
@@ -211,7 +211,11 @@ export default function ReleaseTable({
                               (lineup) => lineup.index === lineupIndex
                             )?.name ?? parenError;
                       return (
-                        <Option key={index} value={index}>{`${name} - ${lineup}`}</Option>
+                        <Option key={index} value={index}>
+                          {name}
+                          {' '}
+                          <Tag>{lineup}</Tag>
+                        </Option>
                       )
                     })
                   }
@@ -269,7 +273,11 @@ export default function ReleaseTable({
                               (lineup) => lineup.index === lineupIndex
                             )?.name ?? parenError;
                       return (
-                        <Option key={index} value={index}>{`${name} - ${lineup}`}</Option>
+                        <Option key={index} value={index}>
+                          {name}
+                          {' '}
+                          <Tag>{lineup}</Tag>
+                        </Option>
                       )
                     })
                   }
@@ -281,13 +289,25 @@ export default function ReleaseTable({
               <Form.Item
                 name='customerIndexListNew'
               >
-                <Checkbox.Group
-                  options={customerList.map((customer) => {
-                    const { index: value, name: label } = customer;
-                    return { value, label };
-                  })}
+                <Select
+                  mode='multiple'
+                  allowClear
+                  filterOption={(input, option) => {
+                    if (!option) { return false; }
+                    const children = option.children as string;
+                    if (!children) { return false; }
+                    return children.toLocaleLowerCase().indexOf(input.toLocaleLowerCase()) !== -1;
+                  }}
                 >
-                </Checkbox.Group>
+                  {
+                    customerList.map((customer) => {
+                      const { index, name } = customer;
+                      return (
+                        <Option key={index} value={index}>{name}</Option>
+                      )
+                    })
+                  }
+                </Select>
               </Form.Item>
             </Form>
           ) : editIndex === key && dataIndex === keyActions ? (
