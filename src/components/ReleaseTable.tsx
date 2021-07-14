@@ -56,7 +56,6 @@ export default function ReleaseTable({
     form.validateFields(['pkgIndex']).then(() => {
       const { pkgIndex, customerList } = form.getFieldsValue(['pkgIndex', 'customerList']);
       const customerIndexList = customerList ?? [];
-      console.log(pkgIndex, customerIndexList);
       if (pkgIndex === -1) {
         return;
       }
@@ -198,6 +197,8 @@ export default function ReleaseTable({
             <Form form={form}>
               <Form.Item
                 name='pkgIndex'
+                rules={[{ required: true }]}
+                help={false}
               >
                 <Select disabled={editIndex !== -1}>
                   {
@@ -222,14 +223,26 @@ export default function ReleaseTable({
               <Form.Item
                 name='customerList'
               >
-                <Checkbox.Group
-                  options={customerList.map((customer) => {
-                    const { index: value, name: label } = customer;
-                    return { value, label };
-                  })}
+                <Select
+                  mode='multiple'
+                  allowClear
+                  filterOption={(input, option) => {
+                    if (!option) { return false; }
+                    const children = option.children as string;
+                    if (!children) { return false; }
+                    return children.toLocaleLowerCase().indexOf(input.toLocaleLowerCase()) !== -1;
+                  }}
                   disabled={editIndex !== -1}
                 >
-                </Checkbox.Group>
+                  {
+                    customerList.map((customer) => {
+                      const { index, name } = customer;
+                      return (
+                        <Option key={index} value={index}>{name}</Option>
+                      )
+                    })
+                  }
+                </Select>
               </Form.Item>
             </Form>
           ) : key === -1 && dataIndex === keyActions ? (
