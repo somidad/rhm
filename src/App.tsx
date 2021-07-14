@@ -12,7 +12,7 @@ import VersionTable from './components/VersionTable';
 import AppMenu from './components/AppMenu';
 import ReleaseTable from './components/ReleaseTable';
 import ChangeTable from './components/ChangeTable';
-import { customerListInit, lineupListInit } from './init';
+import { customerListInit, lineupListInit, pkgListInit } from './init';
 const { Panel } = Collapse;
 
 function App() {
@@ -20,7 +20,7 @@ function App() {
   const [versionIndex, setVersionIndex] = useState(-1);
   const [changeList, setChangeList] = useState<ChangeV2[]>([]);
   const [lineupList, setLineupList] = useState<Enum[]>(lineupListInit);
-  const [pkgList, setPkgList] = useState<Pkg[]>([]);
+  const [pkgList, setPkgList] = useState<Pkg[]>(pkgListInit);
   const [customerList, setCustomerList] = useState<Enum[]>(customerListInit);
 
   function onChangeVersionList(versionList: VersionV2[]) {
