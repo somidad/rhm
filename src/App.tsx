@@ -21,6 +21,7 @@ function App() {
   const [changeList, setChangeList] = useState<ChangeV2[]>([]);
   const [lineupList, setLineupList] = useState<Enum[]>(lineupListInit);
   const [pkgList, setPkgList] = useState<Pkg[]>(pkgListInit);
+  const [releaseList, setReleaseList] = useState<ReleaseV2[]>([]);
   const [customerList, setCustomerList] = useState<Enum[]>(customerListInit);
 
   function onChangeVersionList(versionList: VersionV2[]) {
@@ -29,24 +30,6 @@ function App() {
       setVersionIndex(-1);
     }
     setVersionList(versionList);
-  }
-
-  function onChangeReleaseList(releaseList: ReleaseV2[]) {
-    if (versionIndex === -1) {
-      return;
-    }
-    const indexFound = versionList.findIndex((version) => version.index === versionIndex);
-    if (indexFound === -1) {
-      return;
-    }
-    const version = versionList[indexFound];
-    version.releaseList = releaseList;
-    const versionListNew = [
-      ...versionList.slice(0, indexFound),
-      version,
-      ...versionList.slice(indexFound + 1),
-    ];
-    setVersionList(versionListNew);
   }
 
   function onSelectVersion(index: number) {
@@ -59,25 +42,14 @@ function App() {
     }),
     ...pkgList.map((pkg) => pkg.lineupIndex),
   ];
-  const usedPkgIndexList = [
-    ...versionList.map((version) => {
-      return version.releaseList.map((release) => release.pkgIndex);
-    }).reduce((indexPrevList, indexList) => {
-      return [...indexPrevList, ...indexList];
-    }, []),
-  ];
-  const usedCustomerIndexList = [
-    ...versionList.map((version) => {
-      return version.releaseList.map((release) => release.customerIndexList).reduce((indexListPrev, indexList) => {
-        return [
-          ...indexListPrev,
-          ...indexList,
-        ];
-      }, []);
-    }).reduce((indexPrevList, indexList) => {
-      return [...indexPrevList, ...indexList];
-    }, []),
-  ];
+  const usedPkgIndexList = releaseList.map((release) => release.pkgIndex);
+  // TODO: Need improvement?
+  const usedCustomerIndexList = releaseList.reduce((customerIndexListPrev: number[], release) => {
+    return [
+      ...customerIndexListPrev,
+      ...release.customerIndexList,
+    ];
+  }, []);
 
   const versionCurr = versionList.find((version) => version.index === versionIndex);
   const versionPrev =
@@ -86,7 +58,6 @@ function App() {
       : versionList.find(
           (version) => version.index === versionCurr.indexPrev
         ) ?? -1;
-  const releaseList = versionCurr?.releaseList ?? [];
   return (
     <div className="App">
       <AppMenu
@@ -136,7 +107,7 @@ function App() {
                         customerList={customerList}
                         versionList={versionList}
                         versionIndex={versionIndex}
-                        onChange={onChangeReleaseList}
+                        onChange={setReleaseList}
                         // onChangeVersionList={setVersionList}
                       />
                     </Panel>

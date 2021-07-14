@@ -66,7 +66,7 @@ export default function ReleaseTable({
       const index = findEmptyIndex(releaseList.map((release) => release.index));
       const releaseListNew: ReleaseV2[] = [
         ...releaseList,
-        { index, pkgIndex, customerIndexList, changeIndexListWithCustomerIndexList: [] },
+        { index, versionIndex, pkgIndex, customerIndexList, changeIndexListWithCustomerIndexList: [] },
       ];
       onChange(releaseListNew);
     }).catch((reason) => {
@@ -136,6 +136,7 @@ export default function ReleaseTable({
       ...releaseList.slice(0, indexFound),
       {
         index: editIndex,
+        versionIndex,
         pkgIndex: pkgIndexNew,
         customerIndexList: customerIndexListNew,
         changeIndexListWithCustomerIndexList: [], // FIXME
@@ -160,7 +161,7 @@ export default function ReleaseTable({
 
   const dataSource = [
     { key: -1 },
-    ...releaseList.map((release) => {
+    ...releaseList.filter((release) => release.versionIndex === versionIndex).map((release) => {
       const { index: key, pkgIndex, customerIndexList: customers } = release;
       const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex);
       const pkgName = pkgFound?.name;
