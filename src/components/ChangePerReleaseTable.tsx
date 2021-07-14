@@ -80,6 +80,14 @@ export default function ChangePerReleaseTable({
   );
 
   function EditableCell({ record, dataIndex, children, ...restProps }: EditableCellProps) {
+    // FIXME: No idea why the following check is required to render 'No Data'
+    if (!record) {
+      return (
+        <td colSpan={columns.length} {...restProps}>
+          {children}
+        </td>
+      );
+    }
     const { key, beforeChange, afterChange, lineupIndex, version: versionIndex } = record;
     const versionFound = versionList.find((version) => version.index === versionIndex);
     return (
