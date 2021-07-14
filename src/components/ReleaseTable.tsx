@@ -308,11 +308,19 @@ export default function ReleaseTable({
     )
   }
 
-  function expandedRowRender(props: any) {
+  function expandedRowRender(record: any) {
     return (
-      <td colSpan={columns.length}>
-        <ChangePerReleaseTable />
+      <td colSpan={columns.length + 1}>
+        <ChangePerReleaseTable
+          changeList={changeList}
+          customerList={customerList}
+          lineupList={lineupList}
+          pkgList={pkgList}
+          releaseList={releaseList}
+          versionIndex={versionIndex}
+          versionList={versionList}
+        />
       </td>
-    )
+    );
   }
 }
