@@ -5,7 +5,7 @@ import { keyActions, keyCustomers, keyDescription, keyLineup, keyVersion, parenE
 import { ChangeV2, Enum, Pkg, ReleaseV2, VersionV2 } from "../types";
 const { Text } = Typography;
 
-type ChangePerReleaseTableProps = {
+type ChangePerPkgTableProps = {
   changeList: ChangeV2[];
   customerList: Enum[];
   lineupList: Enum[];
@@ -33,7 +33,7 @@ type PopoverContentProps = {
   afterChange: string;
 };
 
-export default function ChangePerReleaseTable({
+export default function ChangePerPkgTable({
   changeList,
   customerList,
   lineupList,
@@ -41,7 +41,7 @@ export default function ChangePerReleaseTable({
   releaseList,
   versionIndex,
   versionList,
-}: ChangePerReleaseTableProps) {
+}: ChangePerPkgTableProps) {
   const [form] = useForm();
   const [editIndex, setEditIndex] = useState(-1);
 
