@@ -5,7 +5,7 @@ import { useState } from "react";
 import { keyActions, keyCustomers, keyDragHandle, keyPackage, parenError, parenNone, titleActions, titleCustomers, titlePackage } from "../constants";
 import { ChangeV2, Enum, Pkg, ReleaseV2, VersionV2 } from "../types";
 import { findEmptyIndex } from "../utils";
-import ChangePerPkgTable from "./ChangePerPkgTable";
+import ChangePerReleaseTable from "./ChangePerReleaseTable";
 
 const { Option } = Select;
 
@@ -348,12 +348,14 @@ export default function ReleaseTable({
   }
 
   function expandedRowRender(record: any) {
+    const { package: pkgIndex } = record;
     return (
       <td colSpan={columns.length + 1}>
-        <ChangePerPkgTable
+        <ChangePerReleaseTable
           changeList={changeList}
           customerList={customerList}
           lineupList={lineupList}
+          pkgIndex={pkgIndex}
           pkgList={pkgList}
           releaseList={releaseList}
           versionIndex={versionIndex}

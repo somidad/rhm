@@ -6,7 +6,7 @@ import { ChangeV2, Enum, Pkg, ReleaseV2, VersionV2 } from "../types";
 import { accumulateVersionIndex } from "../utils";
 const { Text } = Typography;
 
-type ChangePerPkgTableProps = {
+type ChangePerReleaseTableProps = {
   changeList: ChangeV2[];
   customerList: Enum[];
   lineupList: Enum[];
@@ -34,7 +34,7 @@ type PopoverContentProps = {
   afterChange: string;
 };
 
-export default function ChangePerPkgTable({
+export default function ChangePerReleaseTable({
   changeList,
   customerList,
   lineupList,
@@ -43,7 +43,7 @@ export default function ChangePerPkgTable({
   releaseList,
   versionIndex,
   versionList,
-}: ChangePerPkgTableProps) {
+}: ChangePerReleaseTableProps) {
   const [form] = useForm();
   const [editIndex, setEditIndex] = useState(-1);
 
