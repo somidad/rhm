@@ -97,7 +97,7 @@ function isVersionListCircular(versionList: Version[], index: number) {
 
 export function load(input: string) {
   const parsed = JSON.parse(input);
-  const { versionList, lineupList, pkgList, customerList } = parsed;
+  const { changeList, versionList, lineupList, pkgList, releaseList, customerList } = parsed;
   // Check if it comes from release-history-manager
   if (versionList[0] && versionList[0].versionIndex !== undefined) {
     // Migrate
@@ -133,7 +133,7 @@ export function load(input: string) {
   } else {
     // TODO: Check validity
   }
-  return { versionList, lineupList, pkgList, customerList };
+  return { changeList, versionList, lineupList, pkgList, releaseList, customerList };
 }
 
 export function publish(versionList: Version[], versionIndex: number, lineupList: Enum[], pkgList: Pkg[], customerList: Enum[]) {

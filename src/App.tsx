@@ -65,11 +65,13 @@ function App() {
         customerList={customerList}
         lineupList={lineupList}
         pkgList={pkgList}
+        releaseList={releaseList}
         versionList={versionList}
         onChangeChangeList={setChangeList}
         onChangeCustomerList={setCustomerList}
         onChangeLineupList={setLineupList}
         onChangePkgList={setPkgList}
+        onChangeReleaseList={setReleaseList}
         onChangeVersionList={setVersionList}
       />
       <Row>

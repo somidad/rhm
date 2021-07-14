@@ -1,6 +1,6 @@
 import { Input, Menu } from 'antd';
 import { createRef, useState } from 'react';
-import { ChangeV2, Enum, Pkg, VersionV2 } from '../types';
+import { ChangeV2, Enum, Pkg, ReleaseV2, VersionV2 } from '../types';
 import { load } from '../utils';
 
 type Props = {
@@ -8,11 +8,13 @@ type Props = {
   customerList: Enum[];
   lineupList: Enum[];
   pkgList: Pkg[];
+  releaseList: ReleaseV2[];
   versionList: VersionV2[];
   onChangeChangeList: (changeList: ChangeV2[]) => void;
   onChangeCustomerList: (customerList: Enum[]) => void;
   onChangeLineupList: (lineupList: Enum[]) => void;
   onChangePkgList: (pkgList: Pkg[]) => void;
+  onChangeReleaseList: (releaseList: ReleaseV2[]) => void;
   onChangeVersionList: (versionList: VersionV2[]) => void;
 };
 
@@ -23,11 +25,13 @@ export default function AppMenu({
   customerList,
   lineupList,
   pkgList,
+  releaseList,
   versionList,
   onChangeChangeList,
   onChangeCustomerList,
   onChangeLineupList,
   onChangePkgList,
+  onChangeReleaseList,
   onChangeVersionList,
 }: Props) {
   const refLoad = createRef<HTMLInputElement>();
@@ -50,6 +54,7 @@ export default function AppMenu({
 
   function onClickNew() {
     setFeatureName(UNTITLED);
+    onChangeReleaseList([]);
     onChangeVersionList([]);
     onChangeLineupList([{ index: 0, name: "(None)" }]);
     onChangePkgList([]);
@@ -62,7 +67,7 @@ export default function AppMenu({
       return;
     }
     const blob = new Blob(
-      [JSON.stringify({ versionList, lineupList, pkgList, changeList, customerList })],
+      [JSON.stringify({ versionList, lineupList, pkgList, releaseList, changeList, customerList })],
       { type: "application/json" }
     );
     refSave.current.download = `${featureName}.json`;
@@ -85,13 +90,15 @@ export default function AppMenu({
     const { name } = file;
     const indexLast = name.lastIndexOf(".");
     const featureName = name.substring(0, indexLast);
-    const { versionList, lineupList, pkgList, customerList } = load(result);
+    const { changeList, versionList, lineupList, pkgList, releaseList, customerList } = load(result);
     setFeatureName(featureName);
+    onChangeChangeList(changeList);
     onChangeCustomerList(customerList);
     onChangeLineupList(lineupList);
     onChangeChangeList(changeList);
     onChangePkgList(pkgList);
     onChangeVersionList(versionList);
+    onChangeReleaseList(releaseList);
   };
 
   return (
