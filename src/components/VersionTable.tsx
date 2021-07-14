@@ -1,6 +1,7 @@
 import { Button, Form, Input, Select, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import Link from "antd/lib/typography/Link";
+import { uniq } from "lodash";
 import { useState } from "react";
 import { VersionV2 } from "../types";
 import { findEmptyIndex } from "../utils";
@@ -105,6 +106,11 @@ export default function VersionTable({ versionList, onChange, onSelect }: Props)
     ];
     onChange(versionListNew);
   }
+
+  const usedVersionIndexList = uniq(versionList.filter((version) => {
+    const { index } = version;
+    return !!versionList.find((version) => version.indexPrev === index)
+  }).map((version) => version.index));
 
   const dataSource = [
     { key: -1 },
@@ -212,7 +218,10 @@ export default function VersionTable({ versionList, onChange, onSelect }: Props)
           ) : dataIndex === 'actions' ? (
             <>
               <Button onClick={() => onClickEdit(key)}>Edit</Button>
-              <Button onClick={() => removeVersion(key)}>Remove</Button>
+              <Button
+                onClick={() => removeVersion(key)}
+                disabled={usedVersionIndexList.includes(key)}
+              >Remove</Button>
               <Button>Publish</Button>
             </>
           ) : (children)
