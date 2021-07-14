@@ -167,7 +167,12 @@ export default function EnumTable({ title, enumList, onChange, usedIndexList }: 
           ) : dataIndex === ACTIONS.toLocaleLowerCase() ? (
             <>
               <Button onClick={() => onClickEdit(key)}>Edit</Button>
-              <Button onClick={() => removeEnumItem(key)}>Remove</Button>
+              <Button
+                onClick={() => removeEnumItem(key)}
+                disabled={usedIndexList?.includes(key)}
+              >
+                Remove
+              </Button>
             </>
           ) : (null)
         }
