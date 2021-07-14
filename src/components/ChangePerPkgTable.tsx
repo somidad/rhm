@@ -10,6 +10,7 @@ type ChangePerPkgTableProps = {
   changeList: ChangeV2[];
   customerList: Enum[];
   lineupList: Enum[];
+  pkgIndex: number;
   pkgList: Pkg[];
   releaseList: ReleaseV2[];
   versionIndex: number;
@@ -37,6 +38,7 @@ export default function ChangePerPkgTable({
   changeList,
   customerList,
   lineupList,
+  pkgIndex,
   pkgList,
   releaseList,
   versionIndex,
@@ -67,8 +69,11 @@ export default function ChangePerPkgTable({
   }
 
   const versionIndexList = accumulateVersionIndex(versionList, versionIndex);
+  const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex);
   const changeListFiltered = versionIndexList.reduce((changeListPrev: ChangeV2[], versionIndex) => {
-    const changeListCurr = changeList.filter((change) => change.versionIndex === versionIndex);
+    const changeListCurr = changeList.filter((change) => {
+      return change.versionIndex === versionIndex && change.lineupIndex === pkgFound?.lineupIndex;
+    });
     return [...changeListPrev, ...changeListCurr];
   }, []);
   const dataSource = [
