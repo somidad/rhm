@@ -16,6 +16,11 @@ export type ChangeV2 = {
   versionIndex: number;
 };
 
+export type CustomerIndexListPerChangeIndex = {
+  changeIndex: number;
+  customerIndexList: number[];
+}
+
 export type Enum = {
   index: number;
   name: string;
@@ -38,10 +43,7 @@ export type ReleaseV2 = {
   versionIndex: number;
   pkgIndex: number;
   customerIndexList: number[];
-  changeIndexListWithCustomerIndexList: {
-    changeIndex: number;
-    customerIndexList: number[];
-  }[];
+  customerIndexListPerChangeIndexList: CustomerIndexListPerChangeIndex[];
 }
 
 export type Version = {
