@@ -1,4 +1,4 @@
-import { Change, Enum, OldCustomer, OldPkg, OldVersion, Pkg, Release, Version } from "./types";
+import { Change, Enum, OldCustomer, OldPkg, OldVersion, Pkg, Release, Version, VersionV2 } from "./types";
 
 type ReleaseHistoryPerCustomerIndexList = {
   customerIndexList: number[];
@@ -38,6 +38,18 @@ function accumulateChangeList(
     versionNext = versionList.find((version) => version.index === indexPrev);
   }
   return versionNext;
+}
+
+export function accumulateVersionIndex(versionList: VersionV2[], versionIndex: number): number[] {
+  const versionIndexList: number[] = [];
+  const versionFound = versionList.find((version) => version.index === versionIndex);
+  if (!versionFound) {
+    return versionIndexList;
+  }
+  versionIndexList.push(versionIndex);
+  const { indexPrev } = versionFound;
+  versionIndexList.push(...accumulateVersionIndex(versionList, indexPrev));
+  return versionIndexList;
 }
 
 export function findEmptyIndex(indexList: number[]) {

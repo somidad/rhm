@@ -3,6 +3,7 @@ import { useForm } from "antd/lib/form/Form";
 import { useState } from "react";
 import { keyActions, keyCustomers, keyDescription, keyVersion, parenError, titleActions, titleCustomers, titleDescription, titleVersion } from "../constants";
 import { ChangeV2, Enum, Pkg, ReleaseV2, VersionV2 } from "../types";
+import { accumulateVersionIndex } from "../utils";
 const { Text } = Typography;
 
 type ChangePerPkgTableProps = {
@@ -65,9 +66,13 @@ export default function ChangePerPkgTable({
     setEditIndex(index);
   }
 
-  // TODO: Gather only changes of the current and previous versions
+  const versionIndexList = accumulateVersionIndex(versionList, versionIndex);
+  const changeListFiltered = versionIndexList.reduce((changeListPrev: ChangeV2[], versionIndex) => {
+    const changeListCurr = changeList.filter((change) => change.versionIndex === versionIndex);
+    return [...changeListPrev, ...changeListCurr];
+  }, []);
   const dataSource = [
-    ...changeList.map((change) => {
+    ...changeListFiltered.map((change) => {
       const { description, beforeChange, afterChange, versionIndex } = change;
       return {
         description, beforeChange, afterChange, version: versionIndex,
