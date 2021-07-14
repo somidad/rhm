@@ -4,6 +4,7 @@ import { useState } from "react";
 import { keyActions, keyCustomers, keyDescription, keyVersion, parenError, titleActions, titleCustomers, titleDescription, titleVersion } from "../constants";
 import { ChangeV2, Enum, Pkg, ReleaseV2, VersionV2 } from "../types";
 import { accumulateVersionIndex } from "../utils";
+const { Option } = Select;
 const { Text } = Typography;
 
 type ChangePerReleaseTableProps = {
@@ -12,6 +13,7 @@ type ChangePerReleaseTableProps = {
   lineupList: Enum[];
   pkgIndex: number;
   pkgList: Pkg[];
+  releaseIndex: number;
   releaseList: ReleaseV2[];
   versionIndex: number;
   versionList: VersionV2[];
@@ -40,6 +42,7 @@ export default function ChangePerReleaseTable({
   lineupList,
   pkgIndex,
   pkgList,
+  releaseIndex,
   releaseList,
   versionIndex,
   versionList,
@@ -78,13 +81,18 @@ export default function ChangePerReleaseTable({
   }, []);
   const dataSource = [
     ...changeListFiltered.map((change) => {
-      const { description, beforeChange, afterChange, versionIndex } = change;
+      const { index: key, description, beforeChange, afterChange, versionIndex } = change;
       return {
-        description, beforeChange, afterChange, version: versionIndex,
+        key, description, beforeChange, afterChange, version: versionIndex,
       };
     }),
   ];
 
+  const releaseFound = releaseList.find((release) => release.index === releaseIndex);
+  const customerIndexListPerRelease = releaseFound?.customerIndexList ?? [];
+  const customerListPerRelease = customerList.filter((customer) => {
+    return customerIndexListPerRelease.includes(customer.index);
+  });
   return (
     <Table
       columns={columns}
@@ -120,7 +128,21 @@ export default function ChangePerReleaseTable({
                 <Select
                   mode='multiple'
                   allowClear
+                  filterOption={(input, option) => {
+                    if (!option) { return false; }
+                    const children = option.children as string;
+                    if (!children) { return false; }
+                    return children.toLocaleLowerCase().indexOf(input.toLocaleLowerCase()) !== -1;
+                  }}
                 >
+                  {
+                    customerListPerRelease.map((customer) => {
+                      const { index, name } = customer;
+                      return (
+                        <Option key={index} value={index}>{name}</Option>
+                      )
+                    })
+                  }
                 </Select>
               </Form.Item>
             </Form>

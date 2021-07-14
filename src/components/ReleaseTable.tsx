@@ -348,7 +348,7 @@ export default function ReleaseTable({
   }
 
   function expandedRowRender(record: any) {
-    const { package: pkgIndex } = record;
+    const { key: releaseIndex, package: pkgIndex } = record;
     return (
       <td colSpan={columns.length + 1}>
         <ChangePerReleaseTable
@@ -357,6 +357,7 @@ export default function ReleaseTable({
           lineupList={lineupList}
           pkgIndex={pkgIndex}
           pkgList={pkgList}
+          releaseIndex={releaseIndex}
           releaseList={releaseList}
           versionIndex={versionIndex}
           versionList={versionList}
