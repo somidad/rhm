@@ -13,6 +13,7 @@ import AppMenu from './components/AppMenu';
 import ReleaseTable from './components/ReleaseTable';
 import ChangeTable from './components/ChangeTable';
 import { customerListInit, lineupListInit, pkgListInit } from './init';
+import { uniq } from 'lodash';
 const { Panel } = Collapse;
 
 function App() {
@@ -36,20 +37,20 @@ function App() {
     setVersionIndex(index);
   }
 
-  const usedLineupIndexList = [
+  const usedLineupIndexList = uniq([
     ...changeList.map((change) => {
       return change.lineupIndex;
     }),
     ...pkgList.map((pkg) => pkg.lineupIndex),
-  ];
+  ]);
   const usedPkgIndexList = releaseList.map((release) => release.pkgIndex);
   // TODO: Need improvement?
-  const usedCustomerIndexList = releaseList.reduce((customerIndexListPrev: number[], release) => {
+  const usedCustomerIndexList = uniq(releaseList.reduce((customerIndexListPrev: number[], release) => {
     return [
       ...customerIndexListPrev,
       ...release.customerIndexList,
     ];
-  }, []);
+  }, []));
 
   const versionCurr = versionList.find((version) => version.index === versionIndex);
   const versionPrev =
