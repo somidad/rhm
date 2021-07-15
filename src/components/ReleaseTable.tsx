@@ -1,7 +1,7 @@
 import { MenuOutlined } from "@ant-design/icons";
 import { Button, Form, Select, Table, Tag } from "antd";
 import { useForm } from "antd/lib/form/Form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { keyActions, keyCustomers, keyDragHandle, keyPackage, parenError, parenNone, titleActions, titleCustomers, titlePackage } from "../constants";
 import { CustomerIndexListPerChange, Enum, Pkg, ReleaseV2, VersionV2 } from "../types";
 import { findEmptyIndex } from "../utils";
@@ -34,6 +34,10 @@ export default function ReleaseTable({
   const [form] = useForm();
 
   const [editIndex, setEditIndex] = useState(-1);
+
+  useEffect(() => {
+    setEditIndex(-1);
+  }, [lineupList, pkgList, customerList, versionList, versionIndex]);
 
   const versionFound = versionList.find((version) => version.index === versionIndex);
   const releaseList = versionFound?.releaseList ?? [];
@@ -393,12 +397,11 @@ export default function ReleaseTable({
   }
 
   function expandedRowRender(record: any) {
-    const { key: releaseIndex, package: pkgIndex } = record;
+    const { key: releaseIndex } = record;
     return (
       <td colSpan={columns.length + 1}>
         <ChangePerReleaseTable
           customerList={customerList}
-          pkgIndex={pkgIndex}
           pkgList={pkgList}
           releaseIndex={releaseIndex}
           versionIndex={versionIndex}

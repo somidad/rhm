@@ -31,7 +31,7 @@ export default function ChangeTable({
 
   useEffect(() => {
     setEditIndex(-1);
-  }, [versionIndex]);
+  }, [versionIndex, versionList, lineupList]);
 
   const versionFound = versionList.find((version) => version.index === versionIndex);
   const changeList = versionFound?.changeList ?? [];

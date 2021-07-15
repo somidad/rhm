@@ -1,6 +1,6 @@
 import { Button, Form, Input, Select, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Enum, Pkg } from "../types";
 import { findEmptyIndex } from "../utils";
 
@@ -26,6 +26,10 @@ const ACTIONS = 'Actions';
 export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexList }: Props) {
   const [form] = useForm();
   const [editIndex, setEditIndex] = useState(-1);
+
+  useEffect(() => {
+    setEditIndex(-1);
+  }, [lineupList]);
 
   const columns: any[] = [
     { key: PACKAGE.toLocaleLowerCase(), dataIndex: PACKAGE.toLocaleLowerCase(), title: PACKAGE },

@@ -1,6 +1,6 @@
 import { Button, Form, Popover, Select, Table, Tag, Typography } from "antd";
 import { useForm } from "antd/lib/form/Form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { keyActions, keyCustomers, keyDescription, keyVersion, parenError, parenGlobal, titleActions, titleCustomers, titleDescription, titleVersion } from "../constants";
 import { ChangeV2, CustomerIndexListPerChange, Enum, Pkg, VersionV2 } from "../types";
 import { accumulateVersionIndex } from "../utils";
@@ -9,7 +9,6 @@ const { Text } = Typography;
 
 type ChangePerReleaseTableProps = {
   customerList: Enum[];
-  pkgIndex: number;
   pkgList: Pkg[];
   releaseIndex: number;
   versionIndex: number;
@@ -37,7 +36,6 @@ type PopoverContentProps = {
 
 export default function ChangePerReleaseTable({
   customerList,
-  pkgIndex,
   pkgList,
   releaseIndex,
   versionIndex,
@@ -48,10 +46,16 @@ export default function ChangePerReleaseTable({
   const [editVersionIndex, setEditVersionIndex]= useState(-1);
   const [editChangeIndex, setEditChangeIndex] = useState(-1);
 
+  useEffect(() => {
+    setEditVersionIndex(-1);
+    setEditChangeIndex(-1);
+  }, [customerList, pkgList, releaseIndex, versionIndex, versionList]);
+
   const versionFound = versionList.find((version) => version.index === versionIndex);
   const releaseList = versionFound?.releaseList ?? [];
   const releaseFound = releaseList.find((release) => release.index === releaseIndex);
   const customerIndexListPerChangeList = releaseFound?.customerIndexListPerChangeList ?? [];
+  const pkgIndex = releaseFound?.pkgIndex ?? undefined;
 
   const columns: any[] = [
     { key: keyVersion, dataIndex: keyVersion, title: titleVersion },
