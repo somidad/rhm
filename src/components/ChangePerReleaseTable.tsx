@@ -77,7 +77,7 @@ export default function ChangePerReleaseTable({
   const versionIndexList = accumulateVersionIndex(versionList, versionIndex);
   const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex);
   const changeListFiltered = versionIndexList.reduce(
-    (changeListPrev: ChangeV2[], versionIndex) => {
+    (changeListPrev: (ChangeV2 & { versionIndex: number })[], versionIndex) => {
       const versionFound = versionList.find((version) => version.index === versionIndex);
       if (!versionFound) {
         return changeListPrev;
@@ -86,7 +86,12 @@ export default function ChangePerReleaseTable({
       const changeListCurr = changeList.filter((change) => {
         return change.lineupIndex === pkgFound?.lineupIndex;
       });
-      return [...changeListPrev, ...changeListCurr];
+      return [
+        ...changeListPrev,
+        ...changeListCurr.map((change) => {
+          return { versionIndex, ...change };
+        }),
+      ];
     },
     []
   );
@@ -97,6 +102,7 @@ export default function ChangePerReleaseTable({
         description,
         beforeChange,
         afterChange,
+        versionIndex,
       } = change;
       return {
         key,
