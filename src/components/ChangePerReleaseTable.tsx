@@ -69,6 +69,11 @@ export default function ChangePerReleaseTable({
     };
   });
 
+  function onCancelEdit() {
+    setEditVersionIndex(-1);
+    setEditChangeIndex(-1);
+  }
+
   function onClickEdit(versionIndex: number, changeIndex: number) {
     const customerIndexListPerChangeFound = customerIndexListPerChangeList.find((item) => {
       return item.versionIndex === versionIndex && item.changeIndex === changeIndex;
@@ -242,7 +247,7 @@ export default function ChangePerReleaseTable({
           <Form form={form}>
             <Form.Item>
               <Button onClick={() => onSubmitChange(versionIndex, changeIndex)}>Ok</Button>
-              <Button onClick={() => onClickEdit(-1, -1)}>Cancel</Button>
+              <Button onClick={onCancelEdit}>Cancel</Button>
             </Form.Item>
           </Form>
         ) : dataIndex === keyVersion ? (
