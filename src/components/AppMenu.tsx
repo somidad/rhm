@@ -1,6 +1,6 @@
 import { Input, Menu } from 'antd';
 import { createRef, useState } from 'react';
-import { ChangeV2, Enum, Pkg, ReleaseV2, VersionV2 } from '../types';
+import { Enum, Pkg, VersionV2 } from '../types';
 import { load } from '../utils';
 
 type Props = {
