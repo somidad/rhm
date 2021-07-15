@@ -8,6 +8,7 @@ export const keyLineup = 'lineup';
 export const keyPackage = 'package';
 export const keyVersion = 'version';
 
+export const parenGlobal = '(Global)';
 export const parenNone = '(None)';
 export const parenError = '(Error)';
 

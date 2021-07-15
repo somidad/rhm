@@ -1,7 +1,7 @@
-import { Button, Form, Popover, Select, Table, Typography } from "antd";
+import { Button, Form, Popover, Select, Table, Tag, Typography } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { useState } from "react";
-import { keyActions, keyCustomers, keyDescription, keyVersion, parenError, titleActions, titleCustomers, titleDescription, titleVersion } from "../constants";
+import { keyActions, keyCustomers, keyDescription, keyVersion, parenError, parenGlobal, titleActions, titleCustomers, titleDescription, titleVersion } from "../constants";
 import { ChangeV2, CustomerIndexListPerChange, Enum, Pkg, VersionV2 } from "../types";
 import { accumulateVersionIndex } from "../utils";
 const { Option } = Select;
@@ -70,7 +70,14 @@ export default function ChangePerReleaseTable({
   });
 
   function onClickEdit(versionIndex: number, changeIndex: number) {
-    // TODO
+    const customerIndexListPerChangeFound = customerIndexListPerChangeList.find((item) => {
+      return item.versionIndex === versionIndex && item.changeIndex === changeIndex;
+    });
+    if (!customerIndexListPerChangeFound) {
+      return;
+    }
+    const { customerIndexList } = customerIndexListPerChangeFound;
+    form.setFieldsValue({ customerIndexList });
     setEditVersionIndex(versionIndex);
     setEditChangeIndex(changeIndex);
   }
@@ -219,7 +226,7 @@ export default function ChangePerReleaseTable({
                   );
                 }}
               >
-                <Option key={-1} value={-1}>(Global)</Option>
+                <Option key={-1} value={-1}>{parenGlobal}</Option>
                 {customerListPerRelease.map((customer) => {
                   const { index, name } = customer;
                   return (
@@ -256,7 +263,17 @@ export default function ChangePerReleaseTable({
            * Render previous customers in grey
            * Render current customers in blue
            */
-          JSON.stringify(customerIndexList)
+          customerIndexList.map((customerIndex) => {
+            const customerFound =
+              customerIndex === -1
+                ? { name: parenGlobal }
+                : customerList.find(
+                    (customer) => customer.index === customerIndex
+                  );
+            return (
+              <Tag>{customerFound?.name ?? parenError}</Tag>
+            )
+          })
         ) : dataIndex === keyActions ? (
           <Button onClick={() => onClickEdit(versionIndex, changeIndex)}>Edit</Button>
         ) : (
