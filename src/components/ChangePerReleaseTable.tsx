@@ -19,7 +19,7 @@ type ChangePerReleaseTableProps = {
 
 type EditableCellProps = {
   record: {
-    key: number;
+    changeIndex: number;
     description: string;
     beforeChange: string;
     afterChange: string;
@@ -44,7 +44,8 @@ export default function ChangePerReleaseTable({
   versionList,
 }: ChangePerReleaseTableProps) {
   const [form] = useForm();
-  const [editIndex, setEditIndex] = useState(-1);
+  const [editVersionIndex, setEditVersionIndex]= useState(-1);
+  const [editChangeIndex, setEditChangeIndex] = useState(-1);
 
   const versionFound = versionList.find((version) => version.index === versionIndex);
   const releaseList = versionFound?.releaseList ?? [];
@@ -65,9 +66,14 @@ export default function ChangePerReleaseTable({
     };
   });
 
-  function onClickEdit(index: number) {
+  function onClickEdit(versionIndex: number, changeIndex: number) {
     // TODO
-    setEditIndex(index);
+    setEditVersionIndex(versionIndex);
+    setEditChangeIndex(changeIndex);
+  }
+
+  function onSubmitChange(versionIndex: number, changeIndex: number) {
+    
   }
 
   /**
@@ -98,14 +104,14 @@ export default function ChangePerReleaseTable({
   const dataSource = [
     ...changeListFiltered.map((change) => {
       const {
-        index: key,
+        index: changeIndex,
         description,
         beforeChange,
         afterChange,
         versionIndex,
       } = change;
       return {
-        key,
+        changeIndex,
         description,
         beforeChange,
         afterChange,
@@ -148,13 +154,13 @@ export default function ChangePerReleaseTable({
         </td>
       );
     }
-    const { key, beforeChange, afterChange, version: versionIndex } = record;
+    const { changeIndex, beforeChange, afterChange, version: versionIndex } = record;
     const versionFound = versionList.find(
       (version) => version.index === versionIndex
     );
     return (
       <td {...restProps}>
-        {editIndex === key && dataIndex === keyCustomers ? (
+        {editVersionIndex === versionIndex && editChangeIndex === changeIndex && dataIndex === keyCustomers ? (
           <Form form={form}>
             <Form.Item name="customerIndexList">
               <Select
@@ -175,6 +181,7 @@ export default function ChangePerReleaseTable({
                   );
                 }}
               >
+                <Option key={-1} value={-1}>(Global)</Option>
                 {customerListPerRelease.map((customer) => {
                   const { index, name } = customer;
                   return (
@@ -186,11 +193,11 @@ export default function ChangePerReleaseTable({
               </Select>
             </Form.Item>
           </Form>
-        ) : editIndex === key && dataIndex === keyActions ? (
+        ) : editVersionIndex === versionIndex && editChangeIndex === changeIndex && dataIndex === keyActions ? (
           <Form form={form}>
             <Form.Item>
-              <Button>Ok</Button>
-              <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
+              <Button onClick={() => onSubmitChange(versionIndex, changeIndex)}>Ok</Button>
+              <Button onClick={() => onClickEdit(-1, -1)}>Cancel</Button>
             </Form.Item>
           </Form>
         ) : dataIndex === keyVersion ? (
@@ -213,7 +220,7 @@ export default function ChangePerReleaseTable({
            */
           null
         ) : dataIndex === keyActions ? (
-          <Button onClick={() => onClickEdit(key)}>Edit</Button>
+          <Button onClick={() => onClickEdit(versionIndex, changeIndex)}>Edit</Button>
         ) : (
           children
         )}
