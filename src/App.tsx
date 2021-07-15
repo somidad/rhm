@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import 'antd/dist/antd.css';
 import './App.css';
-import { Col, Collapse, Row, Tabs, Tag } from 'antd';
+import { Col, Collapse, Row, Space, Tabs, Tag } from 'antd';
 import { GithubOutlined } from '@ant-design/icons';
 import EnumTable from './components/EnumTable';
 import PkgTable from './components/PkgTable';
@@ -151,28 +151,32 @@ function App() {
                       </Tag>
                     </>
                   )}
-                  <Collapse defaultActiveKey={["changes", "releases"]}>
-                    <Panel key="releases" header="Releases">
-                      <ReleaseTable
-                        lineupList={lineupList}
-                        pkgList={pkgList}
-                        customerList={customerList}
-                        usedPkgIndexList={usedPkgIndexList}
-                        versionList={versionList}
-                        versionIndex={versionIndex}
-                        onChange={onChangeReleaseList}
-                        // onChangeVersionList={setVersionList}
-                      />
-                    </Panel>
-                    <Panel key="changes" header="Changes">
-                      <ChangeTable
-                        versionIndex={versionIndex}
-                        versionList={versionList}
-                        lineupList={lineupList}
-                        onChange={onChangeChangeList}
-                      />
-                    </Panel>
-                  </Collapse>
+                  <Space direction='vertical' style={{ width: '100%'}}>
+                    <Collapse defaultActiveKey={["changes", "releases"]}>
+                      <Panel key="releases" header="Releases">
+                        <ReleaseTable
+                          lineupList={lineupList}
+                          pkgList={pkgList}
+                          customerList={customerList}
+                          usedPkgIndexList={usedPkgIndexList}
+                          versionList={versionList}
+                          versionIndex={versionIndex}
+                          onChange={onChangeReleaseList}
+                          // onChangeVersionList={setVersionList}
+                        />
+                      </Panel>
+                    </Collapse>
+                    <Collapse defaultActiveKey={["changes", "releases"]}>
+                      <Panel key="changes" header="Changes">
+                        <ChangeTable
+                          versionIndex={versionIndex}
+                          versionList={versionList}
+                          lineupList={lineupList}
+                          onChange={onChangeChangeList}
+                        />
+                      </Panel>
+                    </Collapse>
+                  </Space>
                 </>
               )}
             </Tabs.TabPane>
