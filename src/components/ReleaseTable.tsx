@@ -128,27 +128,31 @@ export default function ReleaseTable({
   }
 
   function onSubmitEditRelease() {
-    const { pkgIndexNew, customerIndexListNew } = form.getFieldsValue(['pkgIndexNew', 'customerIndexListNew']);
-    const releaseFound = releaseList.find((release) => release.index !== editIndex && release.pkgIndex === pkgIndexNew);
-    if (releaseFound) {
-      return;
-    }
-    const indexFound = releaseList.findIndex((release) => release.index === editIndex);
-    if (indexFound === -1) {
-      return;
-    }
-    const releaseListNew: ReleaseV2[] = [
-      ...releaseList.slice(0, indexFound),
-      {
-        index: editIndex,
-        pkgIndex: pkgIndexNew,
-        customerIndexList: customerIndexListNew,
-        customerIndexListPerChangeList: [], // FIXME
-      },
-      ...releaseList.slice(indexFound + 1),
-    ];
-    onChange(releaseListNew);
-    setEditIndex(-1);
+    form.validateFields(['pkgIndexNew', 'customerIndexListNew']).then(() => {
+      const { pkgIndexNew, customerIndexListNew } = form.getFieldsValue(['pkgIndexNew', 'customerIndexListNew']);
+      const releaseFound = releaseList.find((release) => release.index !== editIndex && release.pkgIndex === pkgIndexNew);
+      if (releaseFound) {
+        return;
+      }
+      const indexFound = releaseList.findIndex((release) => release.index === editIndex);
+      if (indexFound === -1) {
+        return;
+      }
+      const releaseListNew: ReleaseV2[] = [
+        ...releaseList.slice(0, indexFound),
+        {
+          index: editIndex,
+          pkgIndex: pkgIndexNew,
+          customerIndexList: customerIndexListNew,
+          customerIndexListPerChangeList: [], // FIXME
+        },
+        ...releaseList.slice(indexFound + 1),
+      ];
+      onChange(releaseListNew);
+      setEditIndex(-1);
+    }).catch((reason) => {
+      console.error(reason);
+    });
   }
 
   function removeRelease(index: number) {
@@ -295,7 +299,11 @@ export default function ReleaseTable({
           </Form>
         ) : editIndex === key && dataIndex === keyCustomers ? (
           <Form form={form}>
-            <Form.Item name="customerIndexListNew">
+            <Form.Item
+              name="customerIndexListNew"
+              rules={[{ required: true }]}
+              help={false}
+            >
               <Select
                 mode="multiple"
                 allowClear
