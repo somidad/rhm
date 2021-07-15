@@ -2,19 +2,19 @@ import { Button, Form, Popover, Select, Table, Typography } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { useState } from "react";
 import { keyActions, keyCustomers, keyDescription, keyVersion, parenError, titleActions, titleCustomers, titleDescription, titleVersion } from "../constants";
-import { ChangeV2, Enum, Pkg, VersionV2 } from "../types";
+import { ChangeV2, CustomerIndexListPerChange, Enum, Pkg, VersionV2 } from "../types";
 import { accumulateVersionIndex } from "../utils";
 const { Option } = Select;
 const { Text } = Typography;
 
 type ChangePerReleaseTableProps = {
   customerList: Enum[];
-  lineupList: Enum[];
   pkgIndex: number;
   pkgList: Pkg[];
   releaseIndex: number;
   versionIndex: number;
   versionList: VersionV2[];
+  onChange: (customerIndexListPerChangeList: CustomerIndexListPerChange[]) => void;
 };
 
 type EditableCellProps = {
@@ -24,6 +24,7 @@ type EditableCellProps = {
     beforeChange: string;
     afterChange: string;
     version: number;
+    customerIndexList: number[];
   };
   dataIndex: string;
   children: any;
@@ -36,12 +37,12 @@ type PopoverContentProps = {
 
 export default function ChangePerReleaseTable({
   customerList,
-  lineupList,
   pkgIndex,
   pkgList,
   releaseIndex,
   versionIndex,
   versionList,
+  onChange,
 }: ChangePerReleaseTableProps) {
   const [form] = useForm();
   const [editVersionIndex, setEditVersionIndex]= useState(-1);
@@ -49,6 +50,8 @@ export default function ChangePerReleaseTable({
 
   const versionFound = versionList.find((version) => version.index === versionIndex);
   const releaseList = versionFound?.releaseList ?? [];
+  const releaseFound = releaseList.find((release) => release.index === releaseIndex);
+  const customerIndexListPerChangeList = releaseFound?.customerIndexListPerChangeList ?? [];
 
   const columns: any[] = [
     { key: keyVersion, dataIndex: keyVersion, title: titleVersion },
@@ -72,8 +75,38 @@ export default function ChangePerReleaseTable({
     setEditChangeIndex(changeIndex);
   }
 
-  function onSubmitChange(versionIndex: number, changeIndex: number) {
-    
+  function onSubmitChange(versionIndexOfChange: number, changeIndex: number) {
+    form.validateFields(['customerIndexList']).then(() => {
+      const versionOfChangeFound = versionList.find((version) => version.index === versionIndexOfChange);
+      if (!versionOfChangeFound) {
+        return;
+      }
+      const { changeList } = versionOfChangeFound;
+      const changeFound = changeList.find((change) => change.index === changeIndex);
+      if (!changeFound) {
+        return;
+      }
+      if (!releaseFound) {
+        return;
+      }
+      const customerIndexListRaw = form.getFieldValue('customerIndexList');
+      const customerIndexList = customerIndexListRaw.includes(-1) ? [-1] : customerIndexListRaw;
+      const { customerIndexListPerChangeList } = releaseFound;
+      const indexFound = customerIndexListPerChangeList.findIndex((item) => {
+        return item.versionIndex === versionIndexOfChange && item.changeIndex === changeIndex;
+      });
+      const customerIndexListPerChangeListNew = indexFound === -1 ? [
+        ...customerIndexListPerChangeList,
+        { versionIndex: versionIndexOfChange, changeIndex, customerIndexList },
+      ] : [
+        ...customerIndexListPerChangeList.slice(0, indexFound),
+        { versionIndex: versionIndexOfChange, changeIndex, customerIndexList },
+        ...customerIndexListPerChangeList.slice(indexFound + 1),
+      ];
+      onChange(customerIndexListPerChangeListNew);
+    }).catch((reason) => {
+      console.error(reason);
+    })
   }
 
   /**
@@ -108,21 +141,22 @@ export default function ChangePerReleaseTable({
         description,
         beforeChange,
         afterChange,
-        versionIndex,
+        versionIndex: versionIndexOfChange,
       } = change;
+      const customerIndexList = customerIndexListPerChangeList.find((item) => {
+        return item.versionIndex === versionIndexOfChange && item.changeIndex === changeIndex;
+      })?.customerIndexList ?? [];
       return {
         changeIndex,
         description,
         beforeChange,
         afterChange,
-        version: versionIndex,
+        version: versionIndexOfChange,
+        customerIndexList,
       };
     }),
   ];
 
-  const releaseFound = releaseList.find(
-    (release) => release.index === releaseIndex
-  );
   const customerIndexListPerRelease = releaseFound?.customerIndexList ?? [];
   const customerListPerRelease = customerList.filter((customer) => {
     return customerIndexListPerRelease.includes(customer.index);
@@ -154,7 +188,7 @@ export default function ChangePerReleaseTable({
         </td>
       );
     }
-    const { changeIndex, beforeChange, afterChange, version: versionIndex } = record;
+    const { changeIndex, beforeChange, afterChange, version: versionIndex, customerIndexList } = record;
     const versionFound = versionList.find(
       (version) => version.index === versionIndex
     );
@@ -162,7 +196,11 @@ export default function ChangePerReleaseTable({
       <td {...restProps}>
         {editVersionIndex === versionIndex && editChangeIndex === changeIndex && dataIndex === keyCustomers ? (
           <Form form={form}>
-            <Form.Item name="customerIndexList">
+            <Form.Item
+              name="customerIndexList"
+              rules={[{ required: true }]}
+              help={false}
+            >
               <Select
                 mode="multiple"
                 allowClear
@@ -218,7 +256,7 @@ export default function ChangePerReleaseTable({
            * Render previous customers in grey
            * Render current customers in blue
            */
-          null
+          JSON.stringify(customerIndexList)
         ) : dataIndex === keyActions ? (
           <Button onClick={() => onClickEdit(versionIndex, changeIndex)}>Edit</Button>
         ) : (

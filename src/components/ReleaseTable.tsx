@@ -3,7 +3,7 @@ import { Button, Form, Select, Table, Tag } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { useState } from "react";
 import { keyActions, keyCustomers, keyDragHandle, keyPackage, parenError, parenNone, titleActions, titleCustomers, titlePackage } from "../constants";
-import { Enum, Pkg, ReleaseV2, VersionV2 } from "../types";
+import { CustomerIndexListPerChange, Enum, Pkg, ReleaseV2, VersionV2 } from "../types";
 import { findEmptyIndex } from "../utils";
 import ChangePerReleaseTable from "./ChangePerReleaseTable";
 
@@ -108,6 +108,27 @@ export default function ReleaseTable({
       ...releaseList.slice(0, indexFound - 1),
       releaseList[indexFound],
       releaseList[indexFound - 1],
+      ...releaseList.slice(indexFound + 1),
+    ];
+    onChange(releaseListNew);
+  }
+
+  function onChangeCustomerIndexListPerChangeList(
+    releaseIndex: number,
+    customerIndexListPerChangeList: CustomerIndexListPerChange[]
+  ) {
+    console.log(releaseIndex);
+    console.table(customerIndexListPerChangeList);
+    const indexFound = releaseList.findIndex((release) => release.index === releaseIndex);
+    console.log(indexFound);
+    if (indexFound === -1) {
+      return;
+    }
+    const release = releaseList[indexFound];
+    const { index, pkgIndex, customerIndexList } = release;
+    const releaseListNew = [
+      ...releaseList.slice(0, indexFound),
+      { index, pkgIndex, customerIndexList, customerIndexListPerChangeList },
       ...releaseList.slice(indexFound + 1),
     ];
     onChange(releaseListNew);
@@ -377,12 +398,17 @@ export default function ReleaseTable({
       <td colSpan={columns.length + 1}>
         <ChangePerReleaseTable
           customerList={customerList}
-          lineupList={lineupList}
           pkgIndex={pkgIndex}
           pkgList={pkgList}
           releaseIndex={releaseIndex}
           versionIndex={versionIndex}
           versionList={versionList}
+          onChange={(customerIndexListPerChangeList) =>
+            onChangeCustomerIndexListPerChangeList(
+              releaseIndex,
+              customerIndexListPerChangeList,
+            )
+          }
         />
       </td>
     );
