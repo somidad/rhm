@@ -195,156 +195,166 @@ export default function ReleaseTable({
     const { key, pkgName, customers: customerIndexList, lineup } = record;
     return (
       <td {...restProps}>
-        {
-          key === -1 && dataIndex === keyPackage ? (
-            <Form form={form}>
-              <Form.Item
-                name='pkgIndex'
-                rules={[{ required: true }]}
-                help={false}
-              >
-                <Select disabled={editIndex !== -1}>
-                  {
-                    pkgList.map((pkg) => {
-                      const { index, name, lineupIndex } = pkg;
-                      const lineup =
-                        lineupIndex === -1
-                          ? parenNone
-                          : lineupList.find(
-                              (lineup) => lineup.index === lineupIndex
-                            )?.name ?? parenError;
-                      return (
-                        <Option
-                          key={index} value={index}
-                          disabled={usedPkgIndexList.includes(index)}
-                        >
-                          {name}
-                          {' '}
-                          <Tag>{lineup}</Tag>
-                        </Option>
-                      )
-                    })
+        {key === -1 && dataIndex === keyPackage ? (
+          <Form form={form}>
+            <Form.Item
+              name="pkgIndex"
+              rules={[{ required: true }]}
+              help={false}
+            >
+              <Select disabled={editIndex !== -1}>
+                {pkgList.map((pkg) => {
+                  const { index, name, lineupIndex } = pkg;
+                  const lineup =
+                    lineupIndex === -1
+                      ? parenNone
+                      : lineupList.find(
+                          (lineup) => lineup.index === lineupIndex
+                        )?.name ?? parenError;
+                  return (
+                    <Option
+                      key={index}
+                      value={index}
+                      disabled={usedPkgIndexList.includes(index)}
+                    >
+                      {name} <Tag>{lineup}</Tag>
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Form>
+        ) : key === -1 && dataIndex === keyCustomers ? (
+          <Form form={form}>
+            <Form.Item name="customerList">
+              <Select
+                mode="multiple"
+                allowClear
+                filterOption={(input, option) => {
+                  if (!option) {
+                    return false;
                   }
-                </Select>
-              </Form.Item>
-            </Form>
-          ) : key === -1 && dataIndex === keyCustomers ? (
-            <Form form={form}>
-              <Form.Item
-                name='customerList'
-              >
-                <Select
-                  mode='multiple'
-                  allowClear
-                  filterOption={(input, option) => {
-                    if (!option) { return false; }
-                    const children = option.children as string;
-                    if (!children) { return false; }
-                    return children.toLocaleLowerCase().indexOf(input.toLocaleLowerCase()) !== -1;
-                  }}
-                  disabled={editIndex !== -1}
-                >
-                  {
-                    customerList.map((customer) => {
-                      const { index, name } = customer;
-                      return (
-                        <Option key={index} value={index}>{name}</Option>
-                      )
-                    })
+                  const children = option.children as string;
+                  if (!children) {
+                    return false;
                   }
-                </Select>
-              </Form.Item>
-            </Form>
-          ) : key === -1 && dataIndex === keyActions ? (
-            <Form>
-              <Form.Item>
-                <Button onClick={addRelease} disabled={editIndex !== -1}>Add</Button>
-              </Form.Item>
-            </Form>
-          ) : key === -1 && dataIndex === keyDragHandle ? (
-            null
-          ) : editIndex === key && dataIndex === keyPackage ? (
-            <Form form={form}>
-              <Form.Item
-                name='pkgIndexNew'
+                  return (
+                    children
+                      .toLocaleLowerCase()
+                      .indexOf(input.toLocaleLowerCase()) !== -1
+                  );
+                }}
+                disabled={editIndex !== -1}
               >
-                <Select>
-                  {
-                    pkgList.map((pkg) => {
-                      const { index, name, lineupIndex } = pkg;
-                      const lineup =
-                        lineupIndex === -1
-                          ? parenNone
-                          : lineupList.find(
-                              (lineup) => lineup.index === lineupIndex
-                            )?.name ?? parenError;
-                      return (
-                        <Option key={index} value={index}>
-                          {name}
-                          {' '}
-                          <Tag>{lineup}</Tag>
-                        </Option>
-                      )
-                    })
+                {customerList.map((customer) => {
+                  const { index, name } = customer;
+                  return (
+                    <Option key={index} value={index}>
+                      {name}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Form>
+        ) : key === -1 && dataIndex === keyActions ? (
+          <Form>
+            <Form.Item>
+              <Button onClick={addRelease} disabled={editIndex !== -1}>
+                Add
+              </Button>
+            </Form.Item>
+          </Form>
+        ) : key === -1 && dataIndex === keyDragHandle ? null : editIndex ===
+            key && dataIndex === keyPackage ? (
+          <Form form={form}>
+            <Form.Item name="pkgIndexNew">
+              <Select>
+                {pkgList.map((pkg) => {
+                  const { index, name, lineupIndex } = pkg;
+                  const lineup =
+                    lineupIndex === -1
+                      ? parenNone
+                      : lineupList.find(
+                          (lineup) => lineup.index === lineupIndex
+                        )?.name ?? parenError;
+                  return (
+                    <Option key={index} value={index}>
+                      {name} <Tag>{lineup}</Tag>
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Form>
+        ) : editIndex === key && dataIndex === keyCustomers ? (
+          <Form form={form}>
+            <Form.Item name="customerIndexListNew">
+              <Select
+                mode="multiple"
+                allowClear
+                filterOption={(input, option) => {
+                  if (!option) {
+                    return false;
                   }
-                </Select>
-              </Form.Item>
-            </Form>
-          ) : editIndex === key && dataIndex === keyCustomers ? (
-            <Form form={form}>
-              <Form.Item
-                name='customerIndexListNew'
+                  const children = option.children as string;
+                  if (!children) {
+                    return false;
+                  }
+                  return (
+                    children
+                      .toLocaleLowerCase()
+                      .indexOf(input.toLocaleLowerCase()) !== -1
+                  );
+                }}
               >
-                <Select
-                  mode='multiple'
-                  allowClear
-                  filterOption={(input, option) => {
-                    if (!option) { return false; }
-                    const children = option.children as string;
-                    if (!children) { return false; }
-                    return children.toLocaleLowerCase().indexOf(input.toLocaleLowerCase()) !== -1;
-                  }}
-                >
-                  {
-                    customerList.map((customer) => {
-                      const { index, name } = customer;
-                      return (
-                        <Option key={index} value={index}>{name}</Option>
-                      )
-                    })
-                  }
-                </Select>
-              </Form.Item>
-            </Form>
-          ) : editIndex === key && dataIndex === keyActions ? (
-            <Form form={form}>
-              <Form.Item>
-                <Button onClick={onSubmitEditRelease}>Ok</Button>
-                <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
-              </Form.Item>
-            </Form>
-          ) : dataIndex === keyPackage ? (
-            `${pkgName} - ${lineup}`
-          ) : dataIndex === keyCustomers ? (
-            customerIndexList.map((customerIndex) => {
-              const customerFound = customerList.find((customer) => customer.index === customerIndex);
-              return customerFound && (
-                <Tag key={customerFound.index}>{customerFound.name}</Tag>
+                {customerList.map((customer) => {
+                  const { index, name } = customer;
+                  return (
+                    <Option key={index} value={index}>
+                      {name}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Form>
+        ) : editIndex === key && dataIndex === keyActions ? (
+          <Form form={form}>
+            <Form.Item>
+              <Button onClick={onSubmitEditRelease}>Ok</Button>
+              <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
+            </Form.Item>
+          </Form>
+        ) : dataIndex === keyPackage ? (
+          <>
+            {pkgName} <Tag>{lineup}</Tag>
+          </>
+        ) : dataIndex === keyCustomers ? (
+          customerIndexList
+            .map((customerIndex) => {
+              const customerFound = customerList.find(
+                (customer) => customer.index === customerIndex
               );
-            }).filter((customerTag) => !!customerTag)
-          ) : dataIndex === keyActions ? (
-            <>
-              <Button onClick={() => onClickEdit(key)}>Edit</Button>
-              <Button onClick={() => removeRelease(key)}>Remove</Button>
-            </>
-          ) : dataIndex === keyDragHandle ? (
-            <MenuOutlined style={{ cursor: 'grab' }} />
-          ) : (
-            children
-          )
-        }
+              return (
+                customerFound && (
+                  <Tag key={customerFound.index}>{customerFound.name}</Tag>
+                )
+              );
+            })
+            .filter((customerTag) => !!customerTag)
+        ) : dataIndex === keyActions ? (
+          <>
+            <Button onClick={() => onClickEdit(key)}>Edit</Button>
+            <Button onClick={() => removeRelease(key)}>Remove</Button>
+          </>
+        ) : dataIndex === keyDragHandle ? (
+          <MenuOutlined style={{ cursor: "grab" }} />
+        ) : (
+          children
+        )}
       </td>
-    )
+    );
   }
 
   function expandedRowRender(record: any) {
