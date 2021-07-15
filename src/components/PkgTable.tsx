@@ -45,8 +45,6 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
   function addPkg() {
     form.validateFields(['name', 'lineup']).then(() => {
       const { name, lineup: lineupIndex } = form.getFieldsValue(['name', 'lineup']);
-      console.log(name);
-      console.log(lineupIndex);
       const pkgFound = pkgList.find((pkg) => pkg.name === name);
       if (pkgFound) {
         return;
@@ -117,7 +115,6 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
     onChange(enumListNew);
   }
 
-  console.log(pkgList);
   const dataSource = [
     { key: -1, package: '', actions: '' },
     ...pkgList.map((pkg) => {

@@ -2,7 +2,7 @@ import { Button, Form, Popover, Select, Table, Typography } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { useState } from "react";
 import { keyActions, keyCustomers, keyDescription, keyVersion, parenError, titleActions, titleCustomers, titleDescription, titleVersion } from "../constants";
-import { ChangeV2, Enum, Pkg, ReleaseV2, VersionV2 } from "../types";
+import { ChangeV2, CustomerIndexListPerChangeIndex, Enum, Pkg, ReleaseV2, VersionV2 } from "../types";
 import { accumulateVersionIndex } from "../utils";
 const { Option } = Select;
 const { Text } = Typography;
@@ -72,6 +72,11 @@ export default function ChangePerReleaseTable({
   }
 
   const versionIndexList = accumulateVersionIndex(versionList, versionIndex);
+  const customerIndexListPerChangeIndexList = releaseList.filter((release) => {
+    return versionIndexList.slice(1).findIndex((versionIndex) => release.versionIndex === versionIndex ) !== -1;
+  }).reduce((customerIndexListPerChangeIndexListPrev: CustomerIndexListPerChangeIndex[], release) => {
+    return [...customerIndexListPerChangeIndexListPrev, ...release.customerIndexListPerChangeIndexList];
+  }, []);
   const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex);
   const changeListFiltered = versionIndexList.reduce((changeListPrev: ChangeV2[], versionIndex) => {
     const changeListCurr = changeList.filter((change) => {

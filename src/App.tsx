@@ -12,14 +12,14 @@ import VersionTable from './components/VersionTable';
 import AppMenu from './components/AppMenu';
 import ReleaseTable from './components/ReleaseTable';
 import ChangeTable from './components/ChangeTable';
-import { customerListInit, lineupListInit, pkgListInit } from './init';
+import { changeListInit, customerListInit, lineupListInit, pkgListInit, versionListInit } from './init';
 import { uniq } from 'lodash';
 const { Panel } = Collapse;
 
 function App() {
-  const [versionList, setVersionList] = useState<VersionV2[]>([]);
+  const [versionList, setVersionList] = useState<VersionV2[]>(versionListInit);
   const [versionIndex, setVersionIndex] = useState(-1);
-  const [changeList, setChangeList] = useState<ChangeV2[]>([]);
+  const [changeList, setChangeList] = useState<ChangeV2[]>(changeListInit);
   const [lineupList, setLineupList] = useState<Enum[]>(lineupListInit);
   const [pkgList, setPkgList] = useState<Pkg[]>(pkgListInit);
   const [releaseList, setReleaseList] = useState<ReleaseV2[]>([]);
