@@ -2,13 +2,13 @@ import { Button, Form, Select, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import TextArea from "antd/lib/input/TextArea";
 import { useEffect, useState } from "react";
-import { ChangeV2, Enum } from "../types";
+import { ChangeV2, Enum, VersionV2 } from "../types";
 import { findEmptyIndex } from "../utils";
 const { Option } = Select;
 
 type Props = {
   versionIndex: number;
-  changeList: ChangeV2[];
+  versionList: VersionV2[];
   lineupList: Enum[];
   onChange: (changeList: ChangeV2[]) => void;
 };
@@ -21,7 +21,7 @@ type EditableCellProps = {
 
 export default function ChangeTable({
   versionIndex,
-  changeList,
+  versionList,
   lineupList,
   onChange,
 }: Props) {
@@ -32,6 +32,9 @@ export default function ChangeTable({
   useEffect(() => {
     setEditIndex(-1);
   }, [versionIndex]);
+
+  const versionFound = versionList.find((version) => version.index === versionIndex);
+  const changeList = versionFound?.changeList ?? [];
 
   const columns: any[] = [
     { key: "description", dataIndex: "description", title: "Description", width: '25%' },
@@ -63,7 +66,7 @@ export default function ChangeTable({
         const index = findEmptyIndex(changeList.map((change) => change.index));
         const changeListNew: ChangeV2[] = [
           ...changeList,
-          { index, description, beforeChange, afterChange, lineupIndex, versionIndex },
+          { index, description, beforeChange, afterChange, lineupIndex },
         ];
         onChange(changeListNew);
         form.setFieldsValue({
@@ -113,7 +116,7 @@ export default function ChangeTable({
       }
       const changeListNew: ChangeV2[] = [
         ...changeList.slice(0, indexFound),
-        { index: editIndex, description, beforeChange, afterChange, lineupIndex, versionIndex },
+        { index: editIndex, description, beforeChange, afterChange, lineupIndex },
         ...changeList.slice(indexFound + 1),
       ];
       onChange(changeListNew);
@@ -135,7 +138,6 @@ export default function ChangeTable({
   const dataSource: any[] = [
     { key: -1 },
     ...changeList
-      .filter((change) => change.versionIndex === versionIndex)
       .map((change) => {
         const {
           index: key,

@@ -49,7 +49,7 @@ export default function VersionTable({ versionList, onChange, onSelect }: Props)
       const index = findEmptyIndex(versionList.map((version) => version.index));
       const versionListNew: VersionV2[] = [
         ...versionList,
-        { index, name, indexPrev },
+        { index, name, indexPrev, changeList: [], releaseList: [] },
       ];
       form.setFieldsValue({ version: '' });
       onChange(versionListNew);
@@ -71,17 +71,19 @@ export default function VersionTable({ versionList, onChange, onSelect }: Props)
   function onSubmitEditVersion() {
     form.validateFields(['nameNew']).then(() => {
       const { nameNew: name, previousNew: indexPrev } = form.getFieldsValue(['nameNew', 'previousNew']);
-      const versionFound = versionList.find((version) => version.index !== editIndex && version.name === name);
-      if (versionFound) {
+      const nameInUse = versionList.find((version) => version.index !== editIndex && version.name === name);
+      if (nameInUse) {
         return;
       }
       const indexFound = versionList.findIndex((version) => version.index === editIndex);
       if (indexFound === -1) {
         return;
       }
+      const version = versionList[indexFound];
+      const { changeList, releaseList } = version;
       const versionListNew: VersionV2[] = [
         ...versionList.slice(0, indexFound),
-        { index: editIndex, name, indexPrev },
+        { index: editIndex, name, indexPrev, changeList, releaseList },
         ...versionList.slice(indexFound + 1),
       ];
       onChange(versionListNew);

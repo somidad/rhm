@@ -13,10 +13,10 @@ export type ChangeV2 = {
   beforeChange: string;
   afterChange: string;
   lineupIndex: number;
-  versionIndex: number;
 };
 
-export type CustomerIndexListPerChangeIndex = {
+export type CustomerIndexListPerChange = {
+  versionIndex: number;
   changeIndex: number;
   customerIndexList: number[];
 }
@@ -40,10 +40,9 @@ export type Release = {
 
 export type ReleaseV2 = {
   index: number;
-  versionIndex: number;
   pkgIndex: number;
   customerIndexList: number[];
-  customerIndexListPerChangeIndexList: CustomerIndexListPerChangeIndex[];
+  customerIndexListPerChangeList: CustomerIndexListPerChange[];
 }
 
 export type Version = {
@@ -58,6 +57,8 @@ export type VersionV2 = {
   index: number;
   name: string;
   indexPrev: number;
+  changeList: ChangeV2[];
+  releaseList: ReleaseV2[];
 };
 
 export type OldChange = {

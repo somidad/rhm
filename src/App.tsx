@@ -12,18 +12,46 @@ import VersionTable from './components/VersionTable';
 import AppMenu from './components/AppMenu';
 import ReleaseTable from './components/ReleaseTable';
 import ChangeTable from './components/ChangeTable';
-import { changeListInit, customerListInit, lineupListInit, pkgListInit, versionListInit } from './init';
+import { customerListInit, lineupListInit, pkgListInit, versionListInit } from './init';
 import { uniq } from 'lodash';
 const { Panel } = Collapse;
 
 function App() {
   const [versionList, setVersionList] = useState<VersionV2[]>(versionListInit);
   const [versionIndex, setVersionIndex] = useState(-1);
-  const [changeList, setChangeList] = useState<ChangeV2[]>(changeListInit);
   const [lineupList, setLineupList] = useState<Enum[]>(lineupListInit);
   const [pkgList, setPkgList] = useState<Pkg[]>(pkgListInit);
-  const [releaseList, setReleaseList] = useState<ReleaseV2[]>([]);
   const [customerList, setCustomerList] = useState<Enum[]>(customerListInit);
+
+  function onChangeChangeList(changeList: ChangeV2[]) {
+    const indexFound = versionList.findIndex((version) => version.index === versionIndex);
+    if (indexFound === -1) {
+      return;
+    }
+    const version = versionList[indexFound];
+    version.changeList = changeList;
+    const versionListNew = [
+      ...versionList.slice(0, indexFound),
+      version,
+      ...versionList.slice(indexFound + 1),
+    ];
+    setVersionList(versionListNew);
+  }
+
+  function onChangeReleaseList(releaseList: ReleaseV2[]) {
+    const indexFound = versionList.findIndex((version) => version.index === versionIndex);
+    if (indexFound === -1) {
+      return;
+    }
+    const version = versionList[indexFound];
+    version.releaseList = releaseList;
+    const versionListNew = [
+      ...versionList.slice(0, indexFound),
+      version,
+      ...versionList.slice(indexFound + 1),
+    ];
+    setVersionList(versionListNew);
+  }
 
   function onChangeVersionList(versionList: VersionV2[]) {
     const versionFound = versionList.find((version) => version.index === versionIndex);
@@ -38,19 +66,46 @@ function App() {
   }
 
   const usedLineupIndexList = uniq([
-    ...changeList.map((change) => {
-      return change.lineupIndex;
-    }),
+    ...versionList.reduce((lineupIndexListPrev: number[], version) => {
+      const { changeList } = version;
+      return [
+        ...lineupIndexListPrev,
+        ...changeList.map((change) => {
+          return change.lineupIndex;
+        }),
+      ];
+    }, []),
     ...pkgList.map((pkg) => pkg.lineupIndex),
   ]);
-  const usedPkgIndexList = releaseList.map((release) => release.pkgIndex);
-  // TODO: Need improvement?
-  const usedCustomerIndexList = uniq(releaseList.reduce((customerIndexListPrev: number[], release) => {
+  const usedPkgIndexList = uniq(versionList.reduce((pkgIndexListPrev: number[], version) => {
+    const { releaseList } = version;
     return [
-      ...customerIndexListPrev,
-      ...release.customerIndexList,
+      ...pkgIndexListPrev,
+      ...releaseList.map((release) => release.pkgIndex),
     ];
   }, []));
+  const usedCustomerIndexList = uniq(
+    versionList.reduce((customerIndexListPrev: number[], version) => {
+      const { releaseList } = version;
+      return [
+        ...customerIndexListPrev,
+        ...releaseList.reduce((customerIndexListPerReleasePrev: number[], release) => {
+        const { customerIndexList, customerIndexListPerChangeList } = release;
+        return [
+          ...customerIndexListPerReleasePrev,
+          ...customerIndexList,
+          ...customerIndexListPerChangeList.reduce((customerIndexListPerChangeListPrev: number[], item) => {
+            const { customerIndexList } = item;
+            return [
+              ...customerIndexListPerChangeListPrev,
+              ...customerIndexList,
+            ];
+          }, []),
+        ];
+      }, []),
+    ]
+    }, [])
+  );
 
   const versionCurr = versionList.find((version) => version.index === versionIndex);
   const versionPrev =
@@ -62,17 +117,13 @@ function App() {
   return (
     <div className="App">
       <AppMenu
-        changeList={changeList}
         customerList={customerList}
         lineupList={lineupList}
         pkgList={pkgList}
-        releaseList={releaseList}
         versionList={versionList}
-        onChangeChangeList={setChangeList}
         onChangeCustomerList={setCustomerList}
         onChangeLineupList={setLineupList}
         onChangePkgList={setPkgList}
-        onChangeReleaseList={setReleaseList}
         onChangeVersionList={setVersionList}
       />
       <Row>
@@ -103,24 +154,22 @@ function App() {
                   <Collapse defaultActiveKey={["changes", "releases"]}>
                     <Panel key="releases" header="Releases">
                       <ReleaseTable
-                        changeList={changeList}
-                        releaseList={releaseList}
                         lineupList={lineupList}
                         pkgList={pkgList}
                         customerList={customerList}
                         usedPkgIndexList={usedPkgIndexList}
                         versionList={versionList}
                         versionIndex={versionIndex}
-                        onChange={setReleaseList}
+                        onChange={onChangeReleaseList}
                         // onChangeVersionList={setVersionList}
                       />
                     </Panel>
                     <Panel key="changes" header="Changes">
                       <ChangeTable
                         versionIndex={versionIndex}
-                        changeList={changeList}
+                        versionList={versionList}
                         lineupList={lineupList}
-                        onChange={setChangeList}
+                        onChange={onChangeChangeList}
                       />
                     </Panel>
                   </Collapse>

@@ -3,15 +3,13 @@ import { Button, Form, Select, Table, Tag } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { useState } from "react";
 import { keyActions, keyCustomers, keyDragHandle, keyPackage, parenError, parenNone, titleActions, titleCustomers, titlePackage } from "../constants";
-import { ChangeV2, Enum, Pkg, ReleaseV2, VersionV2 } from "../types";
+import { Enum, Pkg, ReleaseV2, VersionV2 } from "../types";
 import { findEmptyIndex } from "../utils";
 import ChangePerReleaseTable from "./ChangePerReleaseTable";
 
 const { Option } = Select;
 
 type Props ={ 
-  changeList: ChangeV2[];
-  releaseList: ReleaseV2[];
   lineupList: Enum[];
   pkgList: Pkg[];
   customerList: Enum[];
@@ -28,8 +26,7 @@ type EditableCellProps = {
 };
 
 export default function ReleaseTable({
-  changeList,
-  releaseList, lineupList, pkgList, customerList,
+  lineupList, pkgList, customerList,
   usedPkgIndexList,
   versionList, versionIndex,
   onChange,
@@ -37,6 +34,9 @@ export default function ReleaseTable({
   const [form] = useForm();
 
   const [editIndex, setEditIndex] = useState(-1);
+
+  const versionFound = versionList.find((version) => version.index === versionIndex);
+  const releaseList = versionFound?.releaseList ?? [];
 
   const columns: any[] = [
     { key: keyPackage, dataIndex: keyPackage, title: titlePackage },
@@ -61,14 +61,18 @@ export default function ReleaseTable({
       if (pkgIndex === -1) {
         return;
       }
-      const releaseFound = releaseList.find((release) => release.pkgIndex === pkgIndex);
-      if (releaseFound) {
+      // Check if package is already in use
+      const pkgInUse = versionList.find((version) => {
+        const { releaseList } = version;
+        return releaseList.find((release) => release.pkgIndex === pkgIndex);
+      });
+      if (pkgInUse) {
         return;
       }
       const index = findEmptyIndex(releaseList.map((release) => release.index));
       const releaseListNew: ReleaseV2[] = [
         ...releaseList,
-        { index, versionIndex, pkgIndex, customerIndexList, customerIndexListPerChangeIndexList: [] },
+        { index, pkgIndex, customerIndexList, customerIndexListPerChangeList: [] },
       ];
       onChange(releaseListNew);
     }).catch((reason) => {
@@ -138,10 +142,9 @@ export default function ReleaseTable({
       ...releaseList.slice(0, indexFound),
       {
         index: editIndex,
-        versionIndex,
         pkgIndex: pkgIndexNew,
         customerIndexList: customerIndexListNew,
-        customerIndexListPerChangeIndexList: [], // FIXME
+        customerIndexListPerChangeList: [], // FIXME
       },
       ...releaseList.slice(indexFound + 1),
     ];
@@ -163,7 +166,7 @@ export default function ReleaseTable({
 
   const dataSource = [
     { key: -1 },
-    ...releaseList.filter((release) => release.versionIndex === versionIndex).map((release) => {
+    ...releaseList.map((release) => {
       const { index: key, pkgIndex, customerIndexList: customers } = release;
       const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex);
       const pkgName = pkgFound?.name;
@@ -362,13 +365,11 @@ export default function ReleaseTable({
     return (
       <td colSpan={columns.length + 1}>
         <ChangePerReleaseTable
-          changeList={changeList}
           customerList={customerList}
           lineupList={lineupList}
           pkgIndex={pkgIndex}
           pkgList={pkgList}
           releaseIndex={releaseIndex}
-          releaseList={releaseList}
           versionIndex={versionIndex}
           versionList={versionList}
         />
