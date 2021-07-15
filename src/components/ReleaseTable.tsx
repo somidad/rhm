@@ -55,9 +55,8 @@ export default function ReleaseTable({
   });
 
   function addRelease() {
-    form.validateFields(['pkgIndex']).then(() => {
-      const { pkgIndex, customerList } = form.getFieldsValue(['pkgIndex', 'customerList']);
-      const customerIndexList = customerList ?? [];
+    form.validateFields(['pkgIndex', 'customerList']).then(() => {
+      const { pkgIndex, customerList: customerIndexList } = form.getFieldsValue(['pkgIndex', 'customerList']);
       if (pkgIndex === -1) {
         return;
       }
@@ -229,7 +228,11 @@ export default function ReleaseTable({
           </Form>
         ) : key === -1 && dataIndex === keyCustomers ? (
           <Form form={form}>
-            <Form.Item name="customerList">
+            <Form.Item
+              name="customerList"
+              rules={[{ required: true }]}
+              help={false}
+            >
               <Select
                 mode="multiple"
                 allowClear
