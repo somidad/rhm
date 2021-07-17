@@ -1,3 +1,4 @@
+import { uniq } from "lodash";
 import {
   Change,
   ChangeV2,
@@ -7,6 +8,7 @@ import {
   OldVersion,
   Pkg,
   Release,
+  ReleaseV2,
   Version,
   VersionV2,
 } from "./types";
@@ -220,10 +222,68 @@ export function load(input: string) {
     // TODO: Check validity
   }
   // Migrate from rhm v1 to v2
-  versionList.forEach((version: any) => {
-    const { releaseList } = version;
-    releaseList.forEach((release: any) => {
+  versionList.forEach((version: Version & VersionV2) => {
+    const { index: versionIndex, changeList, releaseList } = version;
+    releaseList.forEach((release: Release & ReleaseV2) => {
       release.customerIndexListPerChangeList = release.customerIndexListPerChangeList ?? [];
+    });
+    changeList.forEach((change: Change & ChangeV2) => {
+      const { index: changeIndex, customerIndexList } = change;
+      if (customerIndexList.length) {
+        customerIndexList.forEach((customerIndex) => {
+          const releaseFound = releaseList.find((release) => {
+            const { pkgIndex } = release;
+            return (pkgList as Pkg[]).find((pkg) => {
+              return (
+                pkg.index === pkgIndex && pkg.lineupIndex === change.lineupIndex &&
+                release.customerIndexList.includes(customerIndex)
+              );
+            });
+          });
+          if (releaseFound) {
+            const { customerIndexListPerChangeList } = releaseFound as ReleaseV2;
+            const customerIndexListPerChangeFound = customerIndexListPerChangeList.find((item) => {
+              return item.versionIndex === versionIndex && item.changeIndex === changeIndex;
+            });
+            if (customerIndexListPerChangeFound) {
+              customerIndexListPerChangeFound.customerIndexList = uniq([
+                ...customerIndexListPerChangeFound.customerIndexList,
+                -1
+              ]);
+            } else {
+              customerIndexListPerChangeList.push({
+                versionIndex, changeIndex, customerIndexList: [-1],
+              });
+            }
+          }
+        });
+      } else {
+        // Global
+        const releaseFound = releaseList.find((release) => {
+          const { pkgIndex } = release;
+          return (pkgList as Pkg[]).find((pkg) => {
+            return (
+              pkg.index === pkgIndex && pkg.lineupIndex === change.lineupIndex
+            );
+          });
+        });
+        if (releaseFound) {
+          const { customerIndexListPerChangeList } = releaseFound as ReleaseV2;
+          const customerIndexListPerChangeFound = customerIndexListPerChangeList.find((item) => {
+            return item.versionIndex === versionIndex && item.changeIndex === changeIndex;
+          });
+          if (customerIndexListPerChangeFound) {
+            customerIndexListPerChangeFound.customerIndexList = uniq([
+              ...customerIndexListPerChangeFound.customerIndexList,
+              -1
+            ]);
+          } else {
+            customerIndexListPerChangeList.push({
+              versionIndex, changeIndex, customerIndexList: [-1],
+            });
+          }
+        }
+      }
     });
   });
   // TODO

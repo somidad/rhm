@@ -297,8 +297,9 @@ function App() {
         }
         visible={modalVisible}
         onCancel={() => setModalVisible(false)}
+        width={960}
       >
-        <TextArea value={releaseHistory} autoSize={true} />
+        <TextArea value={releaseHistory} cols={80} autoSize={true} />
       </Modal>
     </div>
   );

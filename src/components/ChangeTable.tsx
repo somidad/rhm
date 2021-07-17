@@ -216,7 +216,6 @@ export default function ChangeTable({
     ...restProps
   }: EditableCellProps) {
     const { key, lineup: lineupIndex } = record;
-    console.log(children);
     return (
       <td {...restProps} style={{ verticalAlign: "top" }}>
         {key === -1 && dataIndex === "description" ? (

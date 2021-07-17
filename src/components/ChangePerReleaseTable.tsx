@@ -1,5 +1,6 @@
 import { Button, Form, Popover, Select, Table, Tag, Typography } from "antd";
 import { useForm } from "antd/lib/form/Form";
+import TextArea from "antd/lib/input/TextArea";
 import { useEffect, useState } from "react";
 import {
   keyActions,
@@ -369,11 +370,11 @@ export default function ChangePerReleaseTable({
       <>
         <Text strong>Before change</Text>
         <br />
-        {beforeChange}
+        <TextArea value={beforeChange} cols={80} autoSize />
         <br />
         <Text strong>After change</Text>
         <br />
-        {afterChange}
+        <TextArea value={afterChange} cols={80} autoSize />
       </>
     );
   }
