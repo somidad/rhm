@@ -1,3 +1,4 @@
+import { CheckOutlined, CloseOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Select, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { useEffect, useState } from "react";
@@ -207,7 +208,7 @@ export default function PkgTable({
           <Form form={form}>
             <Form.Item>
               <Button onClick={addPkg} disabled={editIndex !== -1}>
-                Add
+                <PlusOutlined />
               </Button>
             </Form.Item>
           </Form>
@@ -238,8 +239,12 @@ export default function PkgTable({
         ) : editIndex === key && dataIndex === ACTIONS.toLocaleLowerCase() ? (
           <Form form={form}>
             <Form.Item>
-              <Button onClick={onSubmitEditPkg}>Ok</Button>
-              <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
+              <Button onClick={onSubmitEditPkg}>
+                <CheckOutlined />
+              </Button>
+              <Button onClick={() => setEditIndex(-1)}>
+                <CloseOutlined />
+              </Button>
             </Form.Item>
           </Form>
         ) : dataIndex === PACKAGE.toLocaleLowerCase() ? (
@@ -253,12 +258,14 @@ export default function PkgTable({
           )
         ) : dataIndex === ACTIONS.toLocaleLowerCase() ? (
           <>
-            <Button onClick={() => onClickEdit(key)}>Edit</Button>
+            <Button onClick={() => onClickEdit(key)}>
+              <EditOutlined />
+            </Button>
             <Button
               onClick={() => removePkg(key)}
               disabled={usedPkgIndexList?.includes(key)}
             >
-              Remove
+              <DeleteOutlined />
             </Button>
           </>
         ) : null}

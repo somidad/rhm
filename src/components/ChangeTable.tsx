@@ -1,3 +1,4 @@
+import { CheckOutlined, CloseOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Form, Select, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import TextArea from "antd/lib/input/TextArea";
@@ -270,7 +271,7 @@ export default function ChangeTable({
           <Form>
             <Form.Item>
               <Button onClick={addChange} disabled={editIndex !== -1}>
-                Add
+                <PlusOutlined />
               </Button>
             </Form.Item>
           </Form>
@@ -325,8 +326,12 @@ export default function ChangeTable({
         ) : editIndex === key && dataIndex === "actions" ? (
           <Form>
             <Form.Item>
-              <Button onClick={onSubmitEditChange}>Ok</Button>
-              <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
+              <Button onClick={onSubmitEditChange}>
+                <CheckOutlined />
+              </Button>
+              <Button onClick={() => setEditIndex(-1)}>
+                <CloseOutlined />
+              </Button>
             </Form.Item>
           </Form>
         ) : dataIndex === "description" ? (
@@ -345,8 +350,12 @@ export default function ChangeTable({
         ) : dataIndex === "actions" ? (
           <Form>
             <Form.Item>
-              <Button onClick={() => onClickEdit(key)}>Edit</Button>
-              <Button onClick={() => removeChange(key)}>Remove</Button>
+              <Button onClick={() => onClickEdit(key)}>
+                <EditOutlined />
+              </Button>
+              <Button onClick={() => removeChange(key)}>
+                <DeleteOutlined />
+              </Button>
             </Form.Item>
           </Form>
         ) : (

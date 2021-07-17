@@ -1,4 +1,4 @@
-import { MenuOutlined } from "@ant-design/icons";
+import { CheckOutlined, CloseOutlined, DeleteOutlined, EditOutlined, MenuOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   useSensors,
   useSensor,
@@ -442,7 +442,7 @@ export default function ReleaseTable({
           <Form>
             <Form.Item>
               <Button onClick={addRelease} disabled={editIndex !== -1}>
-                Add
+                <PlusOutlined />
               </Button>
             </Form.Item>
           </Form>
@@ -507,8 +507,12 @@ export default function ReleaseTable({
         ) : editIndex === key && dataIndex === keyActions ? (
           <Form form={form}>
             <Form.Item>
-              <Button onClick={onSubmitEditRelease}>Ok</Button>
-              <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
+              <Button onClick={onSubmitEditRelease}>
+                <CheckOutlined />
+              </Button>
+              <Button onClick={() => setEditIndex(-1)}>
+                <CloseOutlined />
+              </Button>
             </Form.Item>
           </Form>
         ) : dataIndex === keyPackage ? (
@@ -530,8 +534,12 @@ export default function ReleaseTable({
             .filter((customerTag) => !!customerTag)
         ) : dataIndex === keyActions ? (
           <>
-            <Button onClick={() => onClickEdit(key)}>Edit</Button>
-            <Button onClick={() => removeRelease(key)}>Remove</Button>
+            <Button onClick={() => onClickEdit(key)}>
+              <EditOutlined />
+            </Button>
+            <Button onClick={() => removeRelease(key)}>
+              <DeleteOutlined />
+            </Button>
           </>
         ) : dataIndex === keyDragHandle ? (
           <MenuOutlined style={{ cursor: "grab" }} />

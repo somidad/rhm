@@ -1,3 +1,4 @@
+import { CheckOutlined, CloseOutlined, DeleteOutlined, EditOutlined, ExportOutlined, PlusOutlined, UnorderedListOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Select, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import Link from "antd/lib/typography/Link";
@@ -209,7 +210,7 @@ export default function VersionTable({
           <Form>
             <Form.Item>
               <Button onClick={addVersion} disabled={editIndex !== -1}>
-                Add
+                <PlusOutlined />
               </Button>
             </Form.Item>
           </Form>
@@ -240,8 +241,12 @@ export default function VersionTable({
         ) : editIndex === key && dataIndex === "actions" ? (
           <Form form={form}>
             <Form.Item>
-              <Button onClick={onSubmitEditVersion}>Ok</Button>
-              <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
+              <Button onClick={onSubmitEditVersion}>
+                <CheckOutlined />
+              </Button>
+              <Button onClick={() => setEditIndex(-1)}>
+                <CloseOutlined />
+              </Button>
             </Form.Item>
           </Form>
         ) : dataIndex === "version" ? (
@@ -255,14 +260,18 @@ export default function VersionTable({
           )
         ) : dataIndex === "actions" ? (
           <>
-            <Button onClick={() => onClickEdit(key)}>Edit</Button>
+            <Button onClick={() => onClickEdit(key)}>
+              <EditOutlined />
+            </Button>
             <Button
               onClick={() => removeVersion(key)}
               disabled={usedVersionIndexList.includes(key)}
             >
-              Remove
+              <DeleteOutlined />
             </Button>
-            <Button onClick={() => onClickPublish(key)}>Publish</Button>
+            <Button onClick={() => onClickPublish(key)}>
+              <ExportOutlined />
+            </Button>
           </>
         ) : (
           children

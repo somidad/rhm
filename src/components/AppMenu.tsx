@@ -1,3 +1,4 @@
+import { FileOutlined, FolderOpenOutlined, SaveOutlined } from "@ant-design/icons";
 import { Input, Menu } from "antd";
 import { createRef, useState } from "react";
 import { Enum, Pkg, VersionV2 } from "../types";
@@ -82,10 +83,10 @@ export default function AppMenu({
     <>
       <Menu mode="horizontal" selectable={false}>
         <Menu.Item key="new" onClick={onNew}>
-          New
+          <FileOutlined />
         </Menu.Item>
         <Menu.Item key="load" onClick={() => refLoad.current?.click()}>
-          Load
+          <FolderOpenOutlined />
         </Menu.Item>
         <Menu.Item key="featureName" disabled>
           <Input
@@ -94,7 +95,7 @@ export default function AppMenu({
           />
         </Menu.Item>
         <Menu.Item key="save" onClick={() => onClickSave()}>
-          Save
+          <SaveOutlined />
         </Menu.Item>
       </Menu>
       <input

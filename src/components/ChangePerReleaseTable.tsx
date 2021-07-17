@@ -1,3 +1,4 @@
+import { CheckOutlined, CloseOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Form, Popover, Select, Table, Tag, Typography } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import TextArea from "antd/lib/input/TextArea";
@@ -265,15 +266,15 @@ export default function ChangePerReleaseTable({
       changeIndex,
       beforeChange,
       afterChange,
-      version: versionIndex,
+      version: versionIndexOfChange,
       customerIndexList,
     } = record;
-    const versionFound = versionList.find(
-      (version) => version.index === versionIndex
-    );
+    const versionFound = versionList.find((version) => version.index === versionIndexOfChange);
+    const style = versionIndexOfChange === versionIndex ? { backgroundColor: '#1890ff0f' } : {};
+    (restProps as any).style = Object.assign({}, (restProps as any).style, style);
     return (
       <td {...restProps}>
-        {editVersionIndex === versionIndex &&
+        {editVersionIndex === versionIndexOfChange &&
         editChangeIndex === changeIndex &&
         dataIndex === keyCustomers ? (
           <Form form={form}>
@@ -314,19 +315,23 @@ export default function ChangePerReleaseTable({
               </Select>
             </Form.Item>
           </Form>
-        ) : editVersionIndex === versionIndex &&
+        ) : editVersionIndex === versionIndexOfChange &&
           editChangeIndex === changeIndex &&
           dataIndex === keyActions ? (
           <Form form={form}>
             <Form.Item>
-              <Button onClick={() => onSubmitChange(versionIndex, changeIndex)}>
-                Ok
+              <Button onClick={() => onSubmitChange(versionIndexOfChange, changeIndex)}>
+                <CheckOutlined />
               </Button>
-              <Button onClick={onCancelEdit}>Cancel</Button>
+              <Button onClick={onCancelEdit}>
+                <CloseOutlined />
+              </Button>
             </Form.Item>
           </Form>
         ) : dataIndex === keyVersion ? (
-          versionFound?.name ?? parenError
+          // <span style={style}>
+            versionFound?.name ?? parenError
+          // </span>
         ) : dataIndex === keyDescription ? (
           <Popover
             content={() => (
@@ -355,8 +360,8 @@ export default function ChangePerReleaseTable({
             );
           })
         ) : dataIndex === keyActions ? (
-          <Button onClick={() => onClickEdit(versionIndex, changeIndex)}>
-            Edit
+          <Button onClick={() => onClickEdit(versionIndexOfChange, changeIndex)}>
+            <EditOutlined />
           </Button>
         ) : (
           children

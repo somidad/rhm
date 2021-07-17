@@ -1,3 +1,4 @@
+import { CheckOutlined, CloseOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { useState } from "react";
@@ -173,7 +174,7 @@ export default function EnumTable({
           <Form form={form}>
             <Form.Item>
               <Button onClick={addEnumItem} disabled={editIndex !== -1}>
-                Add
+                <PlusOutlined />
               </Button>
             </Form.Item>
           </Form>
@@ -186,20 +187,26 @@ export default function EnumTable({
         ) : editIndex === key && dataIndex === ACTIONS.toLocaleLowerCase() ? (
           <Form form={form}>
             <Form.Item>
-              <Button onClick={onSubmitRename}>Ok</Button>
-              <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
+              <Button onClick={onSubmitRename}>
+                <CheckOutlined />
+              </Button>
+              <Button onClick={() => setEditIndex(-1)}>
+                <CloseOutlined />
+              </Button>
             </Form.Item>
           </Form>
         ) : dataIndex === NAME.toLocaleLowerCase() ? (
           children
         ) : dataIndex === ACTIONS.toLocaleLowerCase() ? (
           <>
-            <Button onClick={() => onClickEdit(key)}>Edit</Button>
+            <Button onClick={() => onClickEdit(key)}>
+              <EditOutlined />
+            </Button>
             <Button
               onClick={() => removeEnumItem(key)}
               disabled={usedIndexList?.includes(key)}
             >
-              Remove
+              <DeleteOutlined />
             </Button>
           </>
         ) : null}
