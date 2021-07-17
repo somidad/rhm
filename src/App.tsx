@@ -30,7 +30,7 @@ function App() {
   const [lineupList, setLineupList] = useState<Enum[]>(lineupListInit);
   const [pkgList, setPkgList] = useState<Pkg[]>(pkgListInit);
   const [customerList, setCustomerList] = useState<Enum[]>(customerListInit);
-  const [modalVisible, setModalVisible] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
   const [releaseHistory, setReleaseHistory] = useState("");
 
   function onChangeChangeList(changeList: ChangeV2[]) {
@@ -75,6 +75,32 @@ function App() {
       setVersionIndex(-1);
     }
     setVersionList(versionList);
+  }
+
+  function onLoad({
+    customerList,
+    lineupList,
+    pkgList,
+    versionList,
+  }: {
+    customerList: Enum[];
+    lineupList: Enum[];
+    pkgList: Pkg[];
+    versionList: VersionV2[];
+  }) {
+    setVersionIndex(-1);
+    setCustomerList(customerList);
+    setLineupList(lineupList);
+    setPkgList(pkgList);
+    setVersionList(versionList);
+  }
+
+  function onNew() {
+    setVersionIndex(-1);
+    setCustomerList([]);
+    setLineupList([]);
+    setPkgList([]);
+    setVersionList([]);
   }
 
   function onPublish(key: number) {
@@ -160,10 +186,8 @@ function App() {
         lineupList={lineupList}
         pkgList={pkgList}
         versionList={versionList}
-        onChangeCustomerList={setCustomerList}
-        onChangeLineupList={setLineupList}
-        onChangePkgList={setPkgList}
-        onChangeVersionList={setVersionList}
+        onNew={onNew}
+        onLoad={onLoad}
       />
       <Row>
         <Col span={16} offset={4}>

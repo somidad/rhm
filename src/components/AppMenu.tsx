@@ -8,10 +8,13 @@ type Props = {
   lineupList: Enum[];
   pkgList: Pkg[];
   versionList: VersionV2[];
-  onChangeCustomerList: (customerList: Enum[]) => void;
-  onChangeLineupList: (lineupList: Enum[]) => void;
-  onChangePkgList: (pkgList: Pkg[]) => void;
-  onChangeVersionList: (versionList: VersionV2[]) => void;
+  onNew: () => void;
+  onLoad: (content: {
+    customerList: Enum[];
+    lineupList: Enum[];
+    pkgList: Pkg[];
+    versionList: VersionV2[];
+  }) => void;
 };
 
 const UNTITLED = "Untitled";
@@ -21,10 +24,8 @@ export default function AppMenu({
   lineupList,
   pkgList,
   versionList,
-  onChangeCustomerList,
-  onChangeLineupList,
-  onChangePkgList,
-  onChangeVersionList,
+  onNew,
+  onLoad,
 }: Props) {
   const refLoad = createRef<HTMLInputElement>();
   let file: File | undefined;
@@ -42,14 +43,6 @@ export default function AppMenu({
       return;
     }
     reader.readAsText(file);
-  }
-
-  function onClickNew() {
-    setFeatureName(UNTITLED);
-    onChangeVersionList([]);
-    onChangeLineupList([{ index: 0, name: "(None)" }]);
-    onChangePkgList([]);
-    onChangeCustomerList([]);
   }
 
   function onClickSave() {
@@ -82,16 +75,13 @@ export default function AppMenu({
     const featureName = name.substring(0, indexLast);
     const { versionList, lineupList, pkgList, customerList } = load(result);
     setFeatureName(featureName);
-    onChangeCustomerList(customerList);
-    onChangeLineupList(lineupList);
-    onChangePkgList(pkgList);
-    onChangeVersionList(versionList);
+    onLoad({ customerList, lineupList, pkgList, versionList });
   };
 
   return (
     <>
       <Menu mode="horizontal" selectable={false}>
-        <Menu.Item key="new" onClick={onClickNew}>
+        <Menu.Item key="new" onClick={onNew}>
           New
         </Menu.Item>
         <Menu.Item key="load" onClick={() => refLoad.current?.click()}>
