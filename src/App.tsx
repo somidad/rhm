@@ -216,7 +216,17 @@ function App() {
                     </>
                   )}
                   <Space direction="vertical" style={{ width: "100%" }}>
-                    <Collapse defaultActiveKey={["changes", "releases"]}>
+                    <Collapse defaultActiveKey={["changes"]}>
+                      <Panel key="changes" header="Changes">
+                        <ChangeTable
+                          versionIndex={versionIndex}
+                          versionList={versionList}
+                          lineupList={lineupList}
+                          onChange={onChangeChangeList}
+                        />
+                      </Panel>
+                    </Collapse>
+                    <Collapse defaultActiveKey={["releases"]}>
                       <Panel key="releases" header="Releases">
                         <ReleaseTable
                           lineupList={lineupList}
@@ -227,16 +237,6 @@ function App() {
                           versionIndex={versionIndex}
                           onChange={onChangeReleaseList}
                           // onChangeVersionList={setVersionList}
-                        />
-                      </Panel>
-                    </Collapse>
-                    <Collapse defaultActiveKey={["changes", "releases"]}>
-                      <Panel key="changes" header="Changes">
-                        <ChangeTable
-                          versionIndex={versionIndex}
-                          versionList={versionList}
-                          lineupList={lineupList}
-                          onChange={onChangeChangeList}
                         />
                       </Panel>
                     </Collapse>
