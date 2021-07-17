@@ -219,6 +219,14 @@ export function load(input: string) {
   } else {
     // TODO: Check validity
   }
+  // Migrate from rhm v1 to v2
+  versionList.forEach((version: any) => {
+    const { releaseList } = version;
+    releaseList.forEach((release: any) => {
+      release.customerIndexListPerChangeList = release.customerIndexListPerChangeList ?? [];
+    });
+  });
+  // TODO
   return { versionList, lineupList, pkgList, customerList };
 }
 
