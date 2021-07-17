@@ -82,11 +82,10 @@ export default function ChangePerReleaseTable({
     const customerIndexListPerChangeFound = customerIndexListPerChangeList.find((item) => {
       return item.versionIndex === versionIndex && item.changeIndex === changeIndex;
     });
-    if (!customerIndexListPerChangeFound) {
-      return;
+    if (customerIndexListPerChangeFound) {
+      const { customerIndexList } = customerIndexListPerChangeFound;
+      form.setFieldsValue({ customerIndexList });
     }
-    const { customerIndexList } = customerIndexListPerChangeFound;
-    form.setFieldsValue({ customerIndexList });
     setEditVersionIndex(versionIndex);
     setEditChangeIndex(changeIndex);
   }
