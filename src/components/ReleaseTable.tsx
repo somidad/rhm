@@ -251,11 +251,13 @@ export default function ReleaseTable({
   }
 
   function DraggableRow(props: any) {
-    const { children, ...restProps } = props;
+    const { children, style, ...restProps } = props;
     const id = props['data-row-key']?.toString() ?? invalidSortable;
     const { attributes, listeners, setNodeRef } = useSortable({ id });
+    const styleRowBold = Number(id) > -1 ? { fontWeight: "bold" } : null;
+    const styleNew = Object.assign({}, style, styleRowBold);
     return (
-      <tr ref={setNodeRef} {...attributes} {...restProps}>
+      <tr ref={setNodeRef} {...attributes} {...restProps} style={styleNew}>
         {
           id === invalidSortable ? (
             children
