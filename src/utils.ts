@@ -248,11 +248,11 @@ export function load(input: string) {
             if (customerIndexListPerChangeFound) {
               customerIndexListPerChangeFound.customerIndexList = uniq([
                 ...customerIndexListPerChangeFound.customerIndexList,
-                -1
+                customerIndex,
               ]);
             } else {
               customerIndexListPerChangeList.push({
-                versionIndex, changeIndex, customerIndexList: [-1],
+                versionIndex, changeIndex, customerIndexList: [customerIndex],
               });
             }
           }
@@ -273,10 +273,7 @@ export function load(input: string) {
             return item.versionIndex === versionIndex && item.changeIndex === changeIndex;
           });
           if (customerIndexListPerChangeFound) {
-            customerIndexListPerChangeFound.customerIndexList = uniq([
-              ...customerIndexListPerChangeFound.customerIndexList,
-              -1
-            ]);
+            customerIndexListPerChangeFound.customerIndexList = [-1];
           } else {
             customerIndexListPerChangeList.push({
               versionIndex, changeIndex, customerIndexList: [-1],
