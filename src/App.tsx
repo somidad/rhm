@@ -1,22 +1,27 @@
-import { useState } from 'react';
-import 'antd/dist/antd.css';
-import './App.css';
-import { Button, Col, Collapse, Modal, Row, Space, Tabs, Tag } from 'antd';
-import { CopyOutlined, GithubOutlined } from '@ant-design/icons';
-import EnumTable from './components/EnumTable';
-import PkgTable from './components/PkgTable';
-import { ChangeV2, Enum, Pkg, ReleaseV2, VersionV2 } from './types';
-import Title from 'antd/lib/typography/Title';
-import Link from 'antd/lib/typography/Link';
-import VersionTable from './components/VersionTable';
-import AppMenu from './components/AppMenu';
-import ReleaseTable from './components/ReleaseTable';
-import ChangeTable from './components/ChangeTable';
-import { customerListInit, lineupListInit, pkgListInit, versionListInit } from './init';
-import { uniq } from 'lodash';
-import TextArea from 'antd/lib/input/TextArea';
-import { publish } from './utils';
-import { parenError } from './constants';
+import { useState } from "react";
+import "antd/dist/antd.css";
+import "./App.css";
+import { Button, Col, Collapse, Modal, Row, Space, Tabs, Tag } from "antd";
+import { CopyOutlined, GithubOutlined } from "@ant-design/icons";
+import EnumTable from "./components/EnumTable";
+import PkgTable from "./components/PkgTable";
+import { ChangeV2, Enum, Pkg, ReleaseV2, VersionV2 } from "./types";
+import Title from "antd/lib/typography/Title";
+import Link from "antd/lib/typography/Link";
+import VersionTable from "./components/VersionTable";
+import AppMenu from "./components/AppMenu";
+import ReleaseTable from "./components/ReleaseTable";
+import ChangeTable from "./components/ChangeTable";
+import {
+  customerListInit,
+  lineupListInit,
+  pkgListInit,
+  versionListInit,
+} from "./init";
+import { uniq } from "lodash";
+import TextArea from "antd/lib/input/TextArea";
+import { publish } from "./utils";
+import { parenError } from "./constants";
 const { Panel } = Collapse;
 
 function App() {
@@ -26,10 +31,12 @@ function App() {
   const [pkgList, setPkgList] = useState<Pkg[]>(pkgListInit);
   const [customerList, setCustomerList] = useState<Enum[]>(customerListInit);
   const [modalVisible, setModalVisible] = useState(true);
-  const [releaseHistory, setReleaseHistory] = useState('');
+  const [releaseHistory, setReleaseHistory] = useState("");
 
   function onChangeChangeList(changeList: ChangeV2[]) {
-    const indexFound = versionList.findIndex((version) => version.index === versionIndex);
+    const indexFound = versionList.findIndex(
+      (version) => version.index === versionIndex
+    );
     if (indexFound === -1) {
       return;
     }
@@ -44,7 +51,9 @@ function App() {
   }
 
   function onChangeReleaseList(releaseList: ReleaseV2[]) {
-    const indexFound = versionList.findIndex((version) => version.index === versionIndex);
+    const indexFound = versionList.findIndex(
+      (version) => version.index === versionIndex
+    );
     if (indexFound === -1) {
       return;
     }
@@ -59,7 +68,9 @@ function App() {
   }
 
   function onChangeVersionList(versionList: VersionV2[]) {
-    const versionFound = versionList.find((version) => version.index === versionIndex);
+    const versionFound = versionList.find(
+      (version) => version.index === versionIndex
+    );
     if (!versionFound) {
       setVersionIndex(-1);
     }
@@ -67,7 +78,13 @@ function App() {
   }
 
   function onPublish(key: number) {
-    const releaseHistory = publish(versionList, key, lineupList, pkgList, customerList);
+    const releaseHistory = publish(
+      versionList,
+      key,
+      lineupList,
+      pkgList,
+      customerList
+    );
     setReleaseHistory(releaseHistory ?? parenError);
     setModalVisible(true);
   }
@@ -88,37 +105,48 @@ function App() {
     }, []),
     ...pkgList.map((pkg) => pkg.lineupIndex),
   ]);
-  const usedPkgIndexList = uniq(versionList.reduce((pkgIndexListPrev: number[], version) => {
-    const { releaseList } = version;
-    return [
-      ...pkgIndexListPrev,
-      ...releaseList.map((release) => release.pkgIndex),
-    ];
-  }, []));
+  const usedPkgIndexList = uniq(
+    versionList.reduce((pkgIndexListPrev: number[], version) => {
+      const { releaseList } = version;
+      return [
+        ...pkgIndexListPrev,
+        ...releaseList.map((release) => release.pkgIndex),
+      ];
+    }, [])
+  );
   const usedCustomerIndexList = uniq(
     versionList.reduce((customerIndexListPrev: number[], version) => {
       const { releaseList } = version;
       return [
         ...customerIndexListPrev,
-        ...releaseList.reduce((customerIndexListPerReleasePrev: number[], release) => {
-        const { customerIndexList, customerIndexListPerChangeList } = release;
-        return [
-          ...customerIndexListPerReleasePrev,
-          ...customerIndexList,
-          ...customerIndexListPerChangeList.reduce((customerIndexListPerChangeListPrev: number[], item) => {
-            const { customerIndexList } = item;
+        ...releaseList.reduce(
+          (customerIndexListPerReleasePrev: number[], release) => {
+            const { customerIndexList, customerIndexListPerChangeList } =
+              release;
             return [
-              ...customerIndexListPerChangeListPrev,
+              ...customerIndexListPerReleasePrev,
               ...customerIndexList,
+              ...customerIndexListPerChangeList.reduce(
+                (customerIndexListPerChangeListPrev: number[], item) => {
+                  const { customerIndexList } = item;
+                  return [
+                    ...customerIndexListPerChangeListPrev,
+                    ...customerIndexList,
+                  ];
+                },
+                []
+              ),
             ];
-          }, []),
-        ];
-      }, []),
-    ]
+          },
+          []
+        ),
+      ];
     }, [])
   );
 
-  const versionCurr = versionList.find((version) => version.index === versionIndex);
+  const versionCurr = versionList.find(
+    (version) => version.index === versionIndex
+  );
   const versionPrev =
     !versionCurr || versionCurr.indexPrev === -1
       ? undefined
@@ -163,7 +191,7 @@ function App() {
                       </Tag>
                     </>
                   )}
-                  <Space direction='vertical' style={{ width: '100%'}}>
+                  <Space direction="vertical" style={{ width: "100%" }}>
                     <Collapse defaultActiveKey={["changes", "releases"]}>
                       <Panel key="releases" header="Releases">
                         <ReleaseTable

@@ -14,7 +14,13 @@ type Props = {
 };
 
 type EditableCellProps = {
-  record: { key: number, descriptoin: string; beforeChange: string; afterChange: string; lineup: number };
+  record: {
+    key: number;
+    descriptoin: string;
+    beforeChange: string;
+    afterChange: string;
+    lineup: number;
+  };
   dataIndex: string;
   children: any;
 };
@@ -33,15 +39,32 @@ export default function ChangeTable({
     setEditIndex(-1);
   }, [versionIndex, versionList, lineupList]);
 
-  const versionFound = versionList.find((version) => version.index === versionIndex);
+  const versionFound = versionList.find(
+    (version) => version.index === versionIndex
+  );
   const changeList = versionFound?.changeList ?? [];
 
   const columns: any[] = [
-    { key: "description", dataIndex: "description", title: "Description", width: '25%' },
-    { key: "beforeChange", dataIndex: "beforeChange", title: "Before change", width: '25%' },
-    { key: "afterChange", dataIndex: "afterChange", title: "After change", width: '25%' },
-    { key: 'lineup', dataIndex: 'lineup', title: 'Lineup', width: '12.5%' },
-    { key: "actions", dataIndex: "actions", title: "Actions", width: '12.5%' },
+    {
+      key: "description",
+      dataIndex: "description",
+      title: "Description",
+      width: "25%",
+    },
+    {
+      key: "beforeChange",
+      dataIndex: "beforeChange",
+      title: "Before change",
+      width: "25%",
+    },
+    {
+      key: "afterChange",
+      dataIndex: "afterChange",
+      title: "After change",
+      width: "25%",
+    },
+    { key: "lineup", dataIndex: "lineup", title: "Lineup", width: "12.5%" },
+    { key: "actions", dataIndex: "actions", title: "Actions", width: "12.5%" },
   ].map((column) => {
     const { dataIndex } = column;
     return {
@@ -55,9 +78,14 @@ export default function ChangeTable({
 
   function addChange() {
     form
-      .validateFields(["description", "beforeChange", "afterChange", 'lineup'])
+      .validateFields(["description", "beforeChange", "afterChange", "lineup"])
       .then(() => {
-        const { description, beforeChange, afterChange, lineup: lineupIndex } = form.getFieldsValue([
+        const {
+          description,
+          beforeChange,
+          afterChange,
+          lineup: lineupIndex,
+        } = form.getFieldsValue([
           "description",
           "beforeChange",
           "afterChange",
@@ -102,28 +130,48 @@ export default function ChangeTable({
   }
 
   function onSubmitEditChange() {
-    form.validateFields(['descriptionNew', 'beforeChangeNew', 'afterChangeNew', 'lineupNew']).then(() => {
-      const { descriptionNew: description, beforeChangeNew: beforeChange, afterChangeNew: afterChange, lineupNew: lineupIndex } =
-        form.getFieldsValue([
+    form
+      .validateFields([
+        "descriptionNew",
+        "beforeChangeNew",
+        "afterChangeNew",
+        "lineupNew",
+      ])
+      .then(() => {
+        const {
+          descriptionNew: description,
+          beforeChangeNew: beforeChange,
+          afterChangeNew: afterChange,
+          lineupNew: lineupIndex,
+        } = form.getFieldsValue([
           "descriptionNew",
           "beforeChangeNew",
           "afterChangeNew",
           "lineupNew",
         ]);
-      const indexFound = changeList.findIndex((change) => change.index === editIndex);
-      if (indexFound === -1) {
-        return;
-      }
-      const changeListNew: ChangeV2[] = [
-        ...changeList.slice(0, indexFound),
-        { index: editIndex, description, beforeChange, afterChange, lineupIndex },
-        ...changeList.slice(indexFound + 1),
-      ];
-      onChange(changeListNew);
-      setEditIndex(-1);
-    }).catch((reason) => {
-      console.error(reason);
-    });
+        const indexFound = changeList.findIndex(
+          (change) => change.index === editIndex
+        );
+        if (indexFound === -1) {
+          return;
+        }
+        const changeListNew: ChangeV2[] = [
+          ...changeList.slice(0, indexFound),
+          {
+            index: editIndex,
+            description,
+            beforeChange,
+            afterChange,
+            lineupIndex,
+          },
+          ...changeList.slice(indexFound + 1),
+        ];
+        onChange(changeListNew);
+        setEditIndex(-1);
+      })
+      .catch((reason) => {
+        console.error(reason);
+      });
   }
 
   function removeChange(index: number) {
@@ -137,17 +185,16 @@ export default function ChangeTable({
 
   const dataSource: any[] = [
     { key: -1 },
-    ...changeList
-      .map((change) => {
-        const {
-          index: key,
-          description,
-          beforeChange,
-          afterChange,
-          lineupIndex: lineup,
-        } = change;
-        return { key, description, beforeChange, afterChange, lineup };
-      }),
+    ...changeList.map((change) => {
+      const {
+        index: key,
+        description,
+        beforeChange,
+        afterChange,
+        lineupIndex: lineup,
+      } = change;
+      return { key, description, beforeChange, afterChange, lineup };
+    }),
   ];
   return (
     <Table
@@ -171,7 +218,7 @@ export default function ChangeTable({
     const { key, lineup: lineupIndex } = record;
     console.log(children);
     return (
-      <td {...restProps} style={{ verticalAlign: 'top' }}>
+      <td {...restProps} style={{ verticalAlign: "top" }}>
         {key === -1 && dataIndex === "description" ? (
           <Form form={form}>
             <Form.Item
@@ -202,95 +249,101 @@ export default function ChangeTable({
               <TextArea autoSize disabled={editIndex !== -1} />
             </Form.Item>
           </Form>
-        ) : key === -1 && dataIndex === 'lineup' ? (
+        ) : key === -1 && dataIndex === "lineup" ? (
           <Form form={form}>
-            <Form.Item
-              name='lineup'
-              initialValue={-1}
-            >
+            <Form.Item name="lineup" initialValue={-1}>
               <Select disabled={editIndex !== -1}>
-                <Option key={-1} value={-1}>(None)</Option>
-                {
-                  lineupList.map((lineup) => {
-                    const { index, name } = lineup;
-                    return (
-                      <Option key={index} value={index}>{name}</Option>
-                    )
-                  })
-                }
+                <Option key={-1} value={-1}>
+                  (None)
+                </Option>
+                {lineupList.map((lineup) => {
+                  const { index, name } = lineup;
+                  return (
+                    <Option key={index} value={index}>
+                      {name}
+                    </Option>
+                  );
+                })}
               </Select>
             </Form.Item>
           </Form>
         ) : key === -1 && dataIndex === "actions" ? (
           <Form>
             <Form.Item>
-              <Button onClick={addChange} disabled={editIndex !== -1}>Add</Button>
+              <Button onClick={addChange} disabled={editIndex !== -1}>
+                Add
+              </Button>
             </Form.Item>
           </Form>
-        ) : editIndex === key && dataIndex === 'description' ? (
+        ) : editIndex === key && dataIndex === "description" ? (
           <Form form={form}>
             <Form.Item
-              name='descriptionNew'
+              name="descriptionNew"
               rules={[{ required: true }]}
               help={false}
             >
               <TextArea autoSize />
             </Form.Item>
           </Form>
-        ) : editIndex === key && dataIndex === 'beforeChange' ? (
+        ) : editIndex === key && dataIndex === "beforeChange" ? (
           <Form form={form}>
             <Form.Item
-              name='beforeChangeNew'
+              name="beforeChangeNew"
               rules={[{ required: true }]}
               help={false}
             >
               <TextArea autoSize />
             </Form.Item>
           </Form>
-        ) : editIndex === key && dataIndex === 'afterChange' ? (
+        ) : editIndex === key && dataIndex === "afterChange" ? (
           <Form form={form}>
             <Form.Item
-              name='afterChangeNew'
+              name="afterChangeNew"
               rules={[{ required: true }]}
               help={false}
             >
               <TextArea autoSize />
             </Form.Item>
           </Form>
-        ) : editIndex === key && dataIndex === 'lineup' ? (
+        ) : editIndex === key && dataIndex === "lineup" ? (
           <Form form={form}>
-            <Form.Item
-              name='lineupNew'
-            >
+            <Form.Item name="lineupNew">
               <Select>
-                <Option key={-1} value={-1}>(None)</Option>
-                {
-                  lineupList.map((lineup) => {
-                    const { index, name } = lineup;
-                    return (
-                      <Option key={index} value={index}>{name}</Option>
-                    )
-                  })
-                }
+                <Option key={-1} value={-1}>
+                  (None)
+                </Option>
+                {lineupList.map((lineup) => {
+                  const { index, name } = lineup;
+                  return (
+                    <Option key={index} value={index}>
+                      {name}
+                    </Option>
+                  );
+                })}
               </Select>
             </Form.Item>
           </Form>
-        ) : editIndex === key && dataIndex === 'actions' ? (
+        ) : editIndex === key && dataIndex === "actions" ? (
           <Form>
             <Form.Item>
               <Button onClick={onSubmitEditChange}>Ok</Button>
               <Button onClick={() => setEditIndex(-1)}>Cancel</Button>
             </Form.Item>
           </Form>
-        ) : dataIndex === 'description' ? (
-          <TextArea value={children[1]} autoSize style={{ border: 'none '}} />
-        ) : dataIndex === 'beforeChange' ? (
-          <TextArea value={children[1]} autoSize style={{ border: 'none '}} />
-        ) : dataIndex === 'afterChange' ? (
-          <TextArea value={children[1]} autoSize style={{ border: 'none '}} />
-        ) : dataIndex === 'lineup' ? (
-          lineupIndex === -1 ? '(None)' : lineupList.find((lineup) => lineup.index === lineupIndex)?.name ?? '(Error)'
-        ) : dataIndex === 'actions' ? (
+        ) : dataIndex === "description" ? (
+          <TextArea value={children[1]} autoSize style={{ border: "none " }} />
+        ) : dataIndex === "beforeChange" ? (
+          <TextArea value={children[1]} autoSize style={{ border: "none " }} />
+        ) : dataIndex === "afterChange" ? (
+          <TextArea value={children[1]} autoSize style={{ border: "none " }} />
+        ) : dataIndex === "lineup" ? (
+          lineupIndex === -1 ? (
+            "(None)"
+          ) : (
+            lineupList.find((lineup) => lineup.index === lineupIndex)?.name ??
+            "(Error)"
+          )
+        ) : dataIndex === "actions" ? (
           <Form>
             <Form.Item>
               <Button onClick={() => onClickEdit(key)}>Edit</Button>

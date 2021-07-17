@@ -14,16 +14,21 @@ type Props = {
 };
 
 type EditableCellProps = {
-  record: { key: number, name: string; lineup: number; };
+  record: { key: number; name: string; lineup: number };
   dataIndex: string;
   children: any;
-}
+};
 
-const PACKAGE = 'Package';
-const LINEUP = 'Lineup';
-const ACTIONS = 'Actions';
+const PACKAGE = "Package";
+const LINEUP = "Lineup";
+const ACTIONS = "Actions";
 
-export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexList }: Props) {
+export default function PkgTable({
+  pkgList,
+  lineupList,
+  onChange,
+  usedPkgIndexList,
+}: Props) {
   const [form] = useForm();
   const [editIndex, setEditIndex] = useState(-1);
 
@@ -32,9 +37,21 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
   }, [lineupList]);
 
   const columns: any[] = [
-    { key: PACKAGE.toLocaleLowerCase(), dataIndex: PACKAGE.toLocaleLowerCase(), title: PACKAGE },
-    { key: LINEUP.toLocaleLowerCase(), dataIndex: LINEUP.toLocaleLowerCase(), title: LINEUP },
-    { key: ACTIONS.toLocaleLowerCase(), dataIndex: ACTIONS.toLocaleLowerCase(), title: ACTIONS },
+    {
+      key: PACKAGE.toLocaleLowerCase(),
+      dataIndex: PACKAGE.toLocaleLowerCase(),
+      title: PACKAGE,
+    },
+    {
+      key: LINEUP.toLocaleLowerCase(),
+      dataIndex: LINEUP.toLocaleLowerCase(),
+      title: LINEUP,
+    },
+    {
+      key: ACTIONS.toLocaleLowerCase(),
+      dataIndex: ACTIONS.toLocaleLowerCase(),
+      title: ACTIONS,
+    },
   ].map((column) => {
     const { dataIndex } = column;
     return {
@@ -43,29 +60,34 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
         record,
         dataIndex,
       }),
-    }
+    };
   });
 
   function addPkg() {
-    form.validateFields(['name', 'lineup']).then(() => {
-      const { name, lineup: lineupIndex } = form.getFieldsValue(['name', 'lineup']);
-      const pkgFound = pkgList.find((pkg) => pkg.name === name);
-      if (pkgFound) {
-        return;
-      }
-      const index = findEmptyIndex(pkgList.map((pkg) => pkg.index));
-      const pkgListNew = [
-        ...pkgList,
-        { index, name, lineupIndex },
-      ].sort((a, b) => a.name.localeCompare(b.name));
-      onChange(pkgListNew);
-      form.setFieldsValue({
-        name: '',
-        lineup: -1,
+    form
+      .validateFields(["name", "lineup"])
+      .then(() => {
+        const { name, lineup: lineupIndex } = form.getFieldsValue([
+          "name",
+          "lineup",
+        ]);
+        const pkgFound = pkgList.find((pkg) => pkg.name === name);
+        if (pkgFound) {
+          return;
+        }
+        const index = findEmptyIndex(pkgList.map((pkg) => pkg.index));
+        const pkgListNew = [...pkgList, { index, name, lineupIndex }].sort(
+          (a, b) => a.name.localeCompare(b.name)
+        );
+        onChange(pkgListNew);
+        form.setFieldsValue({
+          name: "",
+          lineup: -1,
+        });
+      })
+      .catch((reason) => {
+        console.error(reason);
       });
-    }).catch((reason) => {
-      console.error(reason);
-    });
   }
 
   function onClickEdit(index: number) {
@@ -82,26 +104,34 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
   }
 
   function onSubmitEditPkg() {
-    form.validateFields(['nameNew']).then(() => {
-      const { nameNew, lineupNew: lineupIndexNew } = form.getFieldsValue(['nameNew', 'lineupNew']);
-      const pkgFound = pkgList.find((pkg) => pkg.index !== editIndex && pkg.name === nameNew);
-      if (pkgFound) {
-        return;
-      }
-      const indexFound = pkgList.findIndex((pkg) => pkg.index === editIndex);
-      if (indexFound === -1) {
-        return;
-      }
-      const pkgListNew = [
-        ...pkgList.slice(0, indexFound),
-        { index: editIndex, name: nameNew, lineupIndex: lineupIndexNew },
-        ...pkgList.slice(indexFound + 1),
-      ];
-      onChange(pkgListNew);
-      setEditIndex(-1);
-    }).catch((reason) => {
-      console.error(reason);
-    });
+    form
+      .validateFields(["nameNew"])
+      .then(() => {
+        const { nameNew, lineupNew: lineupIndexNew } = form.getFieldsValue([
+          "nameNew",
+          "lineupNew",
+        ]);
+        const pkgFound = pkgList.find(
+          (pkg) => pkg.index !== editIndex && pkg.name === nameNew
+        );
+        if (pkgFound) {
+          return;
+        }
+        const indexFound = pkgList.findIndex((pkg) => pkg.index === editIndex);
+        if (indexFound === -1) {
+          return;
+        }
+        const pkgListNew = [
+          ...pkgList.slice(0, indexFound),
+          { index: editIndex, name: nameNew, lineupIndex: lineupIndexNew },
+          ...pkgList.slice(indexFound + 1),
+        ];
+        onChange(pkgListNew);
+        setEditIndex(-1);
+      })
+      .catch((reason) => {
+        console.error(reason);
+      });
   }
 
   function removePkg(index: number) {
@@ -120,16 +150,17 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
   }
 
   const dataSource = [
-    { key: -1, package: '', actions: '' },
+    { key: -1, package: "", actions: "" },
     ...pkgList.map((pkg) => {
       const { index: key, name, lineupIndex: lineup } = pkg;
-      return { key, package: name, lineup, actions: '' };
+      return { key, package: name, lineup, actions: "" };
     }),
   ];
 
   return (
     <Table
-      columns={columns} dataSource={dataSource}
+      columns={columns}
+      dataSource={dataSource}
       components={{
         body: {
           cell: EditableCell,
@@ -139,7 +170,12 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
     />
   );
 
-  function EditableCell({record, dataIndex, children, ...restProps}: EditableCellProps) {
+  function EditableCell({
+    record,
+    dataIndex,
+    children,
+    ...restProps
+  }: EditableCellProps) {
     const { key, lineup: lineupIndex } = record;
     return (
       <td {...restProps}>
@@ -151,10 +187,7 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
           </Form>
         ) : key === -1 && dataIndex === LINEUP.toLocaleLowerCase() ? (
           <Form form={form}>
-            <Form.Item
-              name="lineup"
-              initialValue={-1}
-            >
+            <Form.Item name="lineup" initialValue={-1}>
               <Select disabled={editIndex !== -1}>
                 <Option key={-1} value={-1}>
                   (None)
@@ -180,19 +213,13 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
           </Form>
         ) : editIndex === key && dataIndex === PACKAGE.toLocaleLowerCase() ? (
           <Form form={form}>
-            <Form.Item
-              name='nameNew'
-              rules={[{ required: true }]}
-              help={false}
-            >
+            <Form.Item name="nameNew" rules={[{ required: true }]} help={false}>
               <Input />
             </Form.Item>
           </Form>
         ) : editIndex === key && dataIndex === LINEUP.toLocaleLowerCase() ? (
           <Form form={form}>
-            <Form.Item
-              name='lineupNew'
-            >
+            <Form.Item name="lineupNew">
               <Select>
                 <Option key={-1} value={-1}>
                   (None)
@@ -230,7 +257,9 @@ export default function PkgTable({ pkgList, lineupList, onChange, usedPkgIndexLi
             <Button
               onClick={() => removePkg(key)}
               disabled={usedPkgIndexList?.includes(key)}
-            >Remove</Button>
+            >
+              Remove
+            </Button>
           </>
         ) : null}
       </td>

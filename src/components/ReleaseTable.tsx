@@ -1,17 +1,48 @@
 import { MenuOutlined } from "@ant-design/icons";
-import { useSensors, useSensor, PointerSensor, KeyboardSensor, DndContext, closestCenter, DragOverlay } from "@dnd-kit/core";
-import { sortableKeyboardCoordinates, arrayMove, SortableContext, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
+import {
+  useSensors,
+  useSensor,
+  PointerSensor,
+  KeyboardSensor,
+  DndContext,
+  closestCenter,
+  DragOverlay,
+} from "@dnd-kit/core";
+import {
+  sortableKeyboardCoordinates,
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
 import { Button, Form, Select, Table, Tag } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { useEffect, useState } from "react";
-import { invalidSortable, keyActions, keyCustomers, keyDragHandle, keyPackage, parenError, parenNone, titleActions, titleCustomers, titlePackage } from "../constants";
-import { CustomerIndexListPerChange, Enum, Pkg, ReleaseV2, VersionV2 } from "../types";
+import {
+  invalidSortable,
+  keyActions,
+  keyCustomers,
+  keyDragHandle,
+  keyPackage,
+  parenError,
+  parenNone,
+  titleActions,
+  titleCustomers,
+  titlePackage,
+} from "../constants";
+import {
+  CustomerIndexListPerChange,
+  Enum,
+  Pkg,
+  ReleaseV2,
+  VersionV2,
+} from "../types";
 import { findEmptyIndex } from "../utils";
 import ChangePerReleaseTable from "./ChangePerReleaseTable";
 
 const { Option } = Select;
 
-type Props ={ 
+type Props = {
   lineupList: Enum[];
   pkgList: Pkg[];
   customerList: Enum[];
@@ -19,18 +50,27 @@ type Props ={
   versionList: VersionV2[];
   versionIndex: number;
   onChange: (releaseList: ReleaseV2[]) => void;
-}
+};
 
 type EditableCellProps = {
-  record: { key: number; package: number; pkgName: string; customers: number[], lineup: string };
+  record: {
+    key: number;
+    package: number;
+    pkgName: string;
+    customers: number[];
+    lineup: string;
+  };
   dataIndex: string;
   children: any;
 };
 
 export default function ReleaseTable({
-  lineupList, pkgList, customerList,
+  lineupList,
+  pkgList,
+  customerList,
   usedPkgIndexList,
-  versionList, versionIndex,
+  versionList,
+  versionIndex,
   onChange,
 }: Props) {
   const [form] = useForm();
@@ -54,8 +94,12 @@ export default function ReleaseTable({
   function onDragEnd(event: any) {
     const { active, over } = event;
     if (active.id !== over.id) {
-      const oldIndex = releaseList.findIndex((release) => release.index.toString() === active.id);
-      const newIndex = releaseList.findIndex((release) => release.index.toString() === over.id);
+      const oldIndex = releaseList.findIndex(
+        (release) => release.index.toString() === active.id
+      );
+      const newIndex = releaseList.findIndex(
+        (release) => release.index.toString() === over.id
+      );
       const releaseListNew = arrayMove(releaseList, oldIndex, newIndex);
       onChange(releaseListNew);
     }
@@ -67,14 +111,21 @@ export default function ReleaseTable({
     setEditIndex(-1);
   }, [lineupList, pkgList, customerList, versionList, versionIndex]);
 
-  const versionFound = versionList.find((version) => version.index === versionIndex);
+  const versionFound = versionList.find(
+    (version) => version.index === versionIndex
+  );
   const releaseList = versionFound?.releaseList ?? [];
 
   const columns: any[] = [
     { key: keyPackage, dataIndex: keyPackage, title: titlePackage },
-    { key: keyCustomers, dataIndex: keyCustomers, title: titleCustomers, width: '50%' },
+    {
+      key: keyCustomers,
+      dataIndex: keyCustomers,
+      title: titleCustomers,
+      width: "50%",
+    },
     { key: keyActions, dataIndex: keyActions, title: titleActions },
-    { key: keyDragHandle, dataIndex: keyDragHandle, title: '', },
+    { key: keyDragHandle, dataIndex: keyDragHandle, title: "" },
   ].map((column) => {
     const { dataIndex } = column;
     return {
@@ -83,39 +134,52 @@ export default function ReleaseTable({
         record,
         dataIndex,
       }),
-    }
+    };
   });
 
   function addRelease() {
-    form.validateFields(['pkgIndex', 'customerList']).then(() => {
-      const { pkgIndex, customerList: customerIndexList } = form.getFieldsValue(['pkgIndex', 'customerList']);
-      if (pkgIndex === -1) {
-        return;
-      }
-      // Check if package is already in use
-      const pkgInUse = versionList.find((version) => {
-        const { releaseList } = version;
-        return releaseList.find((release) => release.pkgIndex === pkgIndex);
+    form
+      .validateFields(["pkgIndex", "customerList"])
+      .then(() => {
+        const { pkgIndex, customerList: customerIndexList } =
+          form.getFieldsValue(["pkgIndex", "customerList"]);
+        if (pkgIndex === -1) {
+          return;
+        }
+        // Check if package is already in use
+        const pkgInUse = versionList.find((version) => {
+          const { releaseList } = version;
+          return releaseList.find((release) => release.pkgIndex === pkgIndex);
+        });
+        if (pkgInUse) {
+          return;
+        }
+        const index = findEmptyIndex(
+          releaseList.map((release) => release.index)
+        );
+        const releaseListNew: ReleaseV2[] = [
+          ...releaseList,
+          {
+            index,
+            pkgIndex,
+            customerIndexList,
+            customerIndexListPerChangeList: [],
+          },
+        ];
+        onChange(releaseListNew);
+      })
+      .catch((reason) => {
+        console.error(reason);
       });
-      if (pkgInUse) {
-        return;
-      }
-      const index = findEmptyIndex(releaseList.map((release) => release.index));
-      const releaseListNew: ReleaseV2[] = [
-        ...releaseList,
-        { index, pkgIndex, customerIndexList, customerIndexListPerChangeList: [] },
-      ];
-      onChange(releaseListNew);
-    }).catch((reason) => {
-      console.error(reason);
-    });
   }
 
   function onChangeCustomerIndexListPerChangeList(
     releaseIndex: number,
     customerIndexListPerChangeList: CustomerIndexListPerChange[]
   ) {
-    const indexFound = releaseList.findIndex((release) => release.index === releaseIndex);
+    const indexFound = releaseList.findIndex(
+      (release) => release.index === releaseIndex
+    );
     if (indexFound === -1) {
       return;
     }
@@ -134,7 +198,8 @@ export default function ReleaseTable({
     if (!releaseFound) {
       return;
     }
-    const { pkgIndex: pkgIndexNew, customerIndexList: customerIndexListNew } = releaseFound;
+    const { pkgIndex: pkgIndexNew, customerIndexList: customerIndexListNew } =
+      releaseFound;
     const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndexNew);
     if (!pkgFound) {
       return;
@@ -144,35 +209,48 @@ export default function ReleaseTable({
   }
 
   function onSubmitEditRelease() {
-    form.validateFields(['pkgIndexNew', 'customerIndexListNew']).then(() => {
-      const { pkgIndexNew, customerIndexListNew } = form.getFieldsValue(['pkgIndexNew', 'customerIndexListNew']);
-      const releaseFound = releaseList.find((release) => release.index !== editIndex && release.pkgIndex === pkgIndexNew);
-      if (releaseFound) {
-        return;
-      }
-      const indexFound = releaseList.findIndex((release) => release.index === editIndex);
-      if (indexFound === -1) {
-        return;
-      }
-      const releaseListNew: ReleaseV2[] = [
-        ...releaseList.slice(0, indexFound),
-        {
-          index: editIndex,
-          pkgIndex: pkgIndexNew,
-          customerIndexList: customerIndexListNew,
-          customerIndexListPerChangeList: [], // FIXME
-        },
-        ...releaseList.slice(indexFound + 1),
-      ];
-      onChange(releaseListNew);
-      setEditIndex(-1);
-    }).catch((reason) => {
-      console.error(reason);
-    });
+    form
+      .validateFields(["pkgIndexNew", "customerIndexListNew"])
+      .then(() => {
+        const { pkgIndexNew, customerIndexListNew } = form.getFieldsValue([
+          "pkgIndexNew",
+          "customerIndexListNew",
+        ]);
+        const releaseFound = releaseList.find(
+          (release) =>
+            release.index !== editIndex && release.pkgIndex === pkgIndexNew
+        );
+        if (releaseFound) {
+          return;
+        }
+        const indexFound = releaseList.findIndex(
+          (release) => release.index === editIndex
+        );
+        if (indexFound === -1) {
+          return;
+        }
+        const releaseListNew: ReleaseV2[] = [
+          ...releaseList.slice(0, indexFound),
+          {
+            index: editIndex,
+            pkgIndex: pkgIndexNew,
+            customerIndexList: customerIndexListNew,
+            customerIndexListPerChangeList: [], // FIXME
+          },
+          ...releaseList.slice(indexFound + 1),
+        ];
+        onChange(releaseListNew);
+        setEditIndex(-1);
+      })
+      .catch((reason) => {
+        console.error(reason);
+      });
   }
 
   function removeRelease(index: number) {
-    const indexFound = releaseList.findIndex((release) => release.index === index);
+    const indexFound = releaseList.findIndex(
+      (release) => release.index === index
+    );
     if (indexFound === -1) {
       return;
     }
@@ -190,7 +268,11 @@ export default function ReleaseTable({
       const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex);
       const pkgName = pkgFound?.name;
       const lineupIndex = pkgFound?.lineupIndex;
-      const lineup = lineupIndex === -1 ? '(None)' : lineupList.find((lineup) => lineup.index === lineupIndex)?.name ?? '(Error)';
+      const lineup =
+        lineupIndex === -1
+          ? "(None)"
+          : lineupList.find((lineup) => lineup.index === lineupIndex)?.name ??
+            "(Error)";
       return { key, package: pkgIndex, pkgName, customers, lineup };
     }),
   ];
@@ -202,7 +284,8 @@ export default function ReleaseTable({
       onDragEnd={onDragEnd}
     >
       <Table
-        columns={columns} dataSource={dataSource}
+        columns={columns}
+        dataSource={dataSource}
         components={{
           body: {
             wrapper: DraggableWrapper,
@@ -217,19 +300,20 @@ export default function ReleaseTable({
         pagination={false}
       />
       {/* Render overlay component. */}
-      <DragOverlay style={{
-        backgroundColor: "#e0e0e07f",
-        border: "1px solid #e9e9e9",
-        display: "flex",
-        alignItems: "center",
-        paddingLeft: 30,
-      }}>
-        {
-          pkgList.find((pkg) =>  pkg.index === Number(activeId))?.name ?? parenError
-        }
+      <DragOverlay
+        style={{
+          backgroundColor: "#e0e0e07f",
+          border: "1px solid #e9e9e9",
+          display: "flex",
+          alignItems: "center",
+          paddingLeft: 30,
+        }}
+      >
+        {pkgList.find((pkg) => pkg.index === Number(activeId))?.name ??
+          parenError}
       </DragOverlay>
     </DndContext>
-  )
+  );
 
   function DraggableWrapper(props: any) {
     const { children, ...restProps } = props;
@@ -252,17 +336,15 @@ export default function ReleaseTable({
 
   function DraggableRow(props: any) {
     const { children, style, ...restProps } = props;
-    const id = props['data-row-key']?.toString() ?? invalidSortable;
+    const id = props["data-row-key"]?.toString() ?? invalidSortable;
     const { attributes, listeners, setNodeRef } = useSortable({ id });
     const styleRowBold = Number(id) > -1 ? { fontWeight: "bold" } : null;
     const styleNew = Object.assign({}, style, styleRowBold);
     return (
       <tr ref={setNodeRef} {...attributes} {...restProps} style={styleNew}>
-        {
-          id === invalidSortable ? (
-            children
-          ) : (
-            children.map((child: any) => {
+        {id === invalidSortable
+          ? children
+          : children.map((child: any) => {
               const { children, ...restProps } = child;
               const { key } = restProps;
               return key === keyDragHandle ? (
@@ -272,21 +354,24 @@ export default function ReleaseTable({
               ) : (
                 <td {...restProps}>{child}</td>
               );
-            })
-          )
-        }
+            })}
       </tr>
-    )
+    );
   }
 
-  function EditableCell({ record, dataIndex, children, ...restProps }: EditableCellProps) {
+  function EditableCell({
+    record,
+    dataIndex,
+    children,
+    ...restProps
+  }: EditableCellProps) {
     if (!record) {
       return children;
     }
     const { key, pkgName, customers: customerIndexList, lineup } = record;
     return (
       <>
-      {/* <td {...restProps}> */}
+        {/* <td {...restProps}> */}
         {key === -1 && dataIndex === keyPackage ? (
           <Form form={form}>
             <Form.Item
@@ -453,7 +538,7 @@ export default function ReleaseTable({
         ) : (
           children
         )}
-      {/* </td> */}
+        {/* </td> */}
       </>
     );
   }
@@ -471,7 +556,7 @@ export default function ReleaseTable({
           onChange={(customerIndexListPerChangeList) =>
             onChangeCustomerIndexListPerChangeList(
               releaseIndex,
-              customerIndexListPerChangeList,
+              customerIndexListPerChangeList
             )
           }
         />

@@ -1,7 +1,7 @@
-import { Input, Menu } from 'antd';
-import { createRef, useState } from 'react';
-import { Enum, Pkg, VersionV2 } from '../types';
-import { load } from '../utils';
+import { Input, Menu } from "antd";
+import { createRef, useState } from "react";
+import { Enum, Pkg, VersionV2 } from "../types";
+import { load } from "../utils";
 
 type Props = {
   customerList: Enum[];
@@ -14,7 +14,7 @@ type Props = {
   onChangeVersionList: (versionList: VersionV2[]) => void;
 };
 
-const UNTITLED = 'Untitled';
+const UNTITLED = "Untitled";
 
 export default function AppMenu({
   customerList,

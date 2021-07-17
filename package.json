@@ -20,7 +20,8 @@
     "start": "react-scripts start",
     "build": "set \"PUBLIC_URL=https://rhm.js.org\" && react-scripts build && npx shx rm -rf docs && npx shx mv build docs",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "prettier": "npx prettier --write src"
   },
   "eslintConfig": {
     "extends": [

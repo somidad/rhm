@@ -1,8 +1,25 @@
 import { Button, Form, Popover, Select, Table, Tag, Typography } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { useEffect, useState } from "react";
-import { keyActions, keyCustomers, keyDescription, keyVersion, parenError, parenGlobal, titleActions, titleCustomers, titleDescription, titleVersion } from "../constants";
-import { ChangeV2, CustomerIndexListPerChange, Enum, Pkg, VersionV2 } from "../types";
+import {
+  keyActions,
+  keyCustomers,
+  keyDescription,
+  keyVersion,
+  parenError,
+  parenGlobal,
+  titleActions,
+  titleCustomers,
+  titleDescription,
+  titleVersion,
+} from "../constants";
+import {
+  ChangeV2,
+  CustomerIndexListPerChange,
+  Enum,
+  Pkg,
+  VersionV2,
+} from "../types";
 import { accumulateVersionIndex } from "../utils";
 const { Option } = Select;
 const { Text } = Typography;
@@ -13,7 +30,9 @@ type ChangePerReleaseTableProps = {
   releaseIndex: number;
   versionIndex: number;
   versionList: VersionV2[];
-  onChange: (customerIndexListPerChangeList: CustomerIndexListPerChange[]) => void;
+  onChange: (
+    customerIndexListPerChangeList: CustomerIndexListPerChange[]
+  ) => void;
 };
 
 type EditableCellProps = {
@@ -43,7 +62,7 @@ export default function ChangePerReleaseTable({
   onChange,
 }: ChangePerReleaseTableProps) {
   const [form] = useForm();
-  const [editVersionIndex, setEditVersionIndex]= useState(-1);
+  const [editVersionIndex, setEditVersionIndex] = useState(-1);
   const [editChangeIndex, setEditChangeIndex] = useState(-1);
 
   useEffect(() => {
@@ -51,10 +70,15 @@ export default function ChangePerReleaseTable({
     setEditChangeIndex(-1);
   }, [customerList, pkgList, releaseIndex, versionIndex, versionList]);
 
-  const versionFound = versionList.find((version) => version.index === versionIndex);
+  const versionFound = versionList.find(
+    (version) => version.index === versionIndex
+  );
   const releaseList = versionFound?.releaseList ?? [];
-  const releaseFound = releaseList.find((release) => release.index === releaseIndex);
-  const customerIndexListPerChangeList = releaseFound?.customerIndexListPerChangeList ?? [];
+  const releaseFound = releaseList.find(
+    (release) => release.index === releaseIndex
+  );
+  const customerIndexListPerChangeList =
+    releaseFound?.customerIndexListPerChangeList ?? [];
   const pkgIndex = releaseFound?.pkgIndex ?? undefined;
 
   const columns: any[] = [
@@ -79,9 +103,13 @@ export default function ChangePerReleaseTable({
   }
 
   function onClickEdit(versionIndex: number, changeIndex: number) {
-    const customerIndexListPerChangeFound = customerIndexListPerChangeList.find((item) => {
-      return item.versionIndex === versionIndex && item.changeIndex === changeIndex;
-    });
+    const customerIndexListPerChangeFound = customerIndexListPerChangeList.find(
+      (item) => {
+        return (
+          item.versionIndex === versionIndex && item.changeIndex === changeIndex
+        );
+      }
+    );
     if (customerIndexListPerChangeFound) {
       const { customerIndexList } = customerIndexListPerChangeFound;
       form.setFieldsValue({ customerIndexList });
@@ -91,37 +119,60 @@ export default function ChangePerReleaseTable({
   }
 
   function onSubmitChange(versionIndexOfChange: number, changeIndex: number) {
-    form.validateFields(['customerIndexList']).then(() => {
-      const versionOfChangeFound = versionList.find((version) => version.index === versionIndexOfChange);
-      if (!versionOfChangeFound) {
-        return;
-      }
-      const { changeList } = versionOfChangeFound;
-      const changeFound = changeList.find((change) => change.index === changeIndex);
-      if (!changeFound) {
-        return;
-      }
-      if (!releaseFound) {
-        return;
-      }
-      const customerIndexListRaw = form.getFieldValue('customerIndexList');
-      const customerIndexList = customerIndexListRaw.includes(-1) ? [-1] : customerIndexListRaw;
-      const { customerIndexListPerChangeList } = releaseFound;
-      const indexFound = customerIndexListPerChangeList.findIndex((item) => {
-        return item.versionIndex === versionIndexOfChange && item.changeIndex === changeIndex;
+    form
+      .validateFields(["customerIndexList"])
+      .then(() => {
+        const versionOfChangeFound = versionList.find(
+          (version) => version.index === versionIndexOfChange
+        );
+        if (!versionOfChangeFound) {
+          return;
+        }
+        const { changeList } = versionOfChangeFound;
+        const changeFound = changeList.find(
+          (change) => change.index === changeIndex
+        );
+        if (!changeFound) {
+          return;
+        }
+        if (!releaseFound) {
+          return;
+        }
+        const customerIndexListRaw = form.getFieldValue("customerIndexList");
+        const customerIndexList = customerIndexListRaw.includes(-1)
+          ? [-1]
+          : customerIndexListRaw;
+        const { customerIndexListPerChangeList } = releaseFound;
+        const indexFound = customerIndexListPerChangeList.findIndex((item) => {
+          return (
+            item.versionIndex === versionIndexOfChange &&
+            item.changeIndex === changeIndex
+          );
+        });
+        const customerIndexListPerChangeListNew =
+          indexFound === -1
+            ? [
+                ...customerIndexListPerChangeList,
+                {
+                  versionIndex: versionIndexOfChange,
+                  changeIndex,
+                  customerIndexList,
+                },
+              ]
+            : [
+                ...customerIndexListPerChangeList.slice(0, indexFound),
+                {
+                  versionIndex: versionIndexOfChange,
+                  changeIndex,
+                  customerIndexList,
+                },
+                ...customerIndexListPerChangeList.slice(indexFound + 1),
+              ];
+        onChange(customerIndexListPerChangeListNew);
+      })
+      .catch((reason) => {
+        console.error(reason);
       });
-      const customerIndexListPerChangeListNew = indexFound === -1 ? [
-        ...customerIndexListPerChangeList,
-        { versionIndex: versionIndexOfChange, changeIndex, customerIndexList },
-      ] : [
-        ...customerIndexListPerChangeList.slice(0, indexFound),
-        { versionIndex: versionIndexOfChange, changeIndex, customerIndexList },
-        ...customerIndexListPerChangeList.slice(indexFound + 1),
-      ];
-      onChange(customerIndexListPerChangeListNew);
-    }).catch((reason) => {
-      console.error(reason);
-    })
   }
 
   /**
@@ -132,7 +183,9 @@ export default function ChangePerReleaseTable({
   const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex);
   const changeListFiltered = versionIndexList.reduce(
     (changeListPrev: (ChangeV2 & { versionIndex: number })[], versionIndex) => {
-      const versionFound = versionList.find((version) => version.index === versionIndex);
+      const versionFound = versionList.find(
+        (version) => version.index === versionIndex
+      );
       if (!versionFound) {
         return changeListPrev;
       }
@@ -158,9 +211,13 @@ export default function ChangePerReleaseTable({
         afterChange,
         versionIndex: versionIndexOfChange,
       } = change;
-      const customerIndexList = customerIndexListPerChangeList.find((item) => {
-        return item.versionIndex === versionIndexOfChange && item.changeIndex === changeIndex;
-      })?.customerIndexList ?? [];
+      const customerIndexList =
+        customerIndexListPerChangeList.find((item) => {
+          return (
+            item.versionIndex === versionIndexOfChange &&
+            item.changeIndex === changeIndex
+          );
+        })?.customerIndexList ?? [];
       return {
         changeIndex,
         description,
@@ -203,13 +260,21 @@ export default function ChangePerReleaseTable({
         </td>
       );
     }
-    const { changeIndex, beforeChange, afterChange, version: versionIndex, customerIndexList } = record;
+    const {
+      changeIndex,
+      beforeChange,
+      afterChange,
+      version: versionIndex,
+      customerIndexList,
+    } = record;
     const versionFound = versionList.find(
       (version) => version.index === versionIndex
     );
     return (
       <td {...restProps}>
-        {editVersionIndex === versionIndex && editChangeIndex === changeIndex && dataIndex === keyCustomers ? (
+        {editVersionIndex === versionIndex &&
+        editChangeIndex === changeIndex &&
+        dataIndex === keyCustomers ? (
           <Form form={form}>
             <Form.Item
               name="customerIndexList"
@@ -234,7 +299,9 @@ export default function ChangePerReleaseTable({
                   );
                 }}
               >
-                <Option key={-1} value={-1}>{parenGlobal}</Option>
+                <Option key={-1} value={-1}>
+                  {parenGlobal}
+                </Option>
                 {customerListPerRelease.map((customer) => {
                   const { index, name } = customer;
                   return (
@@ -246,10 +313,14 @@ export default function ChangePerReleaseTable({
               </Select>
             </Form.Item>
           </Form>
-        ) : editVersionIndex === versionIndex && editChangeIndex === changeIndex && dataIndex === keyActions ? (
+        ) : editVersionIndex === versionIndex &&
+          editChangeIndex === changeIndex &&
+          dataIndex === keyActions ? (
           <Form form={form}>
             <Form.Item>
-              <Button onClick={() => onSubmitChange(versionIndex, changeIndex)}>Ok</Button>
+              <Button onClick={() => onSubmitChange(versionIndex, changeIndex)}>
+                Ok
+              </Button>
               <Button onClick={onCancelEdit}>Cancel</Button>
             </Form.Item>
           </Form>
@@ -280,10 +351,12 @@ export default function ChangePerReleaseTable({
                   );
             return (
               <Tag key={customerIndex}>{customerFound?.name ?? parenError}</Tag>
-            )
+            );
           })
         ) : dataIndex === keyActions ? (
-          <Button onClick={() => onClickEdit(versionIndex, changeIndex)}>Edit</Button>
+          <Button onClick={() => onClickEdit(versionIndex, changeIndex)}>
+            Edit
+          </Button>
         ) : (
           children
         )}
