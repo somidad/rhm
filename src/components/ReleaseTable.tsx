@@ -1,8 +1,10 @@
 import { MenuOutlined } from "@ant-design/icons";
+import { useSensors, useSensor, PointerSensor, KeyboardSensor, DndContext, closestCenter, DragOverlay } from "@dnd-kit/core";
+import { sortableKeyboardCoordinates, arrayMove, SortableContext, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { Button, Form, Select, Table, Tag } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { useEffect, useState } from "react";
-import { keyActions, keyCustomers, keyDragHandle, keyPackage, parenError, parenNone, titleActions, titleCustomers, titlePackage } from "../constants";
+import { invalidSortable, keyActions, keyCustomers, keyDragHandle, keyPackage, parenError, parenNone, titleActions, titleCustomers, titlePackage } from "../constants";
 import { CustomerIndexListPerChange, Enum, Pkg, ReleaseV2, VersionV2 } from "../types";
 import { findEmptyIndex } from "../utils";
 import ChangePerReleaseTable from "./ChangePerReleaseTable";
@@ -34,6 +36,32 @@ export default function ReleaseTable({
   const [form] = useForm();
 
   const [editIndex, setEditIndex] = useState(-1);
+  // ID to render overlay.
+  const [activeId, setActiveId] = useState(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  function onDragStart(event: any) {
+    const { active } = event;
+    setActiveId(active.id);
+  }
+
+  function onDragEnd(event: any) {
+    const { active, over } = event;
+    if (active.id !== over.id) {
+      const oldIndex = releaseList.findIndex((release) => release.index.toString() === active.id);
+      const newIndex = releaseList.findIndex((release) => release.index.toString() === over.id);
+      const releaseListNew = arrayMove(releaseList, oldIndex, newIndex);
+      onChange(releaseListNew);
+    }
+    // Stop overlay.
+    setActiveId(null);
+  }
 
   useEffect(() => {
     setEditIndex(-1);
@@ -83,48 +111,11 @@ export default function ReleaseTable({
     });
   }
 
-  function moveNewer(index: number) {
-    const indexFound = releaseList.findIndex((release) => release.index === index);
-    if (indexFound === -1) {
-      return;
-    }
-    if (indexFound === releaseList.length - 1) {
-      return;
-    }
-    const releaseListNew = [
-      ...releaseList.slice(0, indexFound),
-      releaseList[indexFound + 1],
-      releaseList[indexFound],
-      ...releaseList.slice(indexFound + 2),
-    ];
-    onChange(releaseListNew);
-  }
-
-  function moveOlder(index: number) {
-    const indexFound = releaseList.findIndex((release) => release.index === index);
-    if (indexFound === -1) {
-      return;
-    }
-    if (indexFound === 0) {
-      return;
-    }
-    const releaseListNew = [
-      ...releaseList.slice(0, indexFound - 1),
-      releaseList[indexFound],
-      releaseList[indexFound - 1],
-      ...releaseList.slice(indexFound + 1),
-    ];
-    onChange(releaseListNew);
-  }
-
   function onChangeCustomerIndexListPerChangeList(
     releaseIndex: number,
     customerIndexListPerChangeList: CustomerIndexListPerChange[]
   ) {
-    console.log(releaseIndex);
-    console.table(customerIndexListPerChangeList);
     const indexFound = releaseList.findIndex((release) => release.index === releaseIndex);
-    console.log(indexFound);
     if (indexFound === -1) {
       return;
     }
@@ -204,20 +195,87 @@ export default function ReleaseTable({
     }),
   ];
   return (
-    <Table
-      columns={columns} dataSource={dataSource}
-      components={{
-        body: {
-          cell: EditableCell,
-        },
-      }}
-      expandable={{
-        expandedRowRender,
-        rowExpandable: (record) => record.key !== -1,
-      }}
-      pagination={false}
-    />
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+    >
+      <Table
+        columns={columns} dataSource={dataSource}
+        components={{
+          body: {
+            wrapper: DraggableWrapper,
+            row: DraggableRow,
+            cell: EditableCell,
+          },
+        }}
+        expandable={{
+          expandedRowRender,
+          rowExpandable: (record) => record.key !== -1,
+        }}
+        pagination={false}
+      />
+      {/* Render overlay component. */}
+      <DragOverlay style={{
+        backgroundColor: "#e0e0e07f",
+        border: "1px solid #e9e9e9",
+        display: "flex",
+        alignItems: "center",
+        paddingLeft: 30,
+      }}>
+        {
+          pkgList.find((pkg) =>  pkg.index === Number(activeId))?.name ?? parenError
+        }
+      </DragOverlay>
+    </DndContext>
   )
+
+  function DraggableWrapper(props: any) {
+    const { children, ...restProps } = props;
+    return (
+      <SortableContext
+        // `children[1]` is `dataSource`.
+        items={children[1].map((child: any) => child.key.toString())}
+        strategy={verticalListSortingStrategy}
+        {...restProps}
+      >
+        <tbody {...restProps}>
+          {
+            // This invokes `Table.components.body.row` for each element of `children`.
+            children
+          }
+        </tbody>
+      </SortableContext>
+    );
+  }
+
+  function DraggableRow(props: any) {
+    const { children, ...restProps } = props;
+    const id = props['data-row-key']?.toString() ?? invalidSortable;
+    const { attributes, listeners, setNodeRef } = useSortable({ id });
+    return (
+      <tr ref={setNodeRef} {...attributes} {...restProps}>
+        {
+          id === invalidSortable ? (
+            children
+          ) : (
+            children.map((child: any) => {
+              const { children, ...restProps } = child;
+              const { key } = restProps;
+              return key === keyDragHandle ? (
+                <td {...listeners} {...restProps}>
+                  {child}
+                </td>
+              ) : (
+                <td {...restProps}>{child}</td>
+              );
+            })
+          )
+        }
+      </tr>
+    )
+  }
 
   function EditableCell({ record, dataIndex, children, ...restProps }: EditableCellProps) {
     if (!record) {
@@ -225,7 +283,8 @@ export default function ReleaseTable({
     }
     const { key, pkgName, customers: customerIndexList, lineup } = record;
     return (
-      <td {...restProps}>
+      <>
+      {/* <td {...restProps}> */}
         {key === -1 && dataIndex === keyPackage ? (
           <Form form={form}>
             <Form.Item
@@ -392,7 +451,8 @@ export default function ReleaseTable({
         ) : (
           children
         )}
-      </td>
+      {/* </td> */}
+      </>
     );
   }
 

@@ -280,7 +280,7 @@ export default function ChangePerReleaseTable({
                     (customer) => customer.index === customerIndex
                   );
             return (
-              <Tag>{customerFound?.name ?? parenError}</Tag>
+              <Tag key={customerIndex}>{customerFound?.name ?? parenError}</Tag>
             )
           })
         ) : dataIndex === keyActions ? (

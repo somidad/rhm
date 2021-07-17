@@ -1,3 +1,5 @@
+export const invalidSortable = 'invalidSortable';
+
 export const keyActions = 'actions';
 export const keyAfterChange = 'afterChange';
 export const keyBeforeChange = 'beforeChange';
