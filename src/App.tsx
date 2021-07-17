@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import 'antd/dist/antd.css';
 import './App.css';
-import { Col, Collapse, Row, Space, Tabs, Tag } from 'antd';
-import { GithubOutlined } from '@ant-design/icons';
+import { Button, Col, Collapse, Modal, Row, Space, Tabs, Tag } from 'antd';
+import { CopyOutlined, GithubOutlined } from '@ant-design/icons';
 import EnumTable from './components/EnumTable';
 import PkgTable from './components/PkgTable';
 import { ChangeV2, Enum, Pkg, ReleaseV2, VersionV2 } from './types';
@@ -14,6 +14,8 @@ import ReleaseTable from './components/ReleaseTable';
 import ChangeTable from './components/ChangeTable';
 import { customerListInit, lineupListInit, pkgListInit, versionListInit } from './init';
 import { uniq } from 'lodash';
+import TextArea from 'antd/lib/input/TextArea';
+import { publish } from './utils';
 const { Panel } = Collapse;
 
 function App() {
@@ -22,6 +24,7 @@ function App() {
   const [lineupList, setLineupList] = useState<Enum[]>(lineupListInit);
   const [pkgList, setPkgList] = useState<Pkg[]>(pkgListInit);
   const [customerList, setCustomerList] = useState<Enum[]>(customerListInit);
+  const [modalVisible, setModalVisible] = useState(true);
 
   function onChangeChangeList(changeList: ChangeV2[]) {
     const indexFound = versionList.findIndex((version) => version.index === versionIndex);
@@ -59,6 +62,11 @@ function App() {
       setVersionIndex(-1);
     }
     setVersionList(versionList);
+  }
+
+  function onPublish(key: number) {
+    const releaseHistory = publish(versionList, key, lineupList, pkgList, customerList);
+    setModalVisible(true);
   }
 
   function onSelectVersion(index: number) {
@@ -136,6 +144,7 @@ function App() {
                   <VersionTable
                     versionList={versionList}
                     onChange={onChangeVersionList}
+                    onPublish={onPublish}
                     onSelect={onSelectVersion}
                   />
                 </Panel>
@@ -223,6 +232,19 @@ function App() {
           </Title>
         </Col>
       </Row>
+      <Modal
+        title="Release history"
+        footer={
+          <Button>
+            <CopyOutlined />
+            Copy to clipboard
+          </Button>
+        }
+        visible={modalVisible}
+        onCancel={() => setModalVisible(false)}
+      >
+        <TextArea value='asdf' autoSize={true} />
+      </Modal>
     </div>
   );
 }

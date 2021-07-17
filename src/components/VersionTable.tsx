@@ -11,6 +11,7 @@ const { Option } = Select;
 type Props = {
   versionList: VersionV2[];
   onChange: (versionList: VersionV2[]) => void;
+  onPublish: (key: number) => void;
   onSelect: (index: number) => void;
 };
 
@@ -20,7 +21,7 @@ type EditableCellPros = {
   children: any;
 };
 
-export default function VersionTable({ versionList, onChange, onSelect }: Props) {
+export default function VersionTable({ versionList, onChange, onPublish, onSelect }: Props) {
   const [form] = useForm();
   const [editIndex, setEditIndex] = useState(-1);
 
@@ -66,6 +67,10 @@ export default function VersionTable({ versionList, onChange, onSelect }: Props)
     const { name: nameNew, indexPrev: previousNew } = versionFound;
     form.setFieldsValue({nameNew, previousNew});
     setEditIndex(key);
+  }
+
+  function onClickPublish(key: number) {
+    onPublish(key);
   }
 
   function onSubmitEditVersion() {
@@ -224,7 +229,7 @@ export default function VersionTable({ versionList, onChange, onSelect }: Props)
                 onClick={() => removeVersion(key)}
                 disabled={usedVersionIndexList.includes(key)}
               >Remove</Button>
-              <Button>Publish</Button>
+              <Button onClick={() => onClickPublish(key)}>Publish</Button>
             </>
           ) : (children)
         }

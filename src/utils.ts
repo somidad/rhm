@@ -73,14 +73,14 @@ function indent(input: string) {
   return input.replace(/^/gm, '    ');
 }
 
-function isVersionListCircular(versionList: Version[], index: number) {
+function isVersionListCircular(versionList: VersionV2[], index: number) {
     const versionFound = versionList.find((version) => version.index === index);
     if (!versionFound) {
       return false;
     }
-    let v1: Version | undefined = versionFound;
+    let v1: VersionV2 | undefined = versionFound;
     let { index: index1, indexPrev: indexPrev1 } = v1;
-    let v2: Version | undefined = versionFound;
+    let v2: VersionV2 | undefined = versionFound;
     let { index: index2, indexPrev: indexPrev2 } = v2;
     while (v1 || v2) {
       // eslint-disable-next-line no-loop-func
@@ -148,7 +148,7 @@ export function load(input: string) {
   return { versionList, lineupList, pkgList, customerList };
 }
 
-export function publish(versionList: Version[], versionIndex: number, lineupList: Enum[], pkgList: Pkg[], customerList: Enum[]) {
+export function publish(versionList: VersionV2[], versionIndex: number, lineupList: Enum[], pkgList: Pkg[], customerList: Enum[]) {
   if (isVersionListCircular(versionList, versionIndex)) {
     return;
   }
@@ -185,7 +185,7 @@ ${indent(releaseHistory)}
   return releaseHistory;
 }
 
-function publishPerCustomer(versionList: Version[], versionIndex: number, lineupList: Enum[], pkgList: Pkg[], customer: Enum) {
+function publishPerCustomer(versionList: VersionV2[], versionIndex: number, lineupList: Enum[], pkgList: Pkg[], customer: Enum) {
   const candidateLineupIndexList = [-1, ...lineupList.map((lineup) => lineup.index)];
   const releaseHistoryPerLineupList: ReleaseHistoryPerLineupIndex[] = [];
   candidateLineupIndexList.forEach((lineupIndex) => {
@@ -211,7 +211,7 @@ ${indent(releaseHistory)}
   return releaseHistory;
 }
 
-function publishPerLineup(versionList: Version[], versionIndex: number, lineupIndex: number, pkgList: Pkg[], customer: Enum) {
+function publishPerLineup(versionList: VersionV2[], versionIndex: number, lineupIndex: number, pkgList: Pkg[], customer: Enum) {
   let versionNext = versionList.find((version) => version.index === versionIndex);
   const { index: customerIndex } = customer;
   const changeListPerPkgList: ReleaseHistoryPerPkg[] = [];
