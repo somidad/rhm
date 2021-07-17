@@ -1,4 +1,4 @@
-import { Change, Enum, OldCustomer, OldPkg, OldVersion, Pkg, Release, Version, VersionV2 } from "./types";
+import { Change, ChangeV2, Enum, OldCustomer, OldPkg, OldVersion, Pkg, Release, Version, VersionV2 } from "./types";
 
 type ReleaseHistoryPerCustomerIndexList = {
   customerIndexList: number[];
@@ -12,12 +12,12 @@ type ReleaseHistoryPerLineupIndex = {
 
 type ReleaseHistoryPerPkg = {
   pkgName: string;
-  changeList: Change[];
+  changeList: ChangeV2[];
 };
 
 function accumulateChangeList(
-  changeListAccumulated: Change[], customerIndex: number,
-  versionList: Version[], indexPrev: number,
+  changeListAccumulated: ChangeV2[], customerIndex: number,
+  versionList: VersionV2[], indexPrev: number, lineupIndex: number,
 ) {
   let versionNext = versionList.find((version) => version.index === indexPrev);
   while (versionNext) {
@@ -29,12 +29,31 @@ function accumulateChangeList(
     if (releaseFound) {
       break;
     }
-    changeListAccumulated.unshift(
-      ...changeList.filter((change) => {
-        const { customerIndexList } = change;
-        return !customerIndexList.length || customerIndexList.includes(customerIndex);
-      })
-    );
+    // Accumulate all changes of releases in a given version
+    releaseList.forEach((release) => {
+      const { customerIndexListPerChangeList } = release;
+      changeListAccumulated.unshift(
+        ...changeList.filter((change) => {
+          return customerIndexListPerChangeList.find((customerIndexListPerChange) => {
+            const { customerIndexList } = customerIndexListPerChange;
+            return (
+              change.lineupIndex === lineupIndex &&
+              (customerIndexList.includes(customerIndex) ||
+                customerIndexList.includes(-1))
+            );
+          })
+        }),
+      );
+    });
+    for (let i = changeListAccumulated.length - 1; i >= 0; i -= 1) {
+      const changeSource = changeListAccumulated[i];
+      const changeTarget = changeListAccumulated.slice(0, i).find((item) => {
+        return item.index === changeSource.index;
+      });
+      if (changeTarget) {
+        changeListAccumulated.splice(i, 1);
+      }
+    }
     versionNext = versionList.find((version) => version.index === indexPrev);
   }
   return versionNext;
@@ -186,7 +205,7 @@ ${indent(releaseHistory)}
 }
 
 function publishPerCustomer(versionList: VersionV2[], versionIndex: number, lineupList: Enum[], pkgList: Pkg[], customer: Enum) {
-  const candidateLineupIndexList = [-1, ...lineupList.map((lineup) => lineup.index)];
+  const candidateLineupIndexList = lineupList.map((lineup) => lineup.index);
   const releaseHistoryPerLineupList: ReleaseHistoryPerLineupIndex[] = [];
   candidateLineupIndexList.forEach((lineupIndex) => {
     releaseHistoryPerLineupList.push({
@@ -231,7 +250,7 @@ function publishPerLineup(versionList: VersionV2[], versionIndex: number, lineup
     if (!releaseFound) {
       versionNext = undefined;
     } else {
-      const { pkgIndex } = releaseFound;
+      const { customerIndexListPerChangeList, pkgIndex } = releaseFound;
       const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex);
       if (!pkgFound) {
         // This is not going to happen
@@ -240,13 +259,18 @@ function publishPerLineup(versionList: VersionV2[], versionIndex: number, lineup
         const { name: pkgName, lineupIndex: pkgLineupIndex } = pkgFound;
         const changeListAccumulated = [
           ...changeList.filter((change) => {
-            const { customerIndexList, lineupIndex: changeLineupIndex } = change;
-            return (!customerIndexList.length || customerIndexList.includes(customerIndex))
-                   && pkgLineupIndex === changeLineupIndex;
+            return customerIndexListPerChangeList.find((customerIndexListPerChange) => {
+              const { customerIndexList } = customerIndexListPerChange;
+              return (
+                change.lineupIndex === pkgLineupIndex &&
+                (customerIndexList.includes(customerIndex) ||
+                  customerIndexList.includes(-1))
+              );
+            });
           }),
         ];
         // Accumulate unreleased versions and get the second latest released version
-        versionNext = accumulateChangeList(changeListAccumulated, customerIndex, versionList, indexPrev);
+        versionNext = accumulateChangeList(changeListAccumulated, customerIndex, versionList, indexPrev, lineupIndex);
         changeListPerPkgList.unshift({ pkgName, changeList: changeListAccumulated });
       }
     }

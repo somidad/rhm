@@ -169,6 +169,7 @@ export default function ChangeTable({
     ...restProps
   }: EditableCellProps) {
     const { key, lineup: lineupIndex } = record;
+    console.log(children);
     return (
       <td {...restProps} style={{ verticalAlign: 'top' }}>
         {key === -1 && dataIndex === "description" ? (
@@ -282,11 +283,11 @@ export default function ChangeTable({
             </Form.Item>
           </Form>
         ) : dataIndex === 'description' ? (
-          children
+          <TextArea value={children[1]} autoSize style={{ border: 'none '}} />
         ) : dataIndex === 'beforeChange' ? (
-          children
+          <TextArea value={children[1]} autoSize style={{ border: 'none '}} />
         ) : dataIndex === 'afterChange' ? (
-          children
+          <TextArea value={children[1]} autoSize style={{ border: 'none '}} />
         ) : dataIndex === 'lineup' ? (
           lineupIndex === -1 ? '(None)' : lineupList.find((lineup) => lineup.index === lineupIndex)?.name ?? '(Error)'
         ) : dataIndex === 'actions' ? (

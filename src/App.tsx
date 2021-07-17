@@ -16,6 +16,7 @@ import { customerListInit, lineupListInit, pkgListInit, versionListInit } from '
 import { uniq } from 'lodash';
 import TextArea from 'antd/lib/input/TextArea';
 import { publish } from './utils';
+import { parenError } from './constants';
 const { Panel } = Collapse;
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
   const [pkgList, setPkgList] = useState<Pkg[]>(pkgListInit);
   const [customerList, setCustomerList] = useState<Enum[]>(customerListInit);
   const [modalVisible, setModalVisible] = useState(true);
+  const [releaseHistory, setReleaseHistory] = useState('');
 
   function onChangeChangeList(changeList: ChangeV2[]) {
     const indexFound = versionList.findIndex((version) => version.index === versionIndex);
@@ -66,6 +68,7 @@ function App() {
 
   function onPublish(key: number) {
     const releaseHistory = publish(versionList, key, lineupList, pkgList, customerList);
+    setReleaseHistory(releaseHistory ?? parenError);
     setModalVisible(true);
   }
 
@@ -243,7 +246,7 @@ function App() {
         visible={modalVisible}
         onCancel={() => setModalVisible(false)}
       >
-        <TextArea value='asdf' autoSize={true} />
+        <TextArea value={releaseHistory} autoSize={true} />
       </Modal>
     </div>
   );
