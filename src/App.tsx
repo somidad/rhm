@@ -21,7 +21,7 @@ import {
 import { uniq } from "lodash";
 import TextArea from "antd/lib/input/TextArea";
 import { publish } from "./utils";
-import { panelChanges, panelReleases, panelVersions, parenError, keyHistory, keyLineups, keyPackages, keyCustomers } from "./constants";
+import { keyChanges, keyReleases, keyVersions, parenError, keyHistory, keyLineups, keyPackages, keyCustomers, titleHistory, titleVersions, titleChanges, titleReleases, titleCustomers, titleCustomer, titleLineups, titleLineup, titlePackages } from "./constants";
 const { Panel } = Collapse;
 
 function App() {
@@ -192,10 +192,10 @@ function App() {
       <Row>
         <Col span={16} offset={4}>
           <Tabs defaultActiveKey={keyHistory}>
-            <Tabs.TabPane tab="History" key={keyHistory}>
+            <Tabs.TabPane tab={titleHistory} key={keyHistory}>
               <Title level={2}>History</Title>
-              <Collapse defaultActiveKey={[panelVersions]}>
-                <Panel key={panelVersions} header="Versions">
+              <Collapse defaultActiveKey={[keyVersions]}>
+                <Panel key={keyVersions} header={titleVersions}>
                   <VersionTable
                     versionList={versionList}
                     onChange={onChangeVersionList}
@@ -216,8 +216,8 @@ function App() {
                     </>
                   )}
                   <Space direction="vertical" style={{ width: "100%" }}>
-                    <Collapse defaultActiveKey={[panelChanges]}>
-                      <Panel key={panelChanges} header="Changes">
+                    <Collapse defaultActiveKey={[keyChanges]}>
+                      <Panel key={keyChanges} header={titleChanges}>
                         <ChangeTable
                           versionIndex={versionIndex}
                           versionList={versionList}
@@ -226,8 +226,8 @@ function App() {
                         />
                       </Panel>
                     </Collapse>
-                    <Collapse defaultActiveKey={[panelReleases]}>
-                      <Panel key={panelReleases} header="Releases">
+                    <Collapse defaultActiveKey={[keyReleases]}>
+                      <Panel key={keyReleases} header={titleReleases}>
                         <ReleaseTable
                           lineupList={lineupList}
                           pkgList={pkgList}
@@ -244,25 +244,25 @@ function App() {
                 </>
               )}
             </Tabs.TabPane>
-            <Tabs.TabPane tab="Customers" key={keyCustomers}>
+            <Tabs.TabPane tab={titleCustomers} key={keyCustomers}>
               <Title level={2}>Customers</Title>
               <EnumTable
-                title="Customer"
+                title={titleCustomer}
                 enumList={customerList}
                 onChange={setCustomerList}
                 usedIndexList={usedCustomerIndexList}
               />
             </Tabs.TabPane>
-            <Tabs.TabPane tab="Lineups" key={keyLineups}>
+            <Tabs.TabPane tab={titleLineups} key={keyLineups}>
               <Title level={2}>Lineups</Title>
               <EnumTable
-                title="Lineup"
+                title={titleLineup}
                 enumList={lineupList}
                 onChange={setLineupList}
                 usedIndexList={usedLineupIndexList}
               />
             </Tabs.TabPane>
-            <Tabs.TabPane tab="Packages" key={keyPackages}>
+            <Tabs.TabPane tab={titlePackages} key={keyPackages}>
               <Title level={2}>Packages</Title>
               <PkgTable
                 pkgList={pkgList}

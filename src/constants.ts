@@ -18,33 +18,38 @@ export const invalidSortable = "invalidSortable";
 export const keyActions = "actions";
 export const keyAfterChange = "afterChange";
 export const keyBeforeChange = "beforeChange";
+export const keyChanges = "changes";
 export const keyCustomers = "customers";
 export const keyDescription = "description";
 export const keyDragHandle = "dragHandle";
+export const keyHistory = "history";
 export const keyLineup = "lineup";
+export const keyLineups = "lineups";
 export const keyName = "name";
 export const keyPackage = "package";
+export const keyPackages = "packages";
 export const keyPrevious = "previous";
+export const keyReleases = "releases"
 export const keyVersion = "version";
-
-export const panelChanges = "changes";
-export const panelReleases = "releases"
-export const panelVersions = "versions";
+export const keyVersions = "versions";
 
 export const parenGlobal = "(Global)";
 export const parenNone = "(None)";
 export const parenError = "(Error)";
 
-export const keyHistory = "history";
-export const keyLineups = "lineups";
-export const keyPackages = "packages";
-
 export const titleActions = "Actions";
 export const titleAfterChange = "After change";
 export const titleBeforeChange = "Before change";
+export const titleChanges = "Changes";
+export const titleCustomer =" Customer";
 export const titleCustomers = "Customers";
 export const titleDescription = "Description";
+export const titleHistory = "History";
 export const titleLineup = "Lineup";
+export const titleLineups = "Lineups";
 export const titlePackage = "Package";
+export const titlePackages = "Packages";
 export const titlePrevious = "Previous";
+export const titleReleases = "Releases";
 export const titleVersion = "Version";
+export const titleVersions = "Versions";
