@@ -103,10 +103,10 @@ function App() {
     setVersionList([]);
   }
 
-  function onPublish(key: number) {
+  function onPublish(versionIndex: number) {
     const releaseHistory = publish(
       versionList,
-      key,
+      versionIndex,
       lineupList,
       pkgList,
       customerList
