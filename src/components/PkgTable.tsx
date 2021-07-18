@@ -2,6 +2,7 @@ import { CheckOutlined, CloseOutlined, DeleteOutlined, EditOutlined, PlusOutline
 import { Button, Form, Input, Select, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { useEffect, useState } from "react";
+import { formLineup, formLineupNew, formName, formNameNew, keyActions, keyLineup, keyPackage, parenError, parenNone, titleActions, titleLineup, titlePackage } from "../constants";
 import { Enum, Pkg } from "../types";
 import { findEmptyIndex } from "../utils";
 
@@ -20,10 +21,6 @@ type EditableCellProps = {
   children: any;
 };
 
-const PACKAGE = "Package";
-const LINEUP = "Lineup";
-const ACTIONS = "Actions";
-
 export default function PkgTable({
   pkgList,
   lineupList,
@@ -39,19 +36,19 @@ export default function PkgTable({
 
   const columns: any[] = [
     {
-      key: PACKAGE.toLocaleLowerCase(),
-      dataIndex: PACKAGE.toLocaleLowerCase(),
-      title: PACKAGE,
+      key: keyPackage,
+      dataIndex: keyPackage,
+      title: titlePackage,
     },
     {
-      key: LINEUP.toLocaleLowerCase(),
-      dataIndex: LINEUP.toLocaleLowerCase(),
-      title: LINEUP,
+      key: keyLineup,
+      dataIndex: keyLineup,
+      title: titleLineup,
     },
     {
-      key: ACTIONS.toLocaleLowerCase(),
-      dataIndex: ACTIONS.toLocaleLowerCase(),
-      title: ACTIONS,
+      key: keyActions,
+      dataIndex: keyActions,
+      title: titleActions,
     },
   ].map((column) => {
     const { dataIndex } = column;
@@ -66,11 +63,11 @@ export default function PkgTable({
 
   function addPkg() {
     form
-      .validateFields(["name", "lineup"])
+      .validateFields([formName, formLineup])
       .then(() => {
         const { name, lineup: lineupIndex } = form.getFieldsValue([
-          "name",
-          "lineup",
+          formName,
+          formLineup,
         ]);
         const pkgFound = pkgList.find((pkg) => pkg.name === name);
         if (pkgFound) {
@@ -106,11 +103,11 @@ export default function PkgTable({
 
   function onSubmitEditPkg() {
     form
-      .validateFields(["nameNew"])
+      .validateFields([formNameNew])
       .then(() => {
         const { nameNew, lineupNew: lineupIndexNew } = form.getFieldsValue([
-          "nameNew",
-          "lineupNew",
+          formNameNew,
+          formLineupNew,
         ]);
         const pkgFound = pkgList.find(
           (pkg) => pkg.index !== editIndex && pkg.name === nameNew
@@ -151,10 +148,10 @@ export default function PkgTable({
   }
 
   const dataSource = [
-    { key: -1, package: "", actions: "" },
+    { key: -1 },
     ...pkgList.map((pkg) => {
       const { index: key, name, lineupIndex: lineup } = pkg;
-      return { key, package: name, lineup, actions: "" };
+      return { key, package: name, lineup };
     }),
   ];
 
@@ -180,18 +177,18 @@ export default function PkgTable({
     const { key, lineup: lineupIndex } = record;
     return (
       <td {...restProps}>
-        {key === -1 && dataIndex === PACKAGE.toLocaleLowerCase() ? (
+        {key === -1 && dataIndex === keyPackage ? (
           <Form form={form} onFinish={addPkg}>
-            <Form.Item name="name" rules={[{ required: true }]} help={false}>
+            <Form.Item name={formName} rules={[{ required: true }]} help={false}>
               <Input disabled={editIndex !== -1} />
             </Form.Item>
           </Form>
-        ) : key === -1 && dataIndex === LINEUP.toLocaleLowerCase() ? (
+        ) : key === -1 && dataIndex === keyLineup ? (
           <Form form={form}>
-            <Form.Item name="lineup" initialValue={-1}>
+            <Form.Item name={formLineup} initialValue={-1}>
               <Select disabled={editIndex !== -1}>
                 <Option key={-1} value={-1}>
-                  (None)
+                  {parenNone}
                 </Option>
                 {lineupList.map((lineup) => {
                   const { index, name } = lineup;
@@ -204,7 +201,7 @@ export default function PkgTable({
               </Select>
             </Form.Item>
           </Form>
-        ) : key === -1 && dataIndex === ACTIONS.toLocaleLowerCase() ? (
+        ) : key === -1 && dataIndex === keyActions ? (
           <Form form={form}>
             <Form.Item>
               <Button onClick={addPkg} disabled={editIndex !== -1}>
@@ -212,18 +209,18 @@ export default function PkgTable({
               </Button>
             </Form.Item>
           </Form>
-        ) : editIndex === key && dataIndex === PACKAGE.toLocaleLowerCase() ? (
+        ) : editIndex === key && dataIndex === keyPackage ? (
           <Form form={form}>
-            <Form.Item name="nameNew" rules={[{ required: true }]} help={false}>
+            <Form.Item name={formNameNew} rules={[{ required: true }]} help={false}>
               <Input />
             </Form.Item>
           </Form>
-        ) : editIndex === key && dataIndex === LINEUP.toLocaleLowerCase() ? (
+        ) : editIndex === key && dataIndex === keyLineup ? (
           <Form form={form}>
-            <Form.Item name="lineupNew">
+            <Form.Item name={formLineupNew}>
               <Select>
                 <Option key={-1} value={-1}>
-                  (None)
+                  {parenNone}
                 </Option>
                 {lineupList.map((lineup) => {
                   const { index, name } = lineup;
@@ -236,37 +233,30 @@ export default function PkgTable({
               </Select>
             </Form.Item>
           </Form>
-        ) : editIndex === key && dataIndex === ACTIONS.toLocaleLowerCase() ? (
+        ) : editIndex === key && dataIndex === keyActions ? (
           <Form form={form}>
             <Form.Item>
-              <Button onClick={onSubmitEditPkg}>
-                <CheckOutlined />
-              </Button>
-              <Button onClick={() => setEditIndex(-1)}>
-                <CloseOutlined />
-              </Button>
+              <Button onClick={onSubmitEditPkg} icon={<CheckOutlined />} />
+              <Button onClick={() => setEditIndex(-1)} icon={<CloseOutlined />} />
             </Form.Item>
           </Form>
-        ) : dataIndex === PACKAGE.toLocaleLowerCase() ? (
+        ) : dataIndex === keyPackage ? (
           children
-        ) : dataIndex === LINEUP.toLocaleLowerCase() ? (
+        ) : dataIndex === keyLineup ? (
           lineupIndex === -1 ? (
-            "(None)"
+            parenNone
           ) : (
             lineupList.find((lineup) => lineup.index === lineupIndex)?.name ??
-            "(Error)"
+            parenError
           )
-        ) : dataIndex === ACTIONS.toLocaleLowerCase() ? (
+        ) : dataIndex === keyActions ? (
           <>
-            <Button onClick={() => onClickEdit(key)}>
-              <EditOutlined />
-            </Button>
+            <Button onClick={() => onClickEdit(key)} icon={<EditOutlined />} />
             <Button
               onClick={() => removePkg(key)}
               disabled={usedPkgIndexList?.includes(key)}
-            >
-              <DeleteOutlined />
-            </Button>
+              icon={<DeleteOutlined />}
+            />
           </>
         ) : null}
       </td>

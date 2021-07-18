@@ -2,6 +2,7 @@ import { CheckOutlined, CloseOutlined, DeleteOutlined, EditOutlined, PlusOutline
 import { Button, Form, Input, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { useState } from "react";
+import { formName, formNameNew, keyActions, keyName, titleActions } from "../constants";
 import { Enum } from "../types";
 import { findEmptyIndex } from "../utils";
 
@@ -18,9 +19,6 @@ type EditableCellProps = {
   children: any;
 };
 
-const NAME = "Name";
-const ACTIONS = "Actions";
-
 export default function EnumTable({
   title,
   enumList,
@@ -32,14 +30,14 @@ export default function EnumTable({
 
   const columns: any[] = [
     {
-      key: NAME.toLocaleLowerCase(),
-      dataIndex: NAME.toLocaleLowerCase(),
+      key: keyName,
+      dataIndex: keyName,
       title,
     },
     {
-      key: ACTIONS.toLocaleLowerCase(),
-      dataIndex: ACTIONS.toLocaleLowerCase(),
-      title: "Actions",
+      key: keyActions,
+      dataIndex: keyActions,
+      title: titleActions,
     },
   ].map((column) => {
     const { dataIndex } = column;
@@ -54,9 +52,9 @@ export default function EnumTable({
 
   function addEnumItem() {
     form
-      .validateFields(["name"])
+      .validateFields([formName])
       .then(() => {
-        const name = form.getFieldValue("name");
+        const name = form.getFieldValue(formName);
         const enumItemFound = enumList.find(
           (enumItem) => enumItem.name === name
         );
@@ -88,9 +86,9 @@ export default function EnumTable({
 
   function onSubmitRename() {
     form
-      .validateFields(["nameNew"])
+      .validateFields([formNameNew])
       .then(() => {
-        const nameNew = form.getFieldValue("nameNew");
+        const nameNew = form.getFieldValue(formNameNew);
         const enumItemFound = enumList.find(
           (enumItem) =>
             enumItem.index !== editIndex && enumItem.name === nameNew
@@ -135,10 +133,10 @@ export default function EnumTable({
   }
 
   const dataSource = [
-    { key: -1, name: "", actions: "" },
+    { key: -1 },
     ...enumList.map((enumItem) => {
       const { index, name } = enumItem;
-      return { key: index, name, actions: "" };
+      return { key: index, name };
     }),
   ];
 
@@ -164,13 +162,13 @@ export default function EnumTable({
     const { key } = record;
     return (
       <td {...restProps}>
-        {key === -1 && dataIndex === NAME.toLocaleLowerCase() ? (
+        {key === -1 && dataIndex === keyName ? (
           <Form form={form} onFinish={addEnumItem}>
-            <Form.Item name="name" rules={[{ required: true }]} help={false}>
+            <Form.Item name={formName} rules={[{ required: true }]} help={false}>
               <Input disabled={editIndex !== -1} />
             </Form.Item>
           </Form>
-        ) : key === -1 && dataIndex === ACTIONS.toLocaleLowerCase() ? (
+        ) : key === -1 && dataIndex === keyActions ? (
           <Form form={form}>
             <Form.Item>
               <Button onClick={addEnumItem} disabled={editIndex !== -1}>
@@ -178,13 +176,13 @@ export default function EnumTable({
               </Button>
             </Form.Item>
           </Form>
-        ) : editIndex === key && dataIndex === NAME.toLocaleLowerCase() ? (
+        ) : editIndex === key && dataIndex === keyName ? (
           <Form form={form} onFinish={onSubmitRename}>
-            <Form.Item name="nameNew" rules={[{ required: true }]} help={false}>
+            <Form.Item name={formNameNew} rules={[{ required: true }]} help={false}>
               <Input />
             </Form.Item>
           </Form>
-        ) : editIndex === key && dataIndex === ACTIONS.toLocaleLowerCase() ? (
+        ) : editIndex === key && dataIndex === keyActions ? (
           <Form form={form}>
             <Form.Item>
               <Button onClick={onSubmitRename}>
@@ -195,9 +193,9 @@ export default function EnumTable({
               </Button>
             </Form.Item>
           </Form>
-        ) : dataIndex === NAME.toLocaleLowerCase() ? (
+        ) : dataIndex === keyName ? (
           children
-        ) : dataIndex === ACTIONS.toLocaleLowerCase() ? (
+        ) : dataIndex === keyActions ? (
           <>
             <Button onClick={() => onClickEdit(key)}>
               <EditOutlined />

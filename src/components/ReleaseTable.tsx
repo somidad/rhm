@@ -270,9 +270,9 @@ export default function ReleaseTable({
       const lineupIndex = pkgFound?.lineupIndex;
       const lineup =
         lineupIndex === -1
-          ? "(None)"
+          ? parenNone
           : lineupList.find((lineup) => lineup.index === lineupIndex)?.name ??
-            "(Error)";
+            parenError;
       return { key, package: pkgIndex, pkgName, customers, lineup };
     }),
   ];

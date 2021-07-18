@@ -4,6 +4,7 @@ import { useForm } from "antd/lib/form/Form";
 import TextArea from "antd/lib/input/TextArea";
 import { useEffect, useState } from "react";
 import {
+  formCustomerIndexList,
   keyActions,
   keyCustomers,
   keyDescription,
@@ -122,7 +123,7 @@ export default function ChangePerReleaseTable({
 
   function onSubmitChange(versionIndexOfChange: number, changeIndex: number) {
     form
-      .validateFields(["customerIndexList"])
+      .validateFields([formCustomerIndexList])
       .then(() => {
         const versionOfChangeFound = versionList.find(
           (version) => version.index === versionIndexOfChange
@@ -140,7 +141,7 @@ export default function ChangePerReleaseTable({
         if (!releaseFound) {
           return;
         }
-        const customerIndexListRaw = form.getFieldValue("customerIndexList");
+        const customerIndexListRaw = form.getFieldValue(formCustomerIndexList);
         const customerIndexList = customerIndexListRaw.includes(-1)
           ? [-1]
           : customerIndexListRaw;
@@ -279,7 +280,7 @@ export default function ChangePerReleaseTable({
         dataIndex === keyCustomers ? (
           <Form form={form}>
             <Form.Item
-              name="customerIndexList"
+              name={formCustomerIndexList}
               rules={[{ required: true }]}
               help={false}
             >
@@ -320,12 +321,8 @@ export default function ChangePerReleaseTable({
           dataIndex === keyActions ? (
           <Form form={form}>
             <Form.Item>
-              <Button onClick={() => onSubmitChange(versionIndexOfChange, changeIndex)}>
-                <CheckOutlined />
-              </Button>
-              <Button onClick={onCancelEdit}>
-                <CloseOutlined />
-              </Button>
+              <Button onClick={() => onSubmitChange(versionIndexOfChange, changeIndex)} icon={<CheckOutlined />} />
+              <Button onClick={onCancelEdit} icon={<CloseOutlined />} />
             </Form.Item>
           </Form>
         ) : dataIndex === keyVersion ? (
@@ -360,9 +357,7 @@ export default function ChangePerReleaseTable({
             );
           })
         ) : dataIndex === keyActions ? (
-          <Button onClick={() => onClickEdit(versionIndexOfChange, changeIndex)}>
-            <EditOutlined />
-          </Button>
+          <Button onClick={() => onClickEdit(versionIndexOfChange, changeIndex)} icon={<EditOutlined />} />
         ) : (
           children
         )}

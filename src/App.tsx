@@ -211,7 +211,7 @@ function App() {
                     <>
                       Previous{" "}
                       <Tag>
-                        {versionPrev === -1 ? "(Error)" : versionPrev.name}
+                        {versionPrev === -1 ? parenError : versionPrev.name}
                       </Tag>
                     </>
                   )}

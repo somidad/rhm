@@ -75,21 +75,15 @@ export default function AppMenu({
   return (
     <>
       <Menu mode="horizontal" selectable={false}>
-        <Menu.Item key="new" onClick={onNew}>
-          <FileOutlined />
-        </Menu.Item>
-        <Menu.Item key="load" onClick={() => refLoad.current?.click()}>
-          <FolderOpenOutlined />
-        </Menu.Item>
+        <Menu.Item key="new" onClick={onNew} icon={<FileOutlined />} />
+        <Menu.Item key="load" onClick={() => refLoad.current?.click()} icon={<FolderOpenOutlined />} />
         <Menu.Item key="featureName" disabled>
           <Input
             value={featureName}
             onChange={(e) => setFeatureName(e.target.value)}
           />
         </Menu.Item>
-        <Menu.Item key="save" onClick={() => onClickSave()}>
-          <SaveOutlined />
-        </Menu.Item>
+        <Menu.Item key="save" onClick={() => onClickSave()} icon={<SaveOutlined />} />
       </Menu>
       <input
         type="file"

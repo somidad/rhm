@@ -4,6 +4,7 @@ import { useForm } from "antd/lib/form/Form";
 import Link from "antd/lib/typography/Link";
 import { uniq } from "lodash";
 import { useState } from "react";
+import { formNameNew, formPrevious, formPreviousNew, formVersion, keyActions, keyPrevious, keyVersion, parenError, parenNone, titleActions, titlePrevious, titleVersion } from "../constants";
 import { VersionV2 } from "../types";
 import { findEmptyIndex } from "../utils";
 
@@ -32,9 +33,9 @@ export default function VersionTable({
   const [editIndex, setEditIndex] = useState(-1);
 
   const columns: any[] = [
-    { key: "version", dataIndex: "version", title: "Version" },
-    { key: "previous", dataIndex: "previous", title: "Previous" },
-    { key: "actions", dataIndex: "actions", title: "Actions" },
+    { key: keyVersion, dataIndex: keyVersion, title: titleVersion },
+    { key: keyPrevious, dataIndex: keyPrevious, title: titlePrevious },
+    { key: keyActions, dataIndex: keyActions, title: titleActions },
   ].map((column) => {
     const { dataIndex } = column;
     return {
@@ -48,11 +49,11 @@ export default function VersionTable({
 
   function addVersion() {
     form
-      .validateFields(["version"])
+      .validateFields([formVersion])
       .then(() => {
         const { version: name, previous: indexPrev } = form.getFieldsValue([
-          "version",
-          "previous",
+          formVersion,
+          formPrevious,
         ]);
         const versionFound = versionList.find(
           (version) => version.name === name
@@ -91,11 +92,11 @@ export default function VersionTable({
 
   function onSubmitEditVersion() {
     form
-      .validateFields(["nameNew"])
+      .validateFields([formNameNew])
       .then(() => {
         const { nameNew: name, previousNew: indexPrev } = form.getFieldsValue([
-          "nameNew",
-          "previousNew",
+          formNameNew,
+          formPreviousNew,
         ]);
         const nameInUse = versionList.find(
           (version) => version.index !== editIndex && version.name === name
@@ -182,18 +183,18 @@ export default function VersionTable({
     const { key, previous: indexPrev } = record;
     return (
       <td {...restProps}>
-        {key === -1 && dataIndex === "version" ? (
+        {key === -1 && dataIndex === keyVersion ? (
           <Form form={form}>
-            <Form.Item name="version" rules={[{ required: true }]} help={false}>
+            <Form.Item name={formVersion} rules={[{ required: true }]} help={false}>
               <Input disabled={editIndex !== -1} />
             </Form.Item>
           </Form>
-        ) : key === -1 && dataIndex === "previous" ? (
+        ) : key === -1 && dataIndex === keyPrevious ? (
           <Form form={form}>
-            <Form.Item name="previous" initialValue={-1}>
+            <Form.Item name={formPrevious} initialValue={-1}>
               <Select disabled={editIndex !== -1}>
                 <Option key={-1} value={-1}>
-                  (None)
+                  {parenNone}
                 </Option>
                 {versionList.map((version) => {
                   const { index, name } = version;
@@ -206,26 +207,24 @@ export default function VersionTable({
               </Select>
             </Form.Item>
           </Form>
-        ) : key === -1 && dataIndex === "actions" ? (
+        ) : key === -1 && dataIndex === keyActions ? (
           <Form>
             <Form.Item>
-              <Button onClick={addVersion} disabled={editIndex !== -1}>
-                <PlusOutlined />
-              </Button>
+              <Button onClick={addVersion} disabled={editIndex !== -1} icon={<PlusOutlined />} />
             </Form.Item>
           </Form>
-        ) : editIndex === key && dataIndex === "version" ? (
+        ) : editIndex === key && dataIndex === keyVersion ? (
           <Form form={form}>
-            <Form.Item name="nameNew" rules={[{ required: true }]} help={false}>
+            <Form.Item name={formNameNew} rules={[{ required: true }]} help={false}>
               <Input />
             </Form.Item>
           </Form>
-        ) : editIndex === key && dataIndex === "previous" ? (
+        ) : editIndex === key && dataIndex === keyPrevious ? (
           <Form form={form}>
-            <Form.Item name="previousNew">
+            <Form.Item name={formPreviousNew}>
               <Select>
                 <Option key={-1} value={-1}>
-                  (None)
+                  {parenNone}
                 </Option>
                 {versionList.map((version) => {
                   const { index, name } = version;
@@ -238,40 +237,31 @@ export default function VersionTable({
               </Select>
             </Form.Item>
           </Form>
-        ) : editIndex === key && dataIndex === "actions" ? (
+        ) : editIndex === key && dataIndex === keyActions ? (
           <Form form={form}>
             <Form.Item>
-              <Button onClick={onSubmitEditVersion}>
-                <CheckOutlined />
-              </Button>
-              <Button onClick={() => setEditIndex(-1)}>
-                <CloseOutlined />
-              </Button>
+              <Button onClick={onSubmitEditVersion} icon={<CheckOutlined />} />
+              <Button onClick={() => setEditIndex(-1)} icon={<CloseOutlined />} />
             </Form.Item>
           </Form>
-        ) : dataIndex === "version" ? (
+        ) : dataIndex === keyVersion ? (
           <Link onClick={() => onSelect(key)}>{children}</Link>
-        ) : dataIndex === "previous" ? (
+        ) : dataIndex === keyPrevious ? (
           indexPrev === -1 ? (
-            "(None)"
+            parenNone
           ) : (
             versionList.find((version) => version.index === indexPrev)?.name ??
-            "(Error)"
+            parenError
           )
-        ) : dataIndex === "actions" ? (
+        ) : dataIndex === keyActions ? (
           <>
-            <Button onClick={() => onClickEdit(key)}>
-              <EditOutlined />
-            </Button>
+            <Button onClick={() => onClickEdit(key)} icon={<EditOutlined />} />
             <Button
               onClick={() => removeVersion(key)}
               disabled={usedVersionIndexList.includes(key)}
-            >
-              <DeleteOutlined />
-            </Button>
-            <Button onClick={() => onClickPublish(key)}>
-              <ExportOutlined />
-            </Button>
+              icon={<DeleteOutlined />}
+            />
+            <Button onClick={() => onClickPublish(key)} icon={<ExportOutlined />} />
           </>
         ) : (
           children
