@@ -21,7 +21,7 @@ import {
 import { uniq } from "lodash";
 import TextArea from "antd/lib/input/TextArea";
 import { publish } from "./utils";
-import { panelChanges, panelReleases, panelVersions, parenError, tabCustomers, tabHistory, tabLineups, tabPackages } from "./constants";
+import { panelChanges, panelReleases, panelVersions, parenError, keyHistory, keyLineups, keyPackages, keyCustomers } from "./constants";
 const { Panel } = Collapse;
 
 function App() {
@@ -191,8 +191,8 @@ function App() {
       />
       <Row>
         <Col span={16} offset={4}>
-          <Tabs defaultActiveKey={tabHistory}>
-            <Tabs.TabPane tab="History" key={tabHistory}>
+          <Tabs defaultActiveKey={keyHistory}>
+            <Tabs.TabPane tab="History" key={keyHistory}>
               <Title level={2}>History</Title>
               <Collapse defaultActiveKey={[panelVersions]}>
                 <Panel key={panelVersions} header="Versions">
@@ -244,7 +244,7 @@ function App() {
                 </>
               )}
             </Tabs.TabPane>
-            <Tabs.TabPane tab="Customers" key={tabCustomers}>
+            <Tabs.TabPane tab="Customers" key={keyCustomers}>
               <Title level={2}>Customers</Title>
               <EnumTable
                 title="Customer"
@@ -253,7 +253,7 @@ function App() {
                 usedIndexList={usedCustomerIndexList}
               />
             </Tabs.TabPane>
-            <Tabs.TabPane tab="Lineups" key={tabLineups}>
+            <Tabs.TabPane tab="Lineups" key={keyLineups}>
               <Title level={2}>Lineups</Title>
               <EnumTable
                 title="Lineup"
@@ -262,7 +262,7 @@ function App() {
                 usedIndexList={usedLineupIndexList}
               />
             </Tabs.TabPane>
-            <Tabs.TabPane tab="Packages" key={tabPackages}>
+            <Tabs.TabPane tab="Packages" key={keyPackages}>
               <Title level={2}>Packages</Title>
               <PkgTable
                 pkgList={pkgList}

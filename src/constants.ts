@@ -35,10 +35,9 @@ export const parenGlobal = "(Global)";
 export const parenNone = "(None)";
 export const parenError = "(Error)";
 
-export const tabCustomers = "customers";
-export const tabHistory = "history";
-export const tabLineups = "lineups";
-export const tabPackages = "packages";
+export const keyHistory = "history";
+export const keyLineups = "lineups";
+export const keyPackages = "packages";
 
 export const titleActions = "Actions";
 export const titleAfterChange = "After change";
