@@ -150,6 +150,7 @@ export default function EnumTable({
         },
       }}
       pagination={false}
+      size="small"
     />
   );
 

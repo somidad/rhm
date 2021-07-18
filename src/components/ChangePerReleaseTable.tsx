@@ -246,6 +246,7 @@ export default function ChangePerReleaseTable({
         },
       }}
       pagination={false}
+      size="small"
     />
   );
 

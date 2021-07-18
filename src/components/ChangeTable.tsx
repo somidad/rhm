@@ -208,6 +208,7 @@ export default function ChangeTable({
         },
       }}
       pagination={false}
+      size="small"
     />
   );
 

@@ -165,6 +165,7 @@ export default function PkgTable({
         },
       }}
       pagination={false}
+      size="small"
     />
   );
 

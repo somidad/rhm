@@ -171,6 +171,7 @@ export default function VersionTable({
         },
       }}
       pagination={false}
+      size="small"
     />
   );
 

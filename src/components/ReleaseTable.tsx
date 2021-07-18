@@ -304,6 +304,7 @@ export default function ReleaseTable({
           rowExpandable: (record) => record.key !== -1,
         }}
         pagination={false}
+        size="small"
       />
       {/* Render overlay component. */}
       <DragOverlay
