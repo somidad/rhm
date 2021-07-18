@@ -27,9 +27,18 @@ export const keyPackage = "package";
 export const keyPrevious = "previous";
 export const keyVersion = "version";
 
+export const panelChanges = "changes";
+export const panelReleases = "releases"
+export const panelVersions = "versions";
+
 export const parenGlobal = "(Global)";
 export const parenNone = "(None)";
 export const parenError = "(Error)";
+
+export const tabCustomers = "customers";
+export const tabHistory = "history";
+export const tabLineups = "lineups";
+export const tabPackages = "packages";
 
 export const titleActions = "Actions";
 export const titleAfterChange = "After change";

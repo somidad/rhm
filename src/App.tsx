@@ -21,7 +21,7 @@ import {
 import { uniq } from "lodash";
 import TextArea from "antd/lib/input/TextArea";
 import { publish } from "./utils";
-import { parenError } from "./constants";
+import { panelChanges, panelReleases, panelVersions, parenError, tabCustomers, tabHistory, tabLineups, tabPackages } from "./constants";
 const { Panel } = Collapse;
 
 function App() {
@@ -191,11 +191,11 @@ function App() {
       />
       <Row>
         <Col span={16} offset={4}>
-          <Tabs defaultActiveKey="history">
-            <Tabs.TabPane tab="History" key="history">
+          <Tabs defaultActiveKey={tabHistory}>
+            <Tabs.TabPane tab="History" key={tabHistory}>
               <Title level={2}>History</Title>
-              <Collapse defaultActiveKey="versions">
-                <Panel key="versions" header="Versions">
+              <Collapse defaultActiveKey={[panelVersions]}>
+                <Panel key={panelVersions} header="Versions">
                   <VersionTable
                     versionList={versionList}
                     onChange={onChangeVersionList}
@@ -216,8 +216,8 @@ function App() {
                     </>
                   )}
                   <Space direction="vertical" style={{ width: "100%" }}>
-                    <Collapse defaultActiveKey={["changes"]}>
-                      <Panel key="changes" header="Changes">
+                    <Collapse defaultActiveKey={[panelChanges]}>
+                      <Panel key={panelChanges} header="Changes">
                         <ChangeTable
                           versionIndex={versionIndex}
                           versionList={versionList}
@@ -226,8 +226,8 @@ function App() {
                         />
                       </Panel>
                     </Collapse>
-                    <Collapse defaultActiveKey={["releases"]}>
-                      <Panel key="releases" header="Releases">
+                    <Collapse defaultActiveKey={[panelReleases]}>
+                      <Panel key={panelReleases} header="Releases">
                         <ReleaseTable
                           lineupList={lineupList}
                           pkgList={pkgList}
@@ -244,7 +244,7 @@ function App() {
                 </>
               )}
             </Tabs.TabPane>
-            <Tabs.TabPane tab="Customers" key="customers">
+            <Tabs.TabPane tab="Customers" key={tabCustomers}>
               <Title level={2}>Customers</Title>
               <EnumTable
                 title="Customer"
@@ -253,7 +253,7 @@ function App() {
                 usedIndexList={usedCustomerIndexList}
               />
             </Tabs.TabPane>
-            <Tabs.TabPane tab="Lineups" key="lineups">
+            <Tabs.TabPane tab="Lineups" key={tabLineups}>
               <Title level={2}>Lineups</Title>
               <EnumTable
                 title="Lineup"
@@ -262,7 +262,7 @@ function App() {
                 usedIndexList={usedLineupIndexList}
               />
             </Tabs.TabPane>
-            <Tabs.TabPane tab="Packages" key="packages">
+            <Tabs.TabPane tab="Packages" key={tabPackages}>
               <Title level={2}>Packages</Title>
               <PkgTable
                 pkgList={pkgList}
