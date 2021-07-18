@@ -35,11 +35,7 @@ export default function AppMenu({
   const [featureName, setFeatureName] = useState(UNTITLED);
 
   function onChangeFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const { files } = e.target;
-    if (!files) {
-      return;
-    }
-    file = files[0];
+    file = e.target.files?.[0];
     if (!file) {
       return;
     }
@@ -64,11 +60,8 @@ export default function AppMenu({
     if (!file) {
       return;
     }
-    if (!e.target) {
-      return;
-    }
-    const { result } = e.target;
-    if (result === null || result instanceof ArrayBuffer) {
+    const result = e.target?.result;
+    if (typeof result !== "string") {
       return;
     }
     const { name } = file;
