@@ -276,6 +276,12 @@ export default function ReleaseTable({
       return { key, package: pkgIndex, pkgName, customers, lineup };
     }),
   ];
+
+  const releaseToDragFound = releaseList.find((release) => release.index === Number(activeId));
+  const pkgToDragFound = pkgList.find((pkg) => pkg.index === releaseToDragFound?.pkgIndex);
+  const pkgNameToDrag = pkgToDragFound?.name;
+  const lineupIndexToDrag = pkgToDragFound?.lineupIndex;
+  const lineupToDrag = lineupList.find((lineup) => lineup.index === lineupIndexToDrag)?.name;
   return (
     <DndContext
       sensors={sensors}
@@ -309,8 +315,7 @@ export default function ReleaseTable({
           paddingLeft: 30,
         }}
       >
-        {pkgList.find((pkg) => pkg.index === Number(activeId))?.name ??
-          parenError}
+        {pkgNameToDrag} <Tag>{lineupToDrag}</Tag>
       </DragOverlay>
     </DndContext>
   );
