@@ -5,7 +5,7 @@ import { Button, Col, Collapse, Modal, Row, Space, Tabs, Tag } from "antd";
 import { CopyOutlined, GithubOutlined } from "@ant-design/icons";
 import EnumTable from "./components/EnumTable";
 import PkgTable from "./components/PkgTable";
-import { ChangeV2, Enum, Pkg, ReleaseV2, VersionV2 } from "./types";
+import { ChangeV2, CustomerIndexListPerChange, Enum, Pkg, ReleaseV2, VersionV2 } from "./types";
 import Title from "antd/lib/typography/Title";
 import Link from "antd/lib/typography/Link";
 import VersionTable from "./components/VersionTable";
@@ -18,7 +18,7 @@ import {
   pkgListInit,
   versionListInit,
 } from "./init";
-import { uniq } from "lodash";
+import { uniq, uniqWith } from "lodash";
 import TextArea from "antd/lib/input/TextArea";
 import { publish } from "./utils";
 import { keyChanges, keyReleases, keyVersions, parenError, keyHistory, keyLineups, keyPackages, keyCustomers, titleHistory, titleVersions, titleChanges, titleReleases, titleCustomers, titleCustomer, titleLineups, titleLineup, titlePackages } from "./constants";
@@ -119,6 +119,34 @@ function App() {
     setVersionIndex(index);
   }
 
+  type ChangeIndexWithVersionIndex = Omit<CustomerIndexListPerChange, "customerIndexList">;
+  const usedChangeIndexWithVersionIndexList: ChangeIndexWithVersionIndex[] =
+    uniqWith(
+      versionList.reduce(
+        (changeIndexListPrev: ChangeIndexWithVersionIndex[], version) => {
+          const { releaseList } = version;
+          const changeIndexListPerReleaseList = releaseList.reduce(
+            (
+              changeIndexListPerReleasePrev: ChangeIndexWithVersionIndex[],
+              release
+            ) => {
+              const { customerIndexListPerChangeList } = release;
+              return [
+                ...changeIndexListPerReleasePrev,
+                ...customerIndexListPerChangeList.map((item) => {
+                  const { versionIndex, changeIndex } = item;
+                  return { versionIndex, changeIndex };
+                }),
+              ];
+            },
+            []
+          );
+          return [...changeIndexListPrev, ...changeIndexListPerReleaseList];
+        },
+        []
+      ),
+      (a, b) => a.versionIndex === b.versionIndex && a.changeIndex === b.changeIndex
+    );
   const usedLineupIndexList = uniq([
     ...versionList.reduce((lineupIndexListPrev: number[], version) => {
       const { changeList } = version;
@@ -222,6 +250,7 @@ function App() {
                           versionIndex={versionIndex}
                           versionList={versionList}
                           lineupList={lineupList}
+                          usedChangeIndexWithVersionIndexList={usedChangeIndexWithVersionIndexList}
                           onChange={onChangeChangeList}
                         />
                       </Panel>

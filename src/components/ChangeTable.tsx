@@ -4,7 +4,7 @@ import { useForm } from "antd/lib/form/Form";
 import TextArea from "antd/lib/input/TextArea";
 import { useEffect, useState } from "react";
 import { formAfterChange, formAfterChangeNew, formBeforeChange, formBeforeChangeNew, formCustomerIndexList, formDescription, formDescriptionNew, formLineup, formLineupNew, keyActions, keyAfterChange, keyBeforeChange, keyDescription, keyLineup, parenError, parenNone, titleActions, titleAfterChange, titleBeforeChange, titleDescription, titleLineup } from "../constants";
-import { ChangeV2, Enum, VersionV2 } from "../types";
+import { ChangeV2, CustomerIndexListPerChange, Enum, VersionV2 } from "../types";
 import { findEmptyIndex } from "../utils";
 const { Option } = Select;
 
@@ -12,6 +12,7 @@ type Props = {
   versionIndex: number;
   versionList: VersionV2[];
   lineupList: Enum[];
+  usedChangeIndexWithVersionIndexList: Omit<CustomerIndexListPerChange, "customerIndexList">[];
   onChange: (changeList: ChangeV2[]) => void;
 };
 
@@ -31,6 +32,7 @@ export default function ChangeTable({
   versionIndex,
   versionList,
   lineupList,
+  usedChangeIndexWithVersionIndexList,
   onChange,
 }: Props) {
   const [form] = useForm();
@@ -349,7 +351,14 @@ export default function ChangeTable({
           <Form>
             <Form.Item>
               <Button onClick={() => onClickEdit(key)} icon={<EditOutlined />} />
-              <Button onClick={() => removeChange(key)} icon={<DeleteOutlined />} />
+              <Button
+                onClick={() => removeChange(key)} icon={<DeleteOutlined />}
+                disabled={
+                  !!usedChangeIndexWithVersionIndexList.find((item) => {
+                    return item.versionIndex === versionIndex && item.changeIndex === key
+                  })
+                }
+              />
             </Form.Item>
           </Form>
         ) : (
