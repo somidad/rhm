@@ -319,7 +319,8 @@ export default function ChangePerReleaseTable({
         ) : dataIndex === keyVersion ? (
           <>
             {versionFound?.name ?? parenError}
-            <Badge color="blue" />
+            {' '}
+            {versionIndexOfChange === versionIndex ? <Badge color="blue" /> : null}
           </>
         ) : dataIndex === keyDescription ? (
           <Popover
