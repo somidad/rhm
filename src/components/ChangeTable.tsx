@@ -224,7 +224,7 @@ export default function ChangeTable({
         {key === -1 && dataIndex === keyDescription ? (
           <Form form={form}>
             <Form.Item
-              name={formCustomerIndexList}
+              name={formDescription}
               rules={[{ required: true }]}
               help={false}
             >
