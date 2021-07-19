@@ -3,7 +3,7 @@ import { Button, Form, Select, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import TextArea from "antd/lib/input/TextArea";
 import { useEffect, useState } from "react";
-import { formAfterChange, formAfterChangeNew, formBeforeChange, formBeforeChangeNew, formCustomerIndexList, formDescription, formDescriptionNew, formLineup, formLineupNew, keyActions, keyAfterChange, keyBeforeChange, keyDescription, keyLineup, parenError, parenNone, titleActions, titleAfterChange, titleBeforeChange, titleDescription, titleLineup } from "../constants";
+import { formAfterChange, formAfterChangeNew, formBeforeChange, formBeforeChangeNew, formDescription, formDescriptionNew, formLineup, formLineupNew, keyActions, keyAfterChange, keyBeforeChange, keyDescription, keyLineup, parenError, parenNone, titleActions, titleAfterChange, titleBeforeChange, titleDescription, titleLineup } from "../constants";
 import { ChangeV2, CustomerIndexListPerChange, Enum, VersionV2 } from "../types";
 import { findEmptyIndex } from "../utils";
 const { Option } = Select;
@@ -82,7 +82,7 @@ export default function ChangeTable({
 
   function addChange() {
     form
-      .validateFields([formDescription, formBeforeChange, formAfterChange, formLineup])
+      .validateFields([formDescription, formLineup])
       .then(() => {
         const {
           description,
@@ -137,8 +137,6 @@ export default function ChangeTable({
     form
       .validateFields([
         formDescriptionNew,
-        formBeforeChangeNew,
-        formAfterChangeNew,
         formLineupNew,
       ])
       .then(() => {
@@ -237,7 +235,6 @@ export default function ChangeTable({
           <Form form={form}>
             <Form.Item
               name={formBeforeChange}
-              rules={[{ required: true }]}
               help={false}
             >
               <TextArea autoSize disabled={editIndex !== -1} />
@@ -247,7 +244,6 @@ export default function ChangeTable({
           <Form form={form}>
             <Form.Item
               name={formAfterChange}
-              rules={[{ required: true }]}
               help={false}
             >
               <TextArea autoSize disabled={editIndex !== -1} />
@@ -293,7 +289,6 @@ export default function ChangeTable({
           <Form form={form}>
             <Form.Item
               name={formBeforeChangeNew}
-              rules={[{ required: true }]}
               help={false}
             >
               <TextArea autoSize />
@@ -303,7 +298,6 @@ export default function ChangeTable({
           <Form form={form}>
             <Form.Item
               name={formAfterChangeNew}
-              rules={[{ required: true }]}
               help={false}
             >
               <TextArea autoSize />
