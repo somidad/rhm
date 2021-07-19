@@ -133,10 +133,15 @@ function App() {
               const { customerIndexListPerChangeList } = release;
               return [
                 ...changeIndexListPerReleasePrev,
-                ...customerIndexListPerChangeList.map((item) => {
-                  const { versionIndex, changeIndex } = item;
-                  return { versionIndex, changeIndex };
-                }),
+                ...customerIndexListPerChangeList
+                  .filter((item) => {
+                    const { customerIndexList } = item;
+                    return customerIndexList && customerIndexList.length;
+                  })
+                  .map((item) => {
+                    const { versionIndex, changeIndex } = item;
+                    return { versionIndex, changeIndex };
+                  }),
               ];
             },
             []
