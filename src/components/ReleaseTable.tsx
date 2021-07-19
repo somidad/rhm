@@ -226,6 +226,7 @@ export default function ReleaseTable({
         const indexFound = releaseList.findIndex(
           (release) => release.index === editIndex
         );
+        const { customerIndexListPerChangeList } = releaseList[indexFound];
         if (indexFound === -1) {
           return;
         }
@@ -235,7 +236,7 @@ export default function ReleaseTable({
             index: editIndex,
             pkgIndex: pkgIndexNew,
             customerIndexList: customerIndexListNew,
-            customerIndexListPerChangeList: [], // FIXME
+            customerIndexListPerChangeList,
           },
           ...releaseList.slice(indexFound + 1),
         ];
