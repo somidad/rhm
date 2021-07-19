@@ -19,6 +19,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "set \"PUBLIC_URL=https://rhm.js.org\" && react-scripts build && npx shx rm -rf docs && npx shx mv build docs",
+    "build-v2": "set \"PUBLIC_URL=https://rhm.js.org/v2\" && react-scripts build && npx shx rm -rf docs/v2 && npx shx mv build docs/v2",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "prettier": "npx prettier --write src"
