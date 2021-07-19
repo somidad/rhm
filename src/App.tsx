@@ -304,16 +304,14 @@ function App() {
         </Col>
       </Row>
       <Row style={{ marginTop: "1em" }}>
-        <Col offset={11}>
-          <Title level={1}>
-            <Link
-              href="https://github.com/gsongsong/rhm"
-              target="_blank"
-              rel="noreferrer"
-            >
-              <GithubOutlined />
-            </Link>
-          </Title>
+        <Col span={24} style={{ display: "flex", justifyContent: "center" }}>
+          <Link
+            href="https://github.com/gsongsong/rhm"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <GithubOutlined />
+          </Link>
         </Col>
       </Row>
       <Modal
