@@ -122,60 +122,53 @@ export default function ChangePerReleaseTable({
   }
 
   function onSubmitChange(versionIndexOfChange: number, changeIndex: number) {
-    form
-      .validateFields([formCustomerIndexList])
-      .then(() => {
-        const versionOfChangeFound = versionList.find(
-          (version) => version.index === versionIndexOfChange
-        );
-        if (!versionOfChangeFound) {
-          return;
-        }
-        const { changeList } = versionOfChangeFound;
-        const changeFound = changeList.find(
-          (change) => change.index === changeIndex
-        );
-        if (!changeFound) {
-          return;
-        }
-        if (!releaseFound) {
-          return;
-        }
-        const customerIndexListRaw = form.getFieldValue(formCustomerIndexList);
-        const customerIndexList = customerIndexListRaw.includes(-1)
-          ? [-1]
-          : customerIndexListRaw;
-        const { customerIndexListPerChangeList } = releaseFound;
-        const indexFound = customerIndexListPerChangeList.findIndex((item) => {
-          return (
-            item.versionIndex === versionIndexOfChange &&
-            item.changeIndex === changeIndex
-          );
-        });
-        const customerIndexListPerChangeListNew =
-          indexFound === -1
-            ? [
-                ...customerIndexListPerChangeList,
-                {
-                  versionIndex: versionIndexOfChange,
-                  changeIndex,
-                  customerIndexList,
-                },
-              ]
-            : [
-                ...customerIndexListPerChangeList.slice(0, indexFound),
-                {
-                  versionIndex: versionIndexOfChange,
-                  changeIndex,
-                  customerIndexList,
-                },
-                ...customerIndexListPerChangeList.slice(indexFound + 1),
-              ];
-        onChange(customerIndexListPerChangeListNew);
-      })
-      .catch((reason) => {
-        console.error(reason);
-      });
+    const versionOfChangeFound = versionList.find(
+      (version) => version.index === versionIndexOfChange
+    );
+    if (!versionOfChangeFound) {
+      return;
+    }
+    const { changeList } = versionOfChangeFound;
+    const changeFound = changeList.find(
+      (change) => change.index === changeIndex
+    );
+    if (!changeFound) {
+      return;
+    }
+    if (!releaseFound) {
+      return;
+    }
+    const customerIndexListRaw = form.getFieldValue(formCustomerIndexList);
+    const customerIndexList = customerIndexListRaw.includes(-1)
+      ? [-1]
+      : customerIndexListRaw;
+    const { customerIndexListPerChangeList } = releaseFound;
+    const indexFound = customerIndexListPerChangeList.findIndex((item) => {
+      return (
+        item.versionIndex === versionIndexOfChange &&
+        item.changeIndex === changeIndex
+      );
+    });
+    const customerIndexListPerChangeListNew =
+      indexFound === -1
+        ? [
+            ...customerIndexListPerChangeList,
+            {
+              versionIndex: versionIndexOfChange,
+              changeIndex,
+              customerIndexList,
+            },
+          ]
+        : [
+            ...customerIndexListPerChangeList.slice(0, indexFound),
+            {
+              versionIndex: versionIndexOfChange,
+              changeIndex,
+              customerIndexList,
+            },
+            ...customerIndexListPerChangeList.slice(indexFound + 1),
+          ];
+    onChange(customerIndexListPerChangeListNew);
   }
 
   /**
@@ -280,7 +273,6 @@ export default function ChangePerReleaseTable({
           <Form form={form}>
             <Form.Item
               name={formCustomerIndexList}
-              rules={[{ required: true }]}
               help={false}
             >
               <Select
