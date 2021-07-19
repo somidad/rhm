@@ -1,5 +1,5 @@
 import { CheckOutlined, CloseOutlined, EditOutlined } from "@ant-design/icons";
-import { Button, Form, Popover, Select, Table, Tag, Typography } from "antd";
+import { Badge, Button, Form, Popover, Select, Table, Tag, Typography } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import TextArea from "antd/lib/input/TextArea";
 import { useEffect, useState } from "react";
@@ -272,8 +272,6 @@ export default function ChangePerReleaseTable({
       customerIndexList,
     } = record;
     const versionFound = versionList.find((version) => version.index === versionIndexOfChange);
-    const style = versionIndexOfChange === versionIndex ? { backgroundColor: '#1890ff0f' } : {};
-    (restProps as any).style = Object.assign({}, (restProps as any).style, style);
     return (
       <td {...restProps}>
         {editVersionIndex === versionIndexOfChange &&
@@ -327,9 +325,10 @@ export default function ChangePerReleaseTable({
             </Form.Item>
           </Form>
         ) : dataIndex === keyVersion ? (
-          // <span style={style}>
-            versionFound?.name ?? parenError
-          // </span>
+          <>
+            {versionFound?.name ?? parenError}
+            <Badge color="blue" />
+          </>
         ) : dataIndex === keyDescription ? (
           <Popover
             content={() => (
