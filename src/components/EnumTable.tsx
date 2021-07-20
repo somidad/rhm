@@ -1,7 +1,7 @@
 import { CheckOutlined, CloseOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
-import { useState } from "react";
+import { createRef, useState } from "react";
 import { formName, formNameNew, keyActions, keyName, titleActions } from "../constants";
 import { Enum } from "../types";
 import { findEmptyIndex } from "../utils";
@@ -26,6 +26,8 @@ export default function EnumTable({
   usedIndexList,
 }: Props) {
   const [form] = useForm();
+  const refButtonAdd = createRef<HTMLElement>();
+  const refButtonEdit = createRef<HTMLElement>();
   const [editIndex, setEditIndex] = useState(-1);
 
   const columns: any[] = [
@@ -166,13 +168,16 @@ export default function EnumTable({
         {key === -1 && dataIndex === keyName ? (
           <Form form={form} onFinish={addEnumItem}>
             <Form.Item name={formName} rules={[{ required: true }]} help={false}>
-              <Input disabled={editIndex !== -1} />
+              <Input
+                onPressEnter={() => refButtonAdd.current?.click()}
+                disabled={editIndex !== -1}
+              />
             </Form.Item>
           </Form>
         ) : key === -1 && dataIndex === keyActions ? (
           <Form form={form}>
             <Form.Item>
-              <Button onClick={addEnumItem} disabled={editIndex !== -1}>
+              <Button ref={refButtonAdd} onClick={addEnumItem} disabled={editIndex !== -1}>
                 <PlusOutlined />
               </Button>
             </Form.Item>
@@ -180,13 +185,13 @@ export default function EnumTable({
         ) : editIndex === key && dataIndex === keyName ? (
           <Form form={form} onFinish={onSubmitRename}>
             <Form.Item name={formNameNew} rules={[{ required: true }]} help={false}>
-              <Input />
+              <Input onPressEnter={() => refButtonEdit.current?.click()} />
             </Form.Item>
           </Form>
         ) : editIndex === key && dataIndex === keyActions ? (
           <Form form={form}>
             <Form.Item>
-              <Button onClick={onSubmitRename}>
+              <Button ref={refButtonEdit} onClick={onSubmitRename}>
                 <CheckOutlined />
               </Button>
               <Button onClick={() => setEditIndex(-1)}>

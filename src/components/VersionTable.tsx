@@ -3,7 +3,7 @@ import { Button, Form, Input, Select, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import Link from "antd/lib/typography/Link";
 import { uniq } from "lodash";
-import { useState } from "react";
+import { createRef, useState } from "react";
 import { formNameNew, formPrevious, formPreviousNew, formVersion, keyActions, keyPrevious, keyVersion, parenError, parenNone, titleActions, titlePrevious, titleVersion } from "../constants";
 import { VersionV2 } from "../types";
 import { findEmptyIndex } from "../utils";
@@ -30,6 +30,8 @@ export default function VersionTable({
   onSelect,
 }: Props) {
   const [form] = useForm();
+  const refButtonAdd = createRef<HTMLElement>();
+  const refButtonEdit = createRef<HTMLElement>();
   const [editIndex, setEditIndex] = useState(-1);
 
   const columns: any[] = [
@@ -187,7 +189,7 @@ export default function VersionTable({
         {key === -1 && dataIndex === keyVersion ? (
           <Form form={form}>
             <Form.Item name={formVersion} rules={[{ required: true }]} help={false}>
-              <Input disabled={editIndex !== -1} />
+              <Input onPressEnter={() => refButtonAdd.current?.click()} disabled={editIndex !== -1} />
             </Form.Item>
           </Form>
         ) : key === -1 && dataIndex === keyPrevious ? (
@@ -211,13 +213,13 @@ export default function VersionTable({
         ) : key === -1 && dataIndex === keyActions ? (
           <Form>
             <Form.Item>
-              <Button onClick={addVersion} disabled={editIndex !== -1} icon={<PlusOutlined />} />
+              <Button ref={refButtonAdd} onClick={addVersion} disabled={editIndex !== -1} icon={<PlusOutlined />} />
             </Form.Item>
           </Form>
         ) : editIndex === key && dataIndex === keyVersion ? (
           <Form form={form}>
             <Form.Item name={formNameNew} rules={[{ required: true }]} help={false}>
-              <Input />
+              <Input onPressEnter={() => refButtonEdit.current?.click()} />
             </Form.Item>
           </Form>
         ) : editIndex === key && dataIndex === keyPrevious ? (
@@ -241,7 +243,7 @@ export default function VersionTable({
         ) : editIndex === key && dataIndex === keyActions ? (
           <Form form={form}>
             <Form.Item>
-              <Button onClick={onSubmitEditVersion} icon={<CheckOutlined />} />
+              <Button ref={refButtonEdit} onClick={onSubmitEditVersion} icon={<CheckOutlined />} />
               <Button onClick={() => setEditIndex(-1)} icon={<CloseOutlined />} />
             </Form.Item>
           </Form>

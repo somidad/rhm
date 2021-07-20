@@ -1,7 +1,7 @@
 import { CheckOutlined, CloseOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Select, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
-import { useEffect, useState } from "react";
+import { createRef, useEffect, useState } from "react";
 import { formLineup, formLineupNew, formName, formNameNew, keyActions, keyLineup, keyPackage, parenError, parenNone, titleActions, titleLineup, titlePackage } from "../constants";
 import { Enum, Pkg } from "../types";
 import { findEmptyIndex } from "../utils";
@@ -28,6 +28,8 @@ export default function PkgTable({
   usedPkgIndexList,
 }: Props) {
   const [form] = useForm();
+  const refButtonAdd = createRef<HTMLElement>();
+  const refButtonEdit = createRef<HTMLElement>();
   const [editIndex, setEditIndex] = useState(-1);
 
   useEffect(() => {
@@ -181,7 +183,7 @@ export default function PkgTable({
         {key === -1 && dataIndex === keyPackage ? (
           <Form form={form} onFinish={addPkg}>
             <Form.Item name={formName} rules={[{ required: true }]} help={false}>
-              <Input disabled={editIndex !== -1} />
+              <Input onPressEnter={() => refButtonAdd.current?.click()} disabled={editIndex !== -1} />
             </Form.Item>
           </Form>
         ) : key === -1 && dataIndex === keyLineup ? (
@@ -205,7 +207,7 @@ export default function PkgTable({
         ) : key === -1 && dataIndex === keyActions ? (
           <Form form={form}>
             <Form.Item>
-              <Button onClick={addPkg} disabled={editIndex !== -1}>
+              <Button ref={refButtonAdd} onClick={addPkg} disabled={editIndex !== -1}>
                 <PlusOutlined />
               </Button>
             </Form.Item>
@@ -213,7 +215,7 @@ export default function PkgTable({
         ) : editIndex === key && dataIndex === keyPackage ? (
           <Form form={form}>
             <Form.Item name={formNameNew} rules={[{ required: true }]} help={false}>
-              <Input />
+              <Input onPressEnter={() => refButtonEdit.current?.click()} />
             </Form.Item>
           </Form>
         ) : editIndex === key && dataIndex === keyLineup ? (
@@ -237,7 +239,7 @@ export default function PkgTable({
         ) : editIndex === key && dataIndex === keyActions ? (
           <Form form={form}>
             <Form.Item>
-              <Button onClick={onSubmitEditPkg} icon={<CheckOutlined />} />
+              <Button ref={refButtonEdit} onClick={onSubmitEditPkg} icon={<CheckOutlined />} />
               <Button onClick={() => setEditIndex(-1)} icon={<CloseOutlined />} />
             </Form.Item>
           </Form>
