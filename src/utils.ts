@@ -358,7 +358,7 @@ function publishPerCustomer(
   pkgList: Pkg[],
   customer: Enum
 ) {
-  const candidateLineupIndexList = lineupList.map((lineup) => lineup.index);
+  const candidateLineupIndexList = [-1, ...lineupList.map((lineup) => lineup.index)];
   const releaseHistoryPerLineupList: ReleaseHistoryPerLineupIndex[] = [];
   candidateLineupIndexList.forEach((lineupIndex) => {
     releaseHistoryPerLineupList.push({
