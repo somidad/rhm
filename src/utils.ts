@@ -229,7 +229,7 @@ export function load(input: string) {
     });
     changeList.forEach((change: Change & ChangeV2) => {
       const { index: changeIndex, customerIndexList } = change;
-      if (customerIndexList.length) {
+      if (customerIndexList && customerIndexList.length) {
         customerIndexList.forEach((customerIndex) => {
           const releaseFound = releaseList.find((release) => {
             const { pkgIndex } = release;
@@ -257,7 +257,7 @@ export function load(input: string) {
             }
           }
         });
-      } else {
+      } else if (customerIndexList && !customerIndexList.length) {
         // Global
         const releaseFound = releaseList.find((release) => {
           const { pkgIndex } = release;
