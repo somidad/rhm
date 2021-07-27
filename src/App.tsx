@@ -322,7 +322,7 @@ function App() {
       <Modal
         title="Release history"
         footer={
-          <Button>
+          <Button onClick={() => navigator.clipboard.writeText(releaseHistory)}>
             <CopyOutlined />
             Copy to clipboard
           </Button>
