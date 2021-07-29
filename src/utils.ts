@@ -54,8 +54,10 @@ function accumulateChangeList(
         ...changeList.filter((change) => {
           return customerIndexListPerChangeList.find(
             (customerIndexListPerChange) => {
-              const { customerIndexList } = customerIndexListPerChange;
+              const { versionIndex: versionIndexOfChange, changeIndex, customerIndexList } = customerIndexListPerChange;
               return (
+                versionNext?.index === versionIndexOfChange &&
+                change.index === changeIndex &&
                 change.lineupIndex === lineupIndex &&
                 (customerIndexList.includes(customerIndex) ||
                   customerIndexList.includes(-1))
@@ -434,8 +436,10 @@ function publishPerLineup(
           ...changeList.filter((change) => {
             return customerIndexListPerChangeList.find(
               (customerIndexListPerChange) => {
-                const { customerIndexList } = customerIndexListPerChange;
+                const { versionIndex: versionIndexOfChange, changeIndex, customerIndexList } = customerIndexListPerChange;
                 return (
+                  versionNext?.index === versionIndexOfChange &&
+                  change.index === changeIndex &&
                   change.lineupIndex === pkgLineupIndex &&
                   (customerIndexList.includes(customerIndex) ||
                     customerIndexList.includes(-1))
