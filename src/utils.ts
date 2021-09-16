@@ -37,9 +37,6 @@ function accumulateChangeList(
 ) {
   let versionNext = versionList.find((version) => version.index === indexPrev);
   while (versionNext) {
-    if (!versionNext) {
-      return versionNext;
-    }
     const { indexPrev, changeList, releaseList } = versionNext;
     const releaseFound = releaseList.find((release) =>
       release.customerIndexList.includes(customerIndex)
