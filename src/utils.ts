@@ -38,10 +38,11 @@ function accumulateChangeList(
   let versionNext = versionList.find((version) => version.index === indexPrev);
   while (versionNext) {
     const { indexPrev, changeList, releaseList } = versionNext;
-    const releaseFound = releaseList.find((release) =>
-      release.customerIndexList.includes(customerIndex)
-    );
-    if (releaseFound) {
+    /**
+     * If this version is released in a certain package to a given customer,
+     * this version shall not be accumulated
+     */
+    if (releaseList.find((rel) => rel.customerIndexList.includes(customerIndex))) {
       break;
     }
     // Accumulate all changes of releases in a given version
