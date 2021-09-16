@@ -29,7 +29,7 @@ type ReleaseHistoryPerPkg = {
 };
 
 function accumulateChangeList(
-  changeListAccumulated: ChangeV2[],
+  changeListAccumulated: (ChangeV2 & { versionIndex: number | undefined })[],
   customerIndex: number,
   versionList: VersionV2[],
   indexPrev: number,
@@ -48,27 +48,30 @@ function accumulateChangeList(
     // Accumulate all changes of releases in a given version
     releaseList.forEach((release) => {
       const { customerIndexListPerChangeList } = release;
-      changeListAccumulated.unshift(
-        ...changeList.filter((change) => {
-          return customerIndexListPerChangeList.find(
-            (customerIndexListPerChange) => {
-              const { versionIndex: versionIndexOfChange, changeIndex, customerIndexList } = customerIndexListPerChange;
-              return (
-                versionNext?.index === versionIndexOfChange &&
-                change.index === changeIndex &&
-                change.lineupIndex === lineupIndex &&
-                (customerIndexList.includes(customerIndex) ||
-                  customerIndexList.includes(-1))
-              );
-            }
-          );
-        })
-      );
+      const changeListToAccumulate = changeList.filter((change) => {
+        return customerIndexListPerChangeList.find(
+          (customerIndexListPerChange) => {
+            const {
+              versionIndex: versionIndexOfChange,
+              changeIndex,
+              customerIndexList,
+            } = customerIndexListPerChange;
+            return (
+              versionNext?.index === versionIndexOfChange &&
+              change.index === changeIndex &&
+              change.lineupIndex === lineupIndex &&
+              (customerIndexList.includes(customerIndex) ||
+                customerIndexList.includes(-1))
+            );
+          }
+        );
+      }).map((change) => ({ versionIndex: versionNext?.index, ...change }));
+      changeListAccumulated.unshift(...changeListToAccumulate);
     });
     for (let i = changeListAccumulated.length - 1; i >= 0; i -= 1) {
       const changeSource = changeListAccumulated[i];
       const changeTarget = changeListAccumulated.slice(0, i).find((item) => {
-        return item.index === changeSource.index;
+        return item.versionIndex === changeSource.versionIndex && item.index === changeSource.index;
       });
       if (changeTarget) {
         changeListAccumulated.splice(i, 1);
@@ -430,22 +433,20 @@ function publishPerLineup(
         break;
       } else {
         const { name: pkgName, lineupIndex: pkgLineupIndex } = pkgFound;
-        const changeListAccumulated = [
-          ...changeList.filter((change) => {
-            return customerIndexListPerChangeList.find(
-              (customerIndexListPerChange) => {
-                const { versionIndex: versionIndexOfChange, changeIndex, customerIndexList } = customerIndexListPerChange;
-                return (
-                  versionNext?.index === versionIndexOfChange &&
-                  change.index === changeIndex &&
-                  change.lineupIndex === pkgLineupIndex &&
-                  (customerIndexList.includes(customerIndex) ||
-                    customerIndexList.includes(-1))
-                );
-              }
-            );
-          }),
-        ];
+        const changeListAccumulated = changeList.filter((change) => {
+          return customerIndexListPerChangeList.find(
+            (customerIndexListPerChange) => {
+              const { versionIndex: versionIndexOfChange, changeIndex, customerIndexList } = customerIndexListPerChange;
+              return (
+                versionNext?.index === versionIndexOfChange &&
+                change.index === changeIndex &&
+                change.lineupIndex === pkgLineupIndex &&
+                (customerIndexList.includes(customerIndex) ||
+                  customerIndexList.includes(-1))
+              );
+            }
+          );
+        }).map((change) => ({ versionIndex: versionNext?.index, ...change })),
         // Accumulate unreleased versions and get the second latest released version
         versionNext = accumulateChangeList(
           changeListAccumulated,
