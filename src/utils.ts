@@ -446,7 +446,7 @@ function publishPerLineup(
               );
             }
           );
-        }).map((change) => ({ versionIndex: versionNext?.index, ...change })),
+        }).map((change) => ({ versionIndex: versionNext?.index, ...change }));
         // Accumulate unreleased versions and get the second latest released version
         versionNext = accumulateChangeList(
           changeListAccumulated,
