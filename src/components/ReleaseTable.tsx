@@ -93,7 +93,7 @@ export default function ReleaseTable({
 
   function onDragEnd(event: any) {
     const { active, over } = event;
-    if (active.id !== over.id) {
+    if (active.id !== "-1" && over.id !== "-1" && active.id !== over.id) {
       const oldIndex = releaseList.findIndex(
         (release) => release.index.toString() === active.id
       );
