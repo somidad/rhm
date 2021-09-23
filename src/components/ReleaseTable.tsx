@@ -308,17 +308,21 @@ export default function ReleaseTable({
         size="small"
       />
       {/* Render overlay component. */}
-      <DragOverlay
-        style={{
-          backgroundColor: "#e0e0e07f",
-          border: "1px solid #e9e9e9",
-          display: "flex",
-          alignItems: "center",
-          paddingLeft: 30,
-        }}
-      >
-        {pkgNameToDrag} <Tag>{lineupToDrag}</Tag>
-      </DragOverlay>
+      {
+        pkgToDragFound ? (
+          <DragOverlay
+            style={{
+              backgroundColor: "#e0e0e07f",
+              border: "1px solid #e9e9e9",
+              display: "flex",
+              alignItems: "center",
+              paddingLeft: 30,
+            }}
+          >
+            {pkgNameToDrag} <Tag>{lineupToDrag}</Tag>
+          </DragOverlay>
+        ) : null
+      }
     </DndContext>
   );
 
