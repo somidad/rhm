@@ -34,7 +34,8 @@ function accumulateChangeList(
   customerIndex: number,
   versionList: VersionV2[],
   indexPrev: number,
-  lineupIndex: number
+  lineupIndex: number,
+  pkgList: Pkg[],
 ) {
   let versionNext = versionList.find((version) => version.index === indexPrev);
   while (versionNext) {
@@ -43,7 +44,14 @@ function accumulateChangeList(
      * If this version is released in a certain package to a given customer,
      * this version shall not be accumulated
      */
-    if (releaseList.find((rel) => rel.customerIndexList.includes(customerIndex))) {
+    if (releaseList.find((rel) => {
+      if (!rel.customerIndexList.includes(customerIndex)) {
+        return false;
+      }
+      const { pkgIndex } = rel;
+      const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex && pkg.lineupIndex === lineupIndex);
+      return pkgFound;
+    })) {
       break;
     }
     // Accumulate all changes of releases in a given version
@@ -464,7 +472,8 @@ function publishPerLineup(
           customerIndex,
           versionList,
           indexPrev,
-          lineupIndex
+          lineupIndex,
+          pkgList,
         );
         changeListPerPkgList.unshift({
           pkgName,
