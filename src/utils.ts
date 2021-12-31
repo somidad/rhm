@@ -1,7 +1,8 @@
-import { uniq } from "lodash";
+import { flatten, uniq } from "lodash";
 import {
   Change,
   ChangeV2,
+  CustomerIndexListPerChange,
   Enum,
   OldCustomer,
   OldPkg,
@@ -48,24 +49,12 @@ function accumulateChangeList(
     // Accumulate all changes of releases in a given version
     releaseList.forEach((release) => {
       const { customerIndexListPerChangeList } = release;
-      const changeListToAccumulate = changeList.filter((change) => {
-        return customerIndexListPerChangeList.find(
-          (customerIndexListPerChange) => {
-            const {
-              versionIndex: versionIndexOfChange,
-              changeIndex,
-              customerIndexList,
-            } = customerIndexListPerChange;
-            return (
-              versionNext?.index === versionIndexOfChange &&
-              change.index === changeIndex &&
-              change.lineupIndex === lineupIndex &&
-              (customerIndexList.includes(customerIndex) ||
-                customerIndexList.includes(-1))
-            );
-          }
-        );
-      }).map((change) => ({ versionIndex: versionNext?.index, ...change }));
+      const changeListToAccumulate = filterChangeListToAccumulate(
+        customerIndex,
+        versionList,
+        customerIndexListPerChangeList,
+        lineupIndex,
+      );
       changeListAccumulated.unshift(...changeListToAccumulate);
     });
     for (let i = changeListAccumulated.length - 1; i >= 0; i -= 1) {
@@ -97,6 +86,36 @@ export function accumulateVersionIndex(
   const { indexPrev } = versionFound;
   versionIndexList.push(...accumulateVersionIndex(versionList, indexPrev));
   return versionIndexList;
+}
+
+function filterChangeListToAccumulate(
+  customerIndex: number,
+  versionList: VersionV2[],
+  customerIndexListPerChangeList: CustomerIndexListPerChange[],
+  lineupIndex: number,
+) {
+  return flatten(versionList.map((version) => {
+    const { index: versionIndex, changeList } = version;
+    const changeListFiltered = changeList.filter((change) => {
+      return customerIndexListPerChangeList.find(
+        (customerIndexListPerChange) => {
+          const {
+            versionIndex: versionIndexOfChange,
+            changeIndex,
+            customerIndexList,
+          } = customerIndexListPerChange;
+          return (
+            versionIndex === versionIndexOfChange &&
+            change.index === changeIndex &&
+            change.lineupIndex === lineupIndex &&
+            (customerIndexList.includes(customerIndex) ||
+              customerIndexList.includes(-1))
+          );
+        }
+      );
+    }).map((change) => ({ versionIndex, ...change }));
+    return changeListFiltered;
+  }));
 }
 
 export function findEmptyIndex(indexList: number[]) {
@@ -433,20 +452,12 @@ function publishPerLineup(
         break;
       } else {
         const { name: pkgName, lineupIndex: pkgLineupIndex } = pkgFound;
-        const changeListAccumulated = changeList.filter((change) => {
-          return customerIndexListPerChangeList.find(
-            (customerIndexListPerChange) => {
-              const { versionIndex: versionIndexOfChange, changeIndex, customerIndexList } = customerIndexListPerChange;
-              return (
-                versionNext?.index === versionIndexOfChange &&
-                change.index === changeIndex &&
-                change.lineupIndex === pkgLineupIndex &&
-                (customerIndexList.includes(customerIndex) ||
-                  customerIndexList.includes(-1))
-              );
-            }
-          );
-        }).map((change) => ({ versionIndex: versionNext?.index, ...change }));
+        const changeListAccumulated = filterChangeListToAccumulate(
+          customerIndex,
+          versionList,
+          customerIndexListPerChangeList,
+          lineupIndex,
+        );
         // Accumulate unreleased versions and get the second latest released version
         versionNext = accumulateChangeList(
           changeListAccumulated,
