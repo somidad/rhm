@@ -67,20 +67,29 @@ export function accumulateVersionIndex(
     // Common
     // - Accumulate changes
     const { indexPrev, releaseList } = versionNext;
+    // Check at least one package is released with the current version
+    if (initialVersion) {
+      const released = releaseList.find((release) => {
+        const { pkgIndex, customerIndexList } = release;
+        if (!customerIndexList.includes(customerIndex)) {
+          return false;
+        }
+        const pkgFound = pkgList.find((pkg) => {
+          return pkg.index === pkgIndex && pkg.lineupIndex === lineupIndex;
+        });
+        return !!pkgFound;
+      });
+      initialVersion = false;
+      if (!released) {
+        return changeList;
+      }
+    }
     for (let i = releaseList.length - 1; i >= 0; i -= 1) {
       const release = releaseList[i];
       const { customerIndexList, customerIndexListPerChangeList, pkgIndex } = release;
       const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex);
       console.log({customerIndexList});
       const customerFound = customerIndexList.findIndex((ci) => ci === customerIndex) !== -1;
-      // If the current version is not released to the customer, the entire accumulation does not need to be performed
-      if (!customerFound && initialVersion && pkgFound?.lineupIndex !== lineupIndex) {
-        console.groupEnd();
-        console.groupEnd();
-        return changeList;
-      } else {
-        initialVersion = false;
-      }
       // Check if the package is with the desired lineup
       if (pkgFound?.lineupIndex !== lineupIndex) {
         continue;
