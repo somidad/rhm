@@ -44,20 +44,21 @@ export function accumulateVersionIndex(
  * Filter change list to accumulate after the previous package to the current package
  * The previous package and the current package may be released in the same version or different versions
  */
-function filterChangeListToAccumulate(
+ function filterChangeListToAccumulate(
   customerIndex: number,
   versionList: VersionV2[],
   versionIndex: number,
   lineupIndex: number,
   pkgList: Pkg[],
 ) {
-  console.group('Customer index:', customerIndex);
+  console.group({customerIndex});
   const changeList: { pkgName: string; changeList: ChangeV2[]; }[] = [];
   let versionNext = versionList.find((version) => version.index === versionIndex);
   let pkgName = '';
   const changeListToAccumulate: ChangeV2[] = [];
+  let initialVersion = true;
   while (versionNext) {
-    console.group(versionNext);
+    console.group({versionNext});
     // Traverse the last release from the first release for each version
     // If a package is released to the customer,
     // - Push the accumulated change list with the package name, if package name is not empy
@@ -65,12 +66,18 @@ function filterChangeListToAccumulate(
     // - Update the package name with the current package
     // Common
     // - Accumulate changes
-    const { changeList: changeListPerVersion, indexPrev, releaseList } = versionNext;
+    const { indexPrev, releaseList } = versionNext;
     for (let i = releaseList.length - 1; i >= 0; i -= 1) {
       const release = releaseList[i];
       const { customerIndexList, customerIndexListPerChangeList, pkgIndex } = release;
+      const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex);
+      // Check if the package is with the desired lineup
+      if (pkgFound?.lineupIndex !== lineupIndex) {
+        continue;
+      }
       console.log({customerIndexList});
-      if (customerIndexList.findIndex((ci) => ci === customerIndex) !== -1) {
+      const customerFound = customerIndexList.findIndex((ci) => ci === customerIndex) !== -1;
+      if (customerFound) {
         if (pkgName) {
           console.log('Pushed', pkgName, changeListToAccumulate);
           // - Push the accumulated change list with the package name, if package name is not empy
@@ -79,24 +86,34 @@ function filterChangeListToAccumulate(
           changeListToAccumulate.length = 0;
         }
         // - Update the package name with the current package
-        const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex);
         pkgName = pkgFound?.name ?? '';
       }
+      // If the current version is not released to the customer, the entire accumulation does not need to be performed
+      if (!customerFound && initialVersion) {
+        console.groupEnd();
+        console.groupEnd();
+        return changeList;
+      } else {
+        initialVersion = false;
+      }
       // - Accumulate changes
-      const changeListToAccumulatePerRelease = changeListPerVersion.filter((change) => {
-        return (
-          change.lineupIndex === lineupIndex &&
-          customerIndexListPerChangeList.find(
-            (item) =>
-              item.versionIndex === versionIndex &&
-              item.changeIndex === change.index &&
-              (
-                item.customerIndexList.includes(customerIndex) ||
-                item.customerIndexList.includes(-1)
-              )
-          )
-        );
+      const chagneIndexListToAccumultate = customerIndexListPerChangeList.filter((item) => {
+        const { customerIndexList } = item;
+        return customerIndexList.includes(customerIndex) || customerIndexList.includes(-1);
       });
+      const changeListToAccumulatePerRelease = versionList.map((version) => {
+        const { changeList: changeListPerVersion } = version;
+        const changeListToAccumulatePerVersion = changeListPerVersion.filter((change) => {
+          const { lineupIndex } = change;
+          return chagneIndexListToAccumultate.find(
+            (item) =>
+            item.versionIndex === version.index &&
+            item.changeIndex === change.index &&
+            change.lineupIndex === lineupIndex
+          );
+        });
+        return changeListToAccumulatePerVersion;
+      }).flat();
       changeListToAccumulate.unshift(...changeListToAccumulatePerRelease);
       console.log({changeListToAccumulate});
     }
