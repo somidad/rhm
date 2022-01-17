@@ -71,12 +71,20 @@ export function accumulateVersionIndex(
       const release = releaseList[i];
       const { customerIndexList, customerIndexListPerChangeList, pkgIndex } = release;
       const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex);
+      console.log({customerIndexList});
+      const customerFound = customerIndexList.findIndex((ci) => ci === customerIndex) !== -1;
+      // If the current version is not released to the customer, the entire accumulation does not need to be performed
+      if (!customerFound && initialVersion && pkgFound?.lineupIndex !== lineupIndex) {
+        console.groupEnd();
+        console.groupEnd();
+        return changeList;
+      } else {
+        initialVersion = false;
+      }
       // Check if the package is with the desired lineup
       if (pkgFound?.lineupIndex !== lineupIndex) {
         continue;
       }
-      console.log({customerIndexList});
-      const customerFound = customerIndexList.findIndex((ci) => ci === customerIndex) !== -1;
       if (customerFound) {
         if (pkgName) {
           console.log('Pushed', pkgName, changeListToAccumulate);
@@ -87,14 +95,6 @@ export function accumulateVersionIndex(
         }
         // - Update the package name with the current package
         pkgName = pkgFound?.name ?? '';
-      }
-      // If the current version is not released to the customer, the entire accumulation does not need to be performed
-      if (!customerFound && initialVersion) {
-        console.groupEnd();
-        console.groupEnd();
-        return changeList;
-      } else {
-        initialVersion = false;
       }
       // - Accumulate changes
       const chagneIndexListToAccumultate = customerIndexListPerChangeList.filter((item) => {
