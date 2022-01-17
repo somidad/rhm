@@ -1,8 +1,7 @@
-import { flatten, uniq } from "lodash";
+import { uniq } from "lodash";
 import {
   Change,
   ChangeV2,
-  CustomerIndexListPerChange,
   Enum,
   OldCustomer,
   OldPkg,
@@ -24,61 +23,6 @@ type ReleaseHistoryPerLineupIndex = {
   releaseHistory: string;
 };
 
-type ReleaseHistoryPerPkg = {
-  pkgName: string;
-  changeList: ChangeV2[];
-};
-
-function accumulateChangeList(
-  changeListAccumulated: (ChangeV2 & { versionIndex: number | undefined })[],
-  customerIndex: number,
-  versionList: VersionV2[],
-  indexPrev: number,
-  lineupIndex: number,
-  pkgList: Pkg[],
-) {
-  let versionNext = versionList.find((version) => version.index === indexPrev);
-  while (versionNext) {
-    const { indexPrev, changeList, releaseList } = versionNext;
-    /**
-     * If this version is released in a certain package to a given customer,
-     * this version shall not be accumulated
-     */
-    if (releaseList.find((rel) => {
-      if (!rel.customerIndexList.includes(customerIndex)) {
-        return false;
-      }
-      const { pkgIndex } = rel;
-      const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex && pkg.lineupIndex === lineupIndex);
-      return pkgFound;
-    })) {
-      break;
-    }
-    // Accumulate all changes of releases in a given version
-    releaseList.forEach((release) => {
-      const { customerIndexListPerChangeList } = release;
-      const changeListToAccumulate = filterChangeListToAccumulate(
-        customerIndex,
-        versionList,
-        customerIndexListPerChangeList,
-        lineupIndex,
-      );
-      changeListAccumulated.unshift(...changeListToAccumulate);
-    });
-    for (let i = changeListAccumulated.length - 1; i >= 0; i -= 1) {
-      const changeSource = changeListAccumulated[i];
-      const changeTarget = changeListAccumulated.slice(0, i).find((item) => {
-        return item.versionIndex === changeSource.versionIndex && item.index === changeSource.index;
-      });
-      if (changeTarget) {
-        changeListAccumulated.splice(i, 1);
-      }
-    }
-    versionNext = versionList.find((version) => version.index === indexPrev);
-  }
-  return versionNext;
-}
-
 export function accumulateVersionIndex(
   versionList: VersionV2[],
   versionIndex: number
@@ -96,34 +40,93 @@ export function accumulateVersionIndex(
   return versionIndexList;
 }
 
-function filterChangeListToAccumulate(
+/**
+ * Filter change list to accumulate after the previous package to the current package
+ * The previous package and the current package may be released in the same version or different versions
+ */
+ function filterChangeListToAccumulate(
   customerIndex: number,
   versionList: VersionV2[],
-  customerIndexListPerChangeList: CustomerIndexListPerChange[],
+  versionIndex: number,
   lineupIndex: number,
+  pkgList: Pkg[],
 ) {
-  return flatten(versionList.map((version) => {
-    const { index: versionIndex, changeList } = version;
-    const changeListFiltered = changeList.filter((change) => {
-      return customerIndexListPerChangeList.find(
-        (customerIndexListPerChange) => {
-          const {
-            versionIndex: versionIndexOfChange,
-            changeIndex,
-            customerIndexList,
-          } = customerIndexListPerChange;
-          return (
-            versionIndex === versionIndexOfChange &&
-            change.index === changeIndex &&
-            change.lineupIndex === lineupIndex &&
-            (customerIndexList.includes(customerIndex) ||
-              customerIndexList.includes(-1))
-          );
+  console.group({customerIndex});
+  const changeList: { pkgName: string; changeList: ChangeV2[]; }[] = [];
+  let versionNext = versionList.find((version) => version.index === versionIndex);
+  let pkgName = '';
+  const changeListToAccumulate: ChangeV2[] = [];
+  let initialVersion = true;
+  while (versionNext) {
+    console.group({versionNext});
+    // Traverse the last release from the first release for each version
+    // If a package is released to the customer,
+    // - Push the accumulated change list with the package name, if package name is not empy
+    // - Reset the accumulated change list
+    // - Update the package name with the current package
+    // Common
+    // - Accumulate changes
+    const { indexPrev, releaseList } = versionNext;
+    for (let i = releaseList.length - 1; i >= 0; i -= 1) {
+      const release = releaseList[i];
+      const { customerIndexList, customerIndexListPerChangeList, pkgIndex } = release;
+      const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex);
+      console.log({customerIndexList});
+      const customerFound = customerIndexList.findIndex((ci) => ci === customerIndex) !== -1;
+      // If the current version is not released to the customer, the entire accumulation does not need to be performed
+      if (!customerFound && initialVersion && pkgFound?.lineupIndex !== lineupIndex) {
+        console.groupEnd();
+        console.groupEnd();
+        return changeList;
+      } else {
+        initialVersion = false;
+      }
+      // Check if the package is with the desired lineup
+      if (pkgFound?.lineupIndex !== lineupIndex) {
+        continue;
+      }
+      if (customerFound) {
+        if (pkgName) {
+          console.log('Pushed', pkgName, changeListToAccumulate);
+          // - Push the accumulated change list with the package name, if package name is not empy
+          changeList.unshift({ pkgName, changeList: [...changeListToAccumulate] });
+          // - Reset the accumulated change list
+          changeListToAccumulate.length = 0;
         }
-      );
-    }).map((change) => ({ versionIndex, ...change }));
-    return changeListFiltered;
-  }));
+        // - Update the package name with the current package
+        pkgName = pkgFound?.name ?? '';
+      }
+      // - Accumulate changes
+      const chagneIndexListToAccumultate = customerIndexListPerChangeList.filter((item) => {
+        const { customerIndexList } = item;
+        return customerIndexList.includes(customerIndex) || customerIndexList.includes(-1);
+      });
+      const changeListToAccumulatePerRelease = versionList.map((version) => {
+        const { changeList: changeListPerVersion } = version;
+        const changeListToAccumulatePerVersion = changeListPerVersion.filter((change) => {
+          const { lineupIndex } = change;
+          return chagneIndexListToAccumultate.find(
+            (item) =>
+            item.versionIndex === version.index &&
+            item.changeIndex === change.index &&
+            change.lineupIndex === lineupIndex
+          );
+        });
+        return changeListToAccumulatePerVersion;
+      }).flat();
+      changeListToAccumulate.unshift(...changeListToAccumulatePerRelease);
+      console.log({changeListToAccumulate});
+    }
+    versionNext = versionList.find((version) => version.index === indexPrev);
+    console.groupEnd();
+  }
+  if (pkgName) {
+    console.log('Pushed', pkgName, changeListToAccumulate);
+    // - Push the accumulated change list with the package name, if package name is not empy
+    changeList.unshift({ pkgName, changeList: [...changeListToAccumulate] });
+  }
+  console.groupEnd();
+  return changeList;
 }
 
 export function findEmptyIndex(indexList: number[]) {
@@ -429,59 +432,14 @@ function publishPerLineup(
   pkgList: Pkg[],
   customer: Enum
 ) {
-  let versionNext = versionList.find(
-    (version) => version.index === versionIndex
-  );
   const { index: customerIndex } = customer;
-  const changeListPerPkgList: ReleaseHistoryPerPkg[] = [];
-  while (versionNext) {
-    const { indexPrev, changeList, releaseList } = versionNext;
-    // Check the current version is released
-    const releaseFound = releaseList.find((release) => {
-      const customerIncluded =
-        release.customerIndexList.includes(customerIndex);
-      if (!customerIncluded) {
-        return false;
-      }
-      const { pkgIndex } = release;
-      const pkgFound = pkgList.find(
-        (pkg) => pkg.lineupIndex === lineupIndex && pkg.index === pkgIndex
-      );
-      return !!pkgFound;
-    });
-    // If the current version is not released, it is not for the given customer
-    if (!releaseFound) {
-      versionNext = undefined;
-    } else {
-      const { customerIndexListPerChangeList, pkgIndex } = releaseFound;
-      const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex);
-      if (!pkgFound) {
-        // This is not going to happen
-        break;
-      } else {
-        const { name: pkgName, lineupIndex: pkgLineupIndex } = pkgFound;
-        const changeListAccumulated = filterChangeListToAccumulate(
-          customerIndex,
-          versionList,
-          customerIndexListPerChangeList,
-          lineupIndex,
-        );
-        // Accumulate unreleased versions and get the second latest released version
-        versionNext = accumulateChangeList(
-          changeListAccumulated,
-          customerIndex,
-          versionList,
-          indexPrev,
-          lineupIndex,
-          pkgList,
-        );
-        changeListPerPkgList.unshift({
-          pkgName,
-          changeList: changeListAccumulated,
-        });
-      }
-    }
-  }
+  const changeListPerPkgList = filterChangeListToAccumulate(
+    customerIndex,
+    versionList,
+    versionIndex,
+    lineupIndex,
+    pkgList,
+  );
   const releaseHistory = changeListPerPkgList
     .map((changeListPerPkg, index) => {
       const { pkgName, changeList } = changeListPerPkg;
