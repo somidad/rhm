@@ -44,21 +44,23 @@ export function accumulateVersionIndex(
  * Filter change list to accumulate after the previous package to the current package
  * The previous package and the current package may be released in the same version or different versions
  */
- function filterChangeListToAccumulate(
+function filterChangeListToAccumulate(
   customerIndex: number,
   versionList: VersionV2[],
   versionIndex: number,
   lineupIndex: number,
-  pkgList: Pkg[],
+  pkgList: Pkg[]
 ) {
-  console.group({customerIndex});
-  const changeList: { pkgName: string; changeList: ChangeV2[]; }[] = [];
-  let versionNext = versionList.find((version) => version.index === versionIndex);
-  let pkgName = '';
+  console.group({ customerIndex });
+  const changeList: { pkgName: string; changeList: ChangeV2[] }[] = [];
+  let versionNext = versionList.find(
+    (version) => version.index === versionIndex
+  );
+  let pkgName = "";
   const changeListToAccumulate: ChangeV2[] = [];
   let initialVersion = true;
   while (versionNext) {
-    console.group({versionNext});
+    console.group({ versionNext });
     // Traverse the last release from the first release for each version
     // If a package is released to the customer,
     // - Push the accumulated change list with the package name, if package name is not empy
@@ -86,51 +88,64 @@ export function accumulateVersionIndex(
     }
     for (let i = releaseList.length - 1; i >= 0; i -= 1) {
       const release = releaseList[i];
-      const { customerIndexList, customerIndexListPerChangeList, pkgIndex } = release;
+      const { customerIndexList, customerIndexListPerChangeList, pkgIndex } =
+        release;
       const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex);
-      console.log({customerIndexList});
-      const customerFound = customerIndexList.findIndex((ci) => ci === customerIndex) !== -1;
+      console.log({ customerIndexList });
+      const customerFound =
+        customerIndexList.findIndex((ci) => ci === customerIndex) !== -1;
       // Check if the package is with the desired lineup
       if (pkgFound?.lineupIndex !== lineupIndex) {
         continue;
       }
       if (customerFound) {
         if (pkgName) {
-          console.log('Pushed', pkgName, changeListToAccumulate);
+          console.log("Pushed", pkgName, changeListToAccumulate);
           // - Push the accumulated change list with the package name, if package name is not empy
-          changeList.unshift({ pkgName, changeList: [...changeListToAccumulate] });
+          changeList.unshift({
+            pkgName,
+            changeList: [...changeListToAccumulate],
+          });
           // - Reset the accumulated change list
           changeListToAccumulate.length = 0;
         }
         // - Update the package name with the current package
-        pkgName = pkgFound?.name ?? '';
+        pkgName = pkgFound?.name ?? "";
       }
       // - Accumulate changes
-      const chagneIndexListToAccumultate = customerIndexListPerChangeList.filter((item) => {
-        const { customerIndexList } = item;
-        return customerIndexList.includes(customerIndex) || customerIndexList.includes(-1);
-      });
-      const changeListToAccumulatePerRelease = versionList.map((version) => {
-        const { changeList: changeListPerVersion } = version;
-        const changeListToAccumulatePerVersion = changeListPerVersion.filter((change) => {
-          const { lineupIndex } = change;
-          return chagneIndexListToAccumultate.find(
-            (item) =>
-            item.versionIndex === version.index &&
-            item.changeIndex === change.index &&
-            change.lineupIndex === lineupIndex
+      const chagneIndexListToAccumultate =
+        customerIndexListPerChangeList.filter((item) => {
+          const { customerIndexList } = item;
+          return (
+            customerIndexList.includes(customerIndex) ||
+            customerIndexList.includes(-1)
           );
         });
-        return changeListToAccumulatePerVersion;
-      }).flat();
+      const changeListToAccumulatePerRelease = versionList
+        .map((version) => {
+          const { changeList: changeListPerVersion } = version;
+          const changeListToAccumulatePerVersion = changeListPerVersion.filter(
+            (change) => {
+              const { lineupIndex } = change;
+              return chagneIndexListToAccumultate.find(
+                (item) =>
+                  item.versionIndex === version.index &&
+                  item.changeIndex === change.index &&
+                  change.lineupIndex === lineupIndex
+              );
+            }
+          );
+          return changeListToAccumulatePerVersion;
+        })
+        .flat();
       changeListToAccumulate.unshift(...changeListToAccumulatePerRelease);
-      console.log({changeListToAccumulate});
+      console.log({ changeListToAccumulate });
     }
     versionNext = versionList.find((version) => version.index === indexPrev);
     console.groupEnd();
   }
   if (pkgName) {
-    console.log('Pushed', pkgName, changeListToAccumulate);
+    console.log("Pushed", pkgName, changeListToAccumulate);
     // - Push the accumulated change list with the package name, if package name is not empy
     changeList.unshift({ pkgName, changeList: [...changeListToAccumulate] });
   }
@@ -267,7 +282,8 @@ export function load(input: string) {
   versionList.forEach((version: Version & VersionV2) => {
     const { index: versionIndex, changeList, releaseList } = version;
     releaseList.forEach((release: Release & ReleaseV2) => {
-      release.customerIndexListPerChangeList = release.customerIndexListPerChangeList ?? [];
+      release.customerIndexListPerChangeList =
+        release.customerIndexListPerChangeList ?? [];
     });
     changeList.forEach((change: Change & ChangeV2) => {
       const { index: changeIndex, customerIndexList } = change;
@@ -277,16 +293,22 @@ export function load(input: string) {
             const { pkgIndex } = release;
             return (pkgList as Pkg[]).find((pkg) => {
               return (
-                pkg.index === pkgIndex && pkg.lineupIndex === change.lineupIndex &&
+                pkg.index === pkgIndex &&
+                pkg.lineupIndex === change.lineupIndex &&
                 release.customerIndexList.includes(customerIndex)
               );
             });
           });
           if (releaseFound) {
-            const { customerIndexListPerChangeList } = releaseFound as ReleaseV2;
-            const customerIndexListPerChangeFound = customerIndexListPerChangeList.find((item) => {
-              return item.versionIndex === versionIndex && item.changeIndex === changeIndex;
-            });
+            const { customerIndexListPerChangeList } =
+              releaseFound as ReleaseV2;
+            const customerIndexListPerChangeFound =
+              customerIndexListPerChangeList.find((item) => {
+                return (
+                  item.versionIndex === versionIndex &&
+                  item.changeIndex === changeIndex
+                );
+              });
             if (customerIndexListPerChangeFound) {
               customerIndexListPerChangeFound.customerIndexList = uniq([
                 ...customerIndexListPerChangeFound.customerIndexList,
@@ -294,7 +316,9 @@ export function load(input: string) {
               ]);
             } else {
               customerIndexListPerChangeList.push({
-                versionIndex, changeIndex, customerIndexList: [customerIndex],
+                versionIndex,
+                changeIndex,
+                customerIndexList: [customerIndex],
               });
             }
           }
@@ -311,14 +335,20 @@ export function load(input: string) {
         });
         if (releaseFound) {
           const { customerIndexListPerChangeList } = releaseFound as ReleaseV2;
-          const customerIndexListPerChangeFound = customerIndexListPerChangeList.find((item) => {
-            return item.versionIndex === versionIndex && item.changeIndex === changeIndex;
-          });
+          const customerIndexListPerChangeFound =
+            customerIndexListPerChangeList.find((item) => {
+              return (
+                item.versionIndex === versionIndex &&
+                item.changeIndex === changeIndex
+              );
+            });
           if (customerIndexListPerChangeFound) {
             customerIndexListPerChangeFound.customerIndexList = [-1];
           } else {
             customerIndexListPerChangeList.push({
-              versionIndex, changeIndex, customerIndexList: [-1],
+              versionIndex,
+              changeIndex,
+              customerIndexList: [-1],
             });
           }
         }
@@ -400,7 +430,10 @@ function publishPerCustomer(
   pkgList: Pkg[],
   customer: Enum
 ) {
-  const candidateLineupIndexList = [-1, ...lineupList.map((lineup) => lineup.index)];
+  const candidateLineupIndexList = [
+    -1,
+    ...lineupList.map((lineup) => lineup.index),
+  ];
   const releaseHistoryPerLineupList: ReleaseHistoryPerLineupIndex[] = [];
   candidateLineupIndexList.forEach((lineupIndex) => {
     releaseHistoryPerLineupList.push({
@@ -447,15 +480,29 @@ function publishPerLineup(
     versionList,
     versionIndex,
     lineupIndex,
-    pkgList,
+    pkgList
   );
   const releaseHistory = changeListPerPkgList
-    .map((changeListPerPkg, index) => {
+    .map((changeListPerPkg, pkgIndex) => {
       const { pkgName, changeList } = changeListPerPkg;
       const changes =
-        index === 0
+        pkgIndex === 0
           ? "- Initial release"
           : changeList
+              .filter((change) => {
+                const { index: changeIndex, lineupIndex } = change;
+                const pkgFound = changeListPerPkgList
+                  .slice(0, pkgIndex)
+                  .find((pkg) => {
+                    const changeFound = pkg.changeList.find(
+                      (change) =>
+                        change.index === changeIndex &&
+                        change.lineupIndex === lineupIndex
+                    );
+                    return changeFound;
+                  });
+                return !pkgFound;
+              })
               .map((change) => {
                 const { description, beforeChange, afterChange } = change;
                 const listToChanges = ["[Description]", indent(description)];
