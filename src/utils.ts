@@ -83,6 +83,8 @@ function filterChangeListToAccumulate(
       });
       initialVersion = false;
       if (!released) {
+        console.groupEnd();
+        console.groupEnd();
         return changeList;
       }
     }
