@@ -128,12 +128,10 @@ function filterChangeListToAccumulate(
           const { changeList: changeListPerVersion } = version;
           const changeListToAccumulatePerVersion = changeListPerVersion.filter(
             (change) => {
-              const { lineupIndex } = change;
               return chagneIndexListToAccumultate.find(
                 (item) =>
                   item.versionIndex === version.index &&
-                  item.changeIndex === change.index &&
-                  change.lineupIndex === lineupIndex
+                  item.changeIndex === change.index
               );
             }
           );
