@@ -57,7 +57,7 @@ function filterChangeListToAccumulate(
     (version) => version.index === versionIndex
   );
   let pkgName = "";
-  const changeListToAccumulate: ChangeV2[] = [];
+  let changeListToAccumulate: ChangeV2[] = [];
   let initialVersion = true;
   while (versionNext) {
     console.group({ versionNext });
@@ -109,7 +109,7 @@ function filterChangeListToAccumulate(
             changeList: [...changeListToAccumulate],
           });
           // - Reset the accumulated change list
-          changeListToAccumulate.length = 0;
+          changeListToAccumulate = [];
         }
         // - Update the package name with the current package
         pkgName = pkgFound?.name ?? "";
