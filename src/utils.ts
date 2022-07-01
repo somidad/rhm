@@ -489,20 +489,20 @@ function publishPerLineup(
         pkgIndex === 0
           ? "- Initial release"
           : changeList
-              .filter((change) => {
-                const { index: changeIndex, lineupIndex } = change;
-                const pkgFound = changeListPerPkgList
-                  .slice(0, pkgIndex)
-                  .find((pkg) => {
-                    const changeFound = pkg.changeList.find(
-                      (change) =>
-                        change.index === changeIndex &&
-                        change.lineupIndex === lineupIndex
-                    );
-                    return changeFound;
-                  });
-                return !pkgFound;
-              })
+              // .filter((change) => {
+              //   const { index: changeIndex, lineupIndex } = change;
+              //   const pkgFound = changeListPerPkgList
+              //     .slice(0, pkgIndex)
+              //     .find((pkg) => {
+              //       const changeFound = pkg.changeList.find(
+              //         (change) =>
+              //           change.index === changeIndex &&
+              //           change.lineupIndex === lineupIndex
+              //       );
+              //       return changeFound;
+              //     });
+              //   return !pkgFound;
+              // })
               .map((change) => {
                 const { description, beforeChange, afterChange } = change;
                 const listToChanges = ["[Description]", indent(description)];
