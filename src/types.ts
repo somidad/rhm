@@ -30,6 +30,7 @@ export type Pkg = {
   index: number;
   name: string;
   lineupIndex: number;
+  alias?: string;
 };
 
 export type Release = {

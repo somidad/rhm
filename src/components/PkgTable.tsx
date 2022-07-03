@@ -1,8 +1,31 @@
-import { CheckOutlined, CloseOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  CheckOutlined,
+  CloseOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 import { Button, Form, Input, Select, Table } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { createRef, useEffect, useState } from "react";
-import { formLineup, formLineupNew, formName, formNameNew, keyActions, keyLineup, keyPackage, parenError, parenNone, titleActions, titleLineup, titlePackage } from "../constants";
+import {
+  formAlias,
+  formAliasNew,
+  formLineup,
+  formLineupNew,
+  formName,
+  formNameNew,
+  keyActions,
+  keyAlias,
+  keyLineup,
+  keyPackage,
+  parenError,
+  parenNone,
+  titleActions,
+  titleAlias,
+  titleLineup,
+  titlePackage,
+} from "../constants";
 import { Enum, Pkg } from "../types";
 import { findEmptyIndex } from "../utils";
 
@@ -43,6 +66,11 @@ export default function PkgTable({
       title: titlePackage,
     },
     {
+      key: keyAlias,
+      dataIndex: keyAlias,
+      title: titleAlias,
+    },
+    {
       key: keyLineup,
       dataIndex: keyLineup,
       title: titleLineup,
@@ -65,23 +93,26 @@ export default function PkgTable({
 
   function addPkg() {
     form
-      .validateFields([formName, formLineup])
+      .validateFields([formName, formAlias, formLineup])
       .then(() => {
-        const { name, lineup: lineupIndex } = form.getFieldsValue([
-          formName,
-          formLineup,
-        ]);
+        const {
+          name,
+          alias,
+          lineup: lineupIndex,
+        } = form.getFieldsValue([formName, formAlias, formLineup]);
         const pkgFound = pkgList.find((pkg) => pkg.name === name);
         if (pkgFound) {
           return;
         }
         const index = findEmptyIndex(pkgList.map((pkg) => pkg.index));
-        const pkgListNew = [...pkgList, { index, name, lineupIndex }].sort(
-          (a, b) => a.name.localeCompare(b.name)
-        );
+        const pkgListNew = [
+          ...pkgList,
+          { index, name, alias, lineupIndex },
+        ].sort((a, b) => a.name.localeCompare(b.name));
         onChange(pkgListNew);
         form.setFieldsValue({
           name: "",
+          alias: "",
           lineup: -1,
         });
       })
@@ -95,9 +126,10 @@ export default function PkgTable({
     if (!pkgFound) {
       return;
     }
-    const { name, lineupIndex } = pkgFound;
+    const { name, alias, lineupIndex } = pkgFound;
     form.setFieldsValue({
       nameNew: name,
+      aliasNew: alias,
       lineupNew: lineupIndex,
     });
     setEditIndex(index);
@@ -107,10 +139,11 @@ export default function PkgTable({
     form
       .validateFields([formNameNew])
       .then(() => {
-        const { nameNew, lineupNew: lineupIndexNew } = form.getFieldsValue([
-          formNameNew,
-          formLineupNew,
-        ]);
+        const {
+          nameNew,
+          aliasNew,
+          lineupNew: lineupIndexNew,
+        } = form.getFieldsValue([formNameNew, formAliasNew, formLineupNew]);
         const pkgFound = pkgList.find(
           (pkg) => pkg.index !== editIndex && pkg.name === nameNew
         );
@@ -123,7 +156,12 @@ export default function PkgTable({
         }
         const pkgListNew = [
           ...pkgList.slice(0, indexFound),
-          { index: editIndex, name: nameNew, lineupIndex: lineupIndexNew },
+          {
+            index: editIndex,
+            name: nameNew,
+            alias: aliasNew,
+            lineupIndex: lineupIndexNew,
+          },
           ...pkgList.slice(indexFound + 1),
         ];
         onChange(pkgListNew);
@@ -152,8 +190,8 @@ export default function PkgTable({
   const dataSource = [
     { key: -1 },
     ...pkgList.map((pkg) => {
-      const { index: key, name, lineupIndex: lineup } = pkg;
-      return { key, package: name, lineup };
+      const { index: key, name, alias, lineupIndex: lineup } = pkg;
+      return { key, package: name, alias, lineup };
     }),
   ];
 
@@ -182,8 +220,24 @@ export default function PkgTable({
       <td {...restProps}>
         {key === -1 && dataIndex === keyPackage ? (
           <Form form={form} onFinish={addPkg}>
-            <Form.Item name={formName} rules={[{ required: true }]} help={false}>
-              <Input onPressEnter={() => refButtonAdd.current?.click()} disabled={editIndex !== -1} />
+            <Form.Item
+              name={formName}
+              rules={[{ required: true }]}
+              help={false}
+            >
+              <Input
+                onPressEnter={() => refButtonAdd.current?.click()}
+                disabled={editIndex !== -1}
+              />
+            </Form.Item>
+          </Form>
+        ) : key === -1 && dataIndex === keyAlias ? (
+          <Form form={form} onFinish={addPkg}>
+            <Form.Item name={formAlias} help={false}>
+              <Input
+                onPressEnter={() => refButtonAdd.current?.click()}
+                disabled={editIndex !== -1}
+              />
             </Form.Item>
           </Form>
         ) : key === -1 && dataIndex === keyLineup ? (
@@ -207,14 +261,28 @@ export default function PkgTable({
         ) : key === -1 && dataIndex === keyActions ? (
           <Form form={form}>
             <Form.Item>
-              <Button ref={refButtonAdd} onClick={addPkg} disabled={editIndex !== -1}>
+              <Button
+                ref={refButtonAdd}
+                onClick={addPkg}
+                disabled={editIndex !== -1}
+              >
                 <PlusOutlined />
               </Button>
             </Form.Item>
           </Form>
         ) : editIndex === key && dataIndex === keyPackage ? (
           <Form form={form}>
-            <Form.Item name={formNameNew} rules={[{ required: true }]} help={false}>
+            <Form.Item
+              name={formNameNew}
+              rules={[{ required: true }]}
+              help={false}
+            >
+              <Input onPressEnter={() => refButtonEdit.current?.click()} />
+            </Form.Item>
+          </Form>
+        ) : editIndex === key && dataIndex === keyAlias ? (
+          <Form form={form}>
+            <Form.Item name={formAliasNew} help={false}>
               <Input onPressEnter={() => refButtonEdit.current?.click()} />
             </Form.Item>
           </Form>
@@ -239,11 +307,20 @@ export default function PkgTable({
         ) : editIndex === key && dataIndex === keyActions ? (
           <Form form={form}>
             <Form.Item>
-              <Button ref={refButtonEdit} onClick={onSubmitEditPkg} icon={<CheckOutlined />} />
-              <Button onClick={() => setEditIndex(-1)} icon={<CloseOutlined />} />
+              <Button
+                ref={refButtonEdit}
+                onClick={onSubmitEditPkg}
+                icon={<CheckOutlined />}
+              />
+              <Button
+                onClick={() => setEditIndex(-1)}
+                icon={<CloseOutlined />}
+              />
             </Form.Item>
           </Form>
         ) : dataIndex === keyPackage ? (
+          children
+        ) : dataIndex === keyAlias ? (
           children
         ) : dataIndex === keyLineup ? (
           lineupIndex === -1 ? (

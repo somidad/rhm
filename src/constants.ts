@@ -1,5 +1,7 @@
 export const formAfterChange = "afterChange";
 export const formAfterChangeNew = "afterChangeNew";
+export const formAlias = "alias";
+export const formAliasNew = "aliasNew";
 export const formBeforeChange = "beforeChange";
 export const formBeforeChangeNew = "beforeChangeNew";
 export const formCustomerIndexList = "customerIndexList";
@@ -17,6 +19,7 @@ export const invalidSortable = "invalidSortable";
 
 export const keyActions = "actions";
 export const keyAfterChange = "afterChange";
+export const keyAlias = "alias";
 export const keyBeforeChange = "beforeChange";
 export const keyChanges = "changes";
 export const keyCustomers = "customers";
@@ -29,7 +32,7 @@ export const keyName = "name";
 export const keyPackage = "package";
 export const keyPackages = "packages";
 export const keyPrevious = "previous";
-export const keyReleases = "releases"
+export const keyReleases = "releases";
 export const keyVersion = "version";
 export const keyVersions = "versions";
 
@@ -39,9 +42,10 @@ export const parenError = "(Error)";
 
 export const titleActions = "Actions";
 export const titleAfterChange = "After change";
+export const titleAlias = "Alias";
 export const titleBeforeChange = "Before change";
 export const titleChanges = "Changes";
-export const titleCustomer =" Customer";
+export const titleCustomer = " Customer";
 export const titleCustomers = "Customers";
 export const titleDescription = "Description";
 export const titleHistory = "History";
