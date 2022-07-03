@@ -112,7 +112,8 @@ function filterChangeListToAccumulate(
           changeListToAccumulate = [];
         }
         // - Update the package name with the current package
-        pkgName = pkgFound?.name ?? "";
+        const { name, alias } = pkgFound;
+        pkgName = (alias || name) ?? "";
       }
       // - Accumulate changes
       const chagneIndexListToAccumultate =
