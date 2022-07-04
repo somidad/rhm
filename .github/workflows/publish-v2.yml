@@ -1,0 +1,33 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Publish v2
+
+# Controls when the workflow will run
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      - run: |
+          git fetch origin feature/v2-antd
+          git branch -a
+          commit_id=$(git log remotes/origin/feature/v2-antd --format=%H -n 1)
+          echo $commit_id
+          git cherry-pick --no-commit $commit_id
+          git status
+          git add .
+          git config user.email "sjeon87@gmail.com"
+          git config user.name "Seokseong Jeon"
+          git commit -m "Publish v2 from ${commit_id}"
+      - run: git push origin master
