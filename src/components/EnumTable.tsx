@@ -1,5 +1,8 @@
-import { useState } from "react";
-import { Button, Form, Table } from "semantic-ui-react";
+import { CheckOutlined, CloseOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import { Button, Form, Input, Table } from "antd";
+import { useForm } from "antd/lib/form/Form";
+import { createRef, useState } from "react";
+import { formName, formNameNew, keyActions, keyName, titleActions } from "../constants";
 import { Enum } from "../types";
 import { findEmptyIndex } from "../utils";
 
@@ -10,26 +13,68 @@ type Props = {
   usedIndexList?: number[];
 };
 
-export default function EnumTable({ title, enumList, onChange, usedIndexList }: Props) {
+type EditableCellProps = {
+  record: { key: number; name: string };
+  dataIndex: string;
+  children: any;
+};
+
+export default function EnumTable({
+  title,
+  enumList,
+  onChange,
+  usedIndexList,
+}: Props) {
+  const [form] = useForm();
+  const refButtonAdd = createRef<HTMLElement>();
+  const refButtonEdit = createRef<HTMLElement>();
   const [editIndex, setEditIndex] = useState(-1);
-  const [name, setName] = useState('');
-  const [nameNew, setNameNew] = useState('');
+
+  const columns: any[] = [
+    {
+      key: keyName,
+      dataIndex: keyName,
+      title,
+    },
+    {
+      key: keyActions,
+      dataIndex: keyActions,
+      title: titleActions,
+    },
+  ].map((column) => {
+    const { dataIndex } = column;
+    return {
+      ...column,
+      onCell: (record: any) => ({
+        record,
+        dataIndex,
+      }),
+    };
+  });
 
   function addEnumItem() {
-    if (!name) {
-      return;
-    }
-    const enumItemFound = enumList.find((enumItem) => enumItem.name === name);
-    if (enumItemFound) {
-      return;
-    }
-    const index = findEmptyIndex(enumList.map((enumItem) => enumItem.index));
-    const enumListNew = [
-      ...enumList,
-      { index, name },
-    ].sort((a, b) => a.name.localeCompare(b.name));
-    onChange(enumListNew);
-    setName('');
+    form
+      .validateFields([formName])
+      .then(() => {
+        const name = form.getFieldValue(formName);
+        const enumItemFound = enumList.find(
+          (enumItem) => enumItem.name === name
+        );
+        if (enumItemFound) {
+          return;
+        }
+        const index = findEmptyIndex(
+          enumList.map((enumItem) => enumItem.index)
+        );
+        const enumListNew = [...enumList, { index, name }].sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
+        onChange(enumListNew);
+        form.setFieldsValue({ name: "" });
+      })
+      .catch((reason) => {
+        console.error(reason);
+      });
   }
 
   function onClickEdit(index: number) {
@@ -37,36 +82,48 @@ export default function EnumTable({ title, enumList, onChange, usedIndexList }: 
     if (!enumItem) {
       return;
     }
-    setNameNew(enumItem.name);
+    form.setFieldsValue({ nameNew: enumItem.name });
     setEditIndex(index);
   }
 
-  function onSubmitRename(index: number) {
-    if (!nameNew) {
-      return;
-    }
-    const enumItemFound = enumList.find((enumItem) => enumItem.index !== index && enumItem.name === nameNew);
-    if (enumItemFound) {
-      return;
-    }
-    const indexFound = enumList.findIndex((enumItem) => enumItem.index === index);
-    if (indexFound === -1) {
-      return;
-    }
-    const enumListNew = [
-      ...enumList.slice(0, indexFound),
-      { index, name: nameNew },
-      ...enumList.slice(indexFound + 1),
-    ];
-    onChange(enumListNew);
-    setEditIndex(-1);
+  function onSubmitRename() {
+    form
+      .validateFields([formNameNew])
+      .then(() => {
+        const nameNew = form.getFieldValue(formNameNew);
+        const enumItemFound = enumList.find(
+          (enumItem) =>
+            enumItem.index !== editIndex && enumItem.name === nameNew
+        );
+        if (enumItemFound) {
+          return;
+        }
+        const indexFound = enumList.findIndex(
+          (enumItem) => enumItem.index === editIndex
+        );
+        if (indexFound === -1) {
+          return;
+        }
+        const enumListNew = [
+          ...enumList.slice(0, indexFound),
+          { index: editIndex, name: nameNew },
+          ...enumList.slice(indexFound + 1),
+        ];
+        onChange(enumListNew);
+        setEditIndex(-1);
+      })
+      .catch((reason) => {
+        console.error(reason);
+      });
   }
 
   function removeEnumItem(index: number) {
     if (usedIndexList && usedIndexList.includes(index)) {
       return;
     }
-    const indexFound = enumList.findIndex((enumItem) => enumItem.index === index);
+    const indexFound = enumList.findIndex(
+      (enumItem) => enumItem.index === index
+    );
     if (indexFound === -1) {
       return;
     }
@@ -77,62 +134,87 @@ export default function EnumTable({ title, enumList, onChange, usedIndexList }: 
     onChange(enumListNew);
   }
 
+  const dataSource = [
+    { key: -1 },
+    ...enumList.map((enumItem) => {
+      const { index, name } = enumItem;
+      return { key: index, name };
+    }),
+  ];
+
   return (
-    <Table celled compact selectable>
-      <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell>{title}</Table.HeaderCell>
-          <Table.HeaderCell>Actions</Table.HeaderCell>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        <Table.Row active>
-          <Table.Cell>
-            <Form onSubmit={addEnumItem}>
-              <Form.Field disabled={editIndex !== -1}>
-                <input value={name} onChange={(e) => setName(e.target.value)} />
-              </Form.Field>
-            </Form>
-          </Table.Cell>
-          <Table.Cell>
-            <Button
-              icon='plus' size='tiny'
-              onClick={addEnumItem}
-              disabled={editIndex !== -1}
-            />
-          </Table.Cell>
-        </Table.Row>
-        {
-          enumList.map((enumItem) => {
-            const { index, name } = enumItem;
-            return index === editIndex ? (
-              <Table.Row key={index}>
-                <Table.Cell>
-                  <Form onSubmit={() => onSubmitRename(index)}>
-                    <Form.Field>
-                      <input value={nameNew} onChange={(e) => setNameNew(e.target.value)} />
-                    </Form.Field>
-                  </Form>
-                </Table.Cell>
-                <Table.Cell singleLine>
-                  <Button icon='check' size='tiny' onClick={() => onSubmitRename(index)} />
-                  <Button icon='cancel' size='tiny' onClick={() => setEditIndex(-1)} />
-                </Table.Cell>
-              </Table.Row>
-            ) : (
-              <Table.Row key={index}>
-                <Table.Cell>{name}</Table.Cell>
-                <Table.Cell singleLine>
-                  <Button icon='edit' size='tiny' onClick={() => onClickEdit(index)} />
-                  <Button icon='trash' size='tiny' onClick={() => removeEnumItem(index)}
-                    disabled={usedIndexList && usedIndexList.includes(index)}
-                  />
-                </Table.Cell>
-              </Table.Row>
-            )
-          })
-        }
-      </Table.Body>
-    </Table>
+    <Table
+      columns={columns}
+      dataSource={dataSource}
+      components={{
+        body: {
+          cell: EditableCell,
+        },
+      }}
+      pagination={false}
+      size="small"
+    />
   );
+
+  function EditableCell({
+    record,
+    dataIndex,
+    children,
+    ...restProps
+  }: EditableCellProps) {
+    const { key } = record;
+    return (
+      <td {...restProps}>
+        {key === -1 && dataIndex === keyName ? (
+          <Form form={form} onFinish={addEnumItem}>
+            <Form.Item name={formName} rules={[{ required: true }]} help={false}>
+              <Input
+                onPressEnter={() => refButtonAdd.current?.click()}
+                disabled={editIndex !== -1}
+              />
+            </Form.Item>
+          </Form>
+        ) : key === -1 && dataIndex === keyActions ? (
+          <Form form={form}>
+            <Form.Item>
+              <Button ref={refButtonAdd} onClick={addEnumItem} disabled={editIndex !== -1}>
+                <PlusOutlined />
+              </Button>
+            </Form.Item>
+          </Form>
+        ) : editIndex === key && dataIndex === keyName ? (
+          <Form form={form} onFinish={onSubmitRename}>
+            <Form.Item name={formNameNew} rules={[{ required: true }]} help={false}>
+              <Input onPressEnter={() => refButtonEdit.current?.click()} />
+            </Form.Item>
+          </Form>
+        ) : editIndex === key && dataIndex === keyActions ? (
+          <Form form={form}>
+            <Form.Item>
+              <Button ref={refButtonEdit} onClick={onSubmitRename}>
+                <CheckOutlined />
+              </Button>
+              <Button onClick={() => setEditIndex(-1)}>
+                <CloseOutlined />
+              </Button>
+            </Form.Item>
+          </Form>
+        ) : dataIndex === keyName ? (
+          children
+        ) : dataIndex === keyActions ? (
+          <>
+            <Button onClick={() => onClickEdit(key)}>
+              <EditOutlined />
+            </Button>
+            <Button
+              onClick={() => removeEnumItem(key)}
+              disabled={usedIndexList?.includes(key)}
+            >
+              <DeleteOutlined />
+            </Button>
+          </>
+        ) : null}
+      </td>
+    );
+  }
 }

@@ -3,21 +3,26 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@ant-design/icons": "^4.6.2",
+    "@dnd-kit/core": "^3.1.1",
+    "@dnd-kit/sortable": "^4.0.0",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "antd": "^4.16.6",
+    "lodash": "^4.17.21",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.2",
-    "semantic-ui-css": "^2.4.1",
-    "semantic-ui-react": "^2.0.3",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build-v1": "set \"PUBLIC_URL=https://rhm.js.org/v1\" && react-scripts build && npx shx rm -rf docs/v1 && npx shx mv build docs/v1",
+    "build": "cross-env PUBLIC_URL=https://rhm.js.org react-scripts build && npx shx rm -rf docs && npx shx mv build docs",
+    "build-v1": "cross-env PUBLIC_URL=https://rhm.js.org/v1 && react-scripts build && npx shx rm -rf docs/v1 && npx shx mv build docs/v1",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "prettier": "npx prettier --write src"
   },
   "eslintConfig": {
     "extends": [
@@ -38,7 +43,9 @@
     ]
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.171",
     "@types/react": "^17.0.2",
+    "cross-env": "^7.0.3",
     "typescript": "^4.1.5"
   }
 }

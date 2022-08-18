@@ -3,9 +3,23 @@ export type Change = {
   description: string;
   beforeChange: string;
   afterChange: string;
-  customerIndexList: number[];
+  customerIndexList: number[]; // Shall be support historical
   lineupIndex: number;
-}
+};
+
+export type ChangeV2 = {
+  index: number;
+  description: string;
+  beforeChange: string;
+  afterChange: string;
+  lineupIndex: number;
+};
+
+export type CustomerIndexListPerChange = {
+  versionIndex: number;
+  changeIndex: number;
+  customerIndexList: number[];
+};
 
 export type Enum = {
   index: number;
@@ -16,13 +30,21 @@ export type Pkg = {
   index: number;
   name: string;
   lineupIndex: number;
+  alias?: string;
 };
 
 export type Release = {
   index: number;
   pkgIndex: number;
   customerIndexList: number[];
-}
+};
+
+export type ReleaseV2 = {
+  index: number;
+  pkgIndex: number;
+  customerIndexList: number[];
+  customerIndexListPerChangeList: CustomerIndexListPerChange[];
+};
 
 export type Version = {
   index: number;
@@ -30,6 +52,14 @@ export type Version = {
   indexPrev: number;
   changeList: Change[];
   releaseList: Release[];
+};
+
+export type VersionV2 = {
+  index: number;
+  name: string;
+  indexPrev: number;
+  changeList: ChangeV2[];
+  releaseList: ReleaseV2[];
 };
 
 export type OldChange = {

@@ -1,78 +1,193 @@
-import React from "react";
-import { useState } from "react";
-import { Button, Form, Icon, Label, Table } from "semantic-ui-react";
-import { Enum, Pkg, Release } from "../types";
+import { CheckOutlined, CloseOutlined, DeleteOutlined, EditOutlined, MenuOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  useSensors,
+  useSensor,
+  PointerSensor,
+  KeyboardSensor,
+  DndContext,
+  closestCenter,
+  DragOverlay,
+} from "@dnd-kit/core";
+import {
+  sortableKeyboardCoordinates,
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { Button, Form, Select, Table, Tag } from "antd";
+import { useForm } from "antd/lib/form/Form";
+import { useEffect, useState } from "react";
+import {
+  invalidSortable,
+  keyActions,
+  keyCustomers,
+  keyDragHandle,
+  keyPackage,
+  parenError,
+  parenNone,
+  titleActions,
+  titleCustomers,
+  titlePackage,
+} from "../constants";
+import {
+  CustomerIndexListPerChange,
+  Enum,
+  Pkg,
+  ReleaseV2,
+  VersionV2,
+} from "../types";
 import { findEmptyIndex } from "../utils";
-import EnumSelector from "./EnumSelector";
+import ChangePerReleaseTable from "./ChangePerReleaseTable";
 
-type Props ={ 
-  releaseList: Release[];
+const { Option } = Select;
+
+type Props = {
   lineupList: Enum[];
   pkgList: Pkg[];
   customerList: Enum[];
-  onChange: (releaseList: Release[]) => void;
-}
+  usedPkgIndexList: number[];
+  versionList: VersionV2[];
+  versionIndex: number;
+  onChange: (releaseList: ReleaseV2[]) => void;
+};
+
+type EditableCellProps = {
+  record: {
+    key: number;
+    package: number;
+    pkgName: string;
+    customers: number[];
+    lineup: string;
+  };
+  dataIndex: string;
+  children: any;
+};
 
 export default function ReleaseTable({
-  releaseList, lineupList, pkgList, customerList,
+  lineupList,
+  pkgList,
+  customerList,
+  usedPkgIndexList,
+  versionList,
+  versionIndex,
   onChange,
 }: Props) {
-  const [pkgIndex, setPkgIndex] = useState(-1);
-  const [customerIndexList, setCustomerIndexList] = useState<number[]>([]);
+  const [form] = useForm();
+
   const [editIndex, setEditIndex] = useState(-1);
-  const [pkgIndexNew, setPkgIndexNew] = useState(-1);
-  const [customerIndexListNew, setCustomerIndexListNew] = useState<number[]>([]);
+  // ID to render overlay.
+  const [activeId, setActiveId] = useState(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  function onDragStart(event: any) {
+    const { active } = event;
+    setActiveId(active.id);
+  }
+
+  function onDragEnd(event: any) {
+    const { active, over } = event;
+    if (active.id !== "-1" && over.id !== "-1" && active.id !== over.id) {
+      const oldIndex = releaseList.findIndex(
+        (release) => release.index.toString() === active.id
+      );
+      const newIndex = releaseList.findIndex(
+        (release) => release.index.toString() === over.id
+      );
+      const releaseListNew = arrayMove(releaseList, oldIndex, newIndex);
+      onChange(releaseListNew);
+    }
+    // Stop overlay.
+    setActiveId(null);
+  }
+
+  useEffect(() => {
+    setEditIndex(-1);
+  }, [lineupList, pkgList, customerList, versionList, versionIndex]);
+
+  const versionFound = versionList.find(
+    (version) => version.index === versionIndex
+  );
+  const releaseList = versionFound?.releaseList ?? [];
+
+  const columns: any[] = [
+    { key: keyPackage, dataIndex: keyPackage, title: titlePackage },
+    {
+      key: keyCustomers,
+      dataIndex: keyCustomers,
+      title: titleCustomers,
+      width: "50%",
+    },
+    { key: keyActions, dataIndex: keyActions, title: titleActions },
+    { key: keyDragHandle, dataIndex: keyDragHandle, title: "" },
+  ].map((column) => {
+    const { dataIndex } = column;
+    return {
+      ...column,
+      onCell: (record: any) => ({
+        record,
+        dataIndex,
+      }),
+    };
+  });
 
   function addRelease() {
-    if (pkgIndex === -1) {
-      return;
-    }
-    if (!customerIndexList.length) {
-      return;
-    }
-    const releaseFound = releaseList.find((release) => release.pkgIndex === pkgIndex);
-    if (releaseFound) {
-      return;
-    }
-    const index = findEmptyIndex(releaseList.map((release) => release.index));
-    const releaseListNew = [
-      ...releaseList,
-      { index, pkgIndex, customerIndexList },
-    ];
-    onChange(releaseListNew);
-    setPkgIndex(-1);
-    setCustomerIndexList([]);
+    form
+      .validateFields(["pkgIndex", "customerList"])
+      .then(() => {
+        const { pkgIndex, customerList: customerIndexList } =
+          form.getFieldsValue(["pkgIndex", "customerList"]);
+        if (pkgIndex === -1) {
+          return;
+        }
+        // Check if package is already in use
+        const pkgInUse = versionList.find((version) => {
+          const { releaseList } = version;
+          return releaseList.find((release) => release.pkgIndex === pkgIndex);
+        });
+        if (pkgInUse) {
+          return;
+        }
+        const index = findEmptyIndex(
+          releaseList.map((release) => release.index)
+        );
+        const releaseListNew: ReleaseV2[] = [
+          ...releaseList,
+          {
+            index,
+            pkgIndex,
+            customerIndexList,
+            customerIndexListPerChangeList: [],
+          },
+        ];
+        onChange(releaseListNew);
+      })
+      .catch((reason) => {
+        console.error(reason);
+      });
   }
 
-  function moveNewer(index: number) {
-    const indexFound = releaseList.findIndex((release) => release.index === index);
+  function onChangeCustomerIndexListPerChangeList(
+    releaseIndex: number,
+    customerIndexListPerChangeList: CustomerIndexListPerChange[]
+  ) {
+    const indexFound = releaseList.findIndex(
+      (release) => release.index === releaseIndex
+    );
     if (indexFound === -1) {
       return;
     }
-    if (indexFound === releaseList.length - 1) {
-      return;
-    }
+    const release = releaseList[indexFound];
+    const { index, pkgIndex, customerIndexList } = release;
     const releaseListNew = [
       ...releaseList.slice(0, indexFound),
-      releaseList[indexFound + 1],
-      releaseList[indexFound],
-      ...releaseList.slice(indexFound + 2),
-    ];
-    onChange(releaseListNew);
-  }
-
-  function moveOlder(index: number) {
-    const indexFound = releaseList.findIndex((release) => release.index === index);
-    if (indexFound === -1) {
-      return;
-    }
-    if (indexFound === 0) {
-      return;
-    }
-    const releaseListNew = [
-      ...releaseList.slice(0, indexFound - 1),
-      releaseList[indexFound],
-      releaseList[indexFound - 1],
+      { index, pkgIndex, customerIndexList, customerIndexListPerChangeList },
       ...releaseList.slice(indexFound + 1),
     ];
     onChange(releaseListNew);
@@ -83,43 +198,60 @@ export default function ReleaseTable({
     if (!releaseFound) {
       return;
     }
-    const { pkgIndex, customerIndexList } = releaseFound;
-    const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex);
+    const { pkgIndex: pkgIndexNew, customerIndexList: customerIndexListNew } =
+      releaseFound;
+    const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndexNew);
     if (!pkgFound) {
       return;
     }
-    setPkgIndexNew(pkgIndex);
-    setCustomerIndexListNew(customerIndexList);
+    form.setFieldsValue({ pkgIndexNew, customerIndexListNew });
     setEditIndex(index);
   }
 
   function onSubmitEditRelease() {
-    if (!customerIndexListNew.length) {
-      return;
-    }
-    const releaseFound = releaseList.find((release) => release.index !== editIndex && release.pkgIndex === pkgIndexNew);
-    if (releaseFound) {
-      return;
-    }
-    const indexFound = releaseList.findIndex((release) => release.index === editIndex);
-    if (indexFound === -1) {
-      return;
-    }
-    const releaseListNew = [
-      ...releaseList.slice(0, indexFound),
-      {
-        index: editIndex,
-        pkgIndex: pkgIndexNew,
-        customerIndexList: customerIndexListNew,
-      },
-      ...releaseList.slice(indexFound + 1),
-    ];
-    onChange(releaseListNew);
-    setEditIndex(-1);
+    form
+      .validateFields(["pkgIndexNew", "customerIndexListNew"])
+      .then(() => {
+        const { pkgIndexNew, customerIndexListNew } = form.getFieldsValue([
+          "pkgIndexNew",
+          "customerIndexListNew",
+        ]);
+        const releaseFound = releaseList.find(
+          (release) =>
+            release.index !== editIndex && release.pkgIndex === pkgIndexNew
+        );
+        if (releaseFound) {
+          return;
+        }
+        const indexFound = releaseList.findIndex(
+          (release) => release.index === editIndex
+        );
+        const { customerIndexListPerChangeList } = releaseList[indexFound];
+        if (indexFound === -1) {
+          return;
+        }
+        const releaseListNew: ReleaseV2[] = [
+          ...releaseList.slice(0, indexFound),
+          {
+            index: editIndex,
+            pkgIndex: pkgIndexNew,
+            customerIndexList: customerIndexListNew,
+            customerIndexListPerChangeList,
+          },
+          ...releaseList.slice(indexFound + 1),
+        ];
+        onChange(releaseListNew);
+        setEditIndex(-1);
+      })
+      .catch((reason) => {
+        console.error(reason);
+      });
   }
 
   function removeRelease(index: number) {
-    const indexFound = releaseList.findIndex((release) => release.index === index);
+    const indexFound = releaseList.findIndex(
+      (release) => release.index === index
+    );
     if (indexFound === -1) {
       return;
     }
@@ -130,130 +262,324 @@ export default function ReleaseTable({
     onChange(releaseListNew);
   }
 
+  const dataSource = [
+    { key: -1 },
+    ...releaseList.map((release) => {
+      const { index: key, pkgIndex, customerIndexList: customers } = release;
+      const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex);
+      const pkgName = pkgFound?.name;
+      const lineupIndex = pkgFound?.lineupIndex;
+      const lineup =
+        lineupIndex === -1
+          ? parenNone
+          : lineupList.find((lineup) => lineup.index === lineupIndex)?.name ??
+            parenError;
+      return { key, package: pkgIndex, pkgName, customers, lineup };
+    }),
+  ];
+
+  const releaseToDragFound = releaseList.find((release) => release.index === Number(activeId));
+  const pkgToDragFound = pkgList.find((pkg) => pkg.index === releaseToDragFound?.pkgIndex);
+  const pkgNameToDrag = pkgToDragFound?.name;
+  const lineupIndexToDrag = pkgToDragFound?.lineupIndex;
+  const lineupToDrag = lineupList.find((lineup) => lineup.index === lineupIndexToDrag)?.name;
   return (
-    <Table celled compact selectable>
-      <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell>Package</Table.HeaderCell>
-          <Table.HeaderCell rowSpan={2}>Actions</Table.HeaderCell>
-        </Table.Row>
-        <Table.Row>
-          <Table.HeaderCell>Customers</Table.HeaderCell>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        <Table.Row active>
-          <Table.Cell>
-            <Form>
-              <Form.Field disabled={editIndex !== -1}>
-                <select value={pkgIndex} onChange={(e) => setPkgIndex(+e.target.value)}>
-                  <option value={-1}>Select a package</option>
-                  {
-                    pkgList.map((pkg) => {
-                      const { index, name, lineupIndex } = pkg;
-                      const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
-                      const lineup = `- Lineup: ${lineupFound ? lineupFound.name : '(None)'}`;
-                      return (
-                        <option key={index} value={index}>{name} {lineup}</option>
-                      )
-                    })
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+    >
+      <Table
+        columns={columns}
+        dataSource={dataSource}
+        components={{
+          body: {
+            wrapper: DraggableWrapper,
+            row: DraggableRow,
+            cell: EditableCell,
+          },
+        }}
+        expandable={{
+          expandedRowRender,
+          rowExpandable: (record) => record.key !== -1,
+        }}
+        pagination={false}
+        size="small"
+      />
+      {/* Render overlay component. */}
+      {
+        pkgToDragFound ? (
+          <DragOverlay
+            style={{
+              backgroundColor: "#e0e0e07f",
+              border: "1px solid #e9e9e9",
+              display: "flex",
+              alignItems: "center",
+              paddingLeft: 30,
+            }}
+          >
+            {pkgNameToDrag} <Tag>{lineupToDrag}</Tag>
+          </DragOverlay>
+        ) : null
+      }
+    </DndContext>
+  );
+
+  function DraggableWrapper(props: any) {
+    const { children, ...restProps } = props;
+    return (
+      <SortableContext
+        // `children[1]` is `dataSource`.
+        items={children[1].map((child: any) => child.key.toString())}
+        strategy={verticalListSortingStrategy}
+        {...restProps}
+      >
+        <tbody {...restProps}>
+          {
+            // This invokes `Table.components.body.row` for each element of `children`.
+            children
+          }
+        </tbody>
+      </SortableContext>
+    );
+  }
+
+  function DraggableRow(props: any) {
+    const { children, style, ...restProps } = props;
+    const id = props["data-row-key"]?.toString() ?? invalidSortable;
+    const { attributes, listeners, setNodeRef } = useSortable({ id });
+    const styleRowBold = Number(id) > -1 ? { fontWeight: "bold" } : null;
+    const styleNew = Object.assign({}, style, styleRowBold);
+    return (
+      <tr ref={setNodeRef} {...attributes} {...restProps} style={styleNew}>
+        {id === invalidSortable
+          ? children
+          : children.map((child: any) => {
+              const { children, ...restProps } = child;
+              const { key } = restProps;
+              return key === keyDragHandle ? (
+                <td {...listeners} {...restProps}>
+                  {child}
+                </td>
+              ) : (
+                <td {...restProps}>{child}</td>
+              );
+            })}
+      </tr>
+    );
+  }
+
+  function EditableCell({
+    record,
+    dataIndex,
+    children,
+    ...restProps
+  }: EditableCellProps) {
+    if (!record) {
+      return children;
+    }
+    const { key, pkgName, customers: customerIndexList, lineup } = record;
+    return (
+      <>
+        {/* <td {...restProps}> */}
+        {key === -1 && dataIndex === keyPackage ? (
+          <Form form={form}>
+            <Form.Item
+              name="pkgIndex"
+              rules={[{ required: true }]}
+              help={false}
+            >
+              <Select disabled={editIndex !== -1}>
+                {pkgList.map((pkg) => {
+                  const { index, name, lineupIndex } = pkg;
+                  const lineup =
+                    lineupIndex === -1
+                      ? parenNone
+                      : lineupList.find(
+                          (lineup) => lineup.index === lineupIndex
+                        )?.name ?? parenError;
+                  return (
+                    <Option
+                      key={index}
+                      value={index}
+                      disabled={usedPkgIndexList.includes(index)}
+                    >
+                      {name} <Tag>{lineup}</Tag>
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Form>
+        ) : key === -1 && dataIndex === keyCustomers ? (
+          <Form form={form}>
+            <Form.Item
+              name="customerList"
+              rules={[{ required: true }]}
+              help={false}
+            >
+              <Select
+                mode="multiple"
+                allowClear
+                filterOption={(input, option) => {
+                  if (!option) {
+                    return false;
                   }
-                </select>
-              </Form.Field>
-            </Form>
-          </Table.Cell>
-          <Table.Cell rowSpan={2}>
-            <Button icon='plus' size='tiny' onClick={addRelease} disabled={editIndex !== -1} />
-          </Table.Cell>
-        </Table.Row>
-        <Table.Row active>
-          <Table.Cell>
-            <EnumSelector enumList={customerList} selectedIndexList={customerIndexList}
-              onChange={setCustomerIndexList}
-              disabled={editIndex !== -1}
-            />
-          </Table.Cell>
-        </Table.Row>
-        {
-          releaseList.map((release) => {
-            const { index, pkgIndex, customerIndexList }= release;
-            const pkgFound = pkgList.find((pkg) => pkg.index === pkgIndex) as Pkg;
-            if (!pkgFound) {
+                  const children = option.children as string;
+                  if (!children) {
+                    return false;
+                  }
+                  return (
+                    children
+                      .toLocaleLowerCase()
+                      .indexOf(input.toLocaleLowerCase()) !== -1
+                  );
+                }}
+                disabled={editIndex !== -1}
+              >
+                {customerList.map((customer) => {
+                  const { index, name } = customer;
+                  return (
+                    <Option key={index} value={index}>
+                      {name}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Form>
+        ) : key === -1 && dataIndex === keyActions ? (
+          <Form>
+            <Form.Item>
+              <Button onClick={addRelease} disabled={editIndex !== -1}>
+                <PlusOutlined />
+              </Button>
+            </Form.Item>
+          </Form>
+        ) : key === -1 && dataIndex === keyDragHandle ? null : editIndex ===
+            key && dataIndex === keyPackage ? (
+          <Form form={form}>
+            <Form.Item name="pkgIndexNew">
+              <Select>
+                {pkgList.map((pkg) => {
+                  const { index, name, lineupIndex } = pkg;
+                  const lineup =
+                    lineupIndex === -1
+                      ? parenNone
+                      : lineupList.find(
+                          (lineup) => lineup.index === lineupIndex
+                        )?.name ?? parenError;
+                  return (
+                    <Option key={index} value={index}>
+                      {name} <Tag>{lineup}</Tag>
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Form>
+        ) : editIndex === key && dataIndex === keyCustomers ? (
+          <Form form={form}>
+            <Form.Item
+              name="customerIndexListNew"
+              rules={[{ required: true }]}
+              help={false}
+            >
+              <Select
+                mode="multiple"
+                allowClear
+                filterOption={(input, option) => {
+                  if (!option) {
+                    return false;
+                  }
+                  const children = option.children as string;
+                  if (!children) {
+                    return false;
+                  }
+                  return (
+                    children
+                      .toLocaleLowerCase()
+                      .indexOf(input.toLocaleLowerCase()) !== -1
+                  );
+                }}
+              >
+                {customerList.map((customer) => {
+                  const { index, name } = customer;
+                  return (
+                    <Option key={index} value={index}>
+                      {name}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Form>
+        ) : editIndex === key && dataIndex === keyActions ? (
+          <Form form={form}>
+            <Form.Item>
+              <Button onClick={onSubmitEditRelease}>
+                <CheckOutlined />
+              </Button>
+              <Button onClick={() => setEditIndex(-1)}>
+                <CloseOutlined />
+              </Button>
+            </Form.Item>
+          </Form>
+        ) : dataIndex === keyPackage ? (
+          <>
+            {pkgName} <Tag>{lineup}</Tag>
+          </>
+        ) : dataIndex === keyCustomers ? (
+          customerIndexList
+            .map((customerIndex) => {
+              const customerFound = customerList.find(
+                (customer) => customer.index === customerIndex
+              );
               return (
-                <React.Fragment key={index} />
-              )
-            }
-            const { name, lineupIndex } = pkgFound;
-            const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
-            const lineup = `- Lineup: ${lineupFound ? lineupFound.name : '(None)'}`;
-            return index === editIndex ? (
-              <React.Fragment key={index}>
-                <Table.Row>
-                  <Table.Cell>
-                    <Form>
-                      <Form.Field>
-                        <select value={pkgIndexNew} onChange={(e) => setPkgIndexNew(+e.target.value)}>
-                          {
-                            pkgList.map((pkg) => {
-                              const { index, name, lineupIndex } = pkg;
-                              const lineupFound = lineupList.find((lineup) => lineup.index === lineupIndex);
-                              const lineup = `- Lineup: ${lineupFound ? lineupFound.name : '(None)'}`;
-                              return (
-                                <option key={index} value={index}>{name} {lineup}</option>
-                              )
-                            })
-                          }
-                        </select>
-                      </Form.Field>
-                    </Form>
-                  </Table.Cell>
-                  <Table.Cell rowSpan={2} singleLine>
-                    <Button icon='check' size='tiny' onClick={onSubmitEditRelease} />
-                    <Button icon='cancel' size='tiny' onClick={() => setEditIndex(-1)} />
-                  </Table.Cell>
-                </Table.Row>
-                <Table.Row key={`${index}-lower`}>
-                  <Table.Cell>
-                    <EnumSelector enumList={customerList} selectedIndexList={customerIndexListNew}
-                      onChange={setCustomerIndexListNew}
-                    />
-                  </Table.Cell>
-                </Table.Row>
-              </React.Fragment>
-            ) : (
-              <React.Fragment key={index}>
-                <Table.Row>
-                  <Table.Cell>
-                    <Label ribbon>{name} {lineup}</Label>
-                  </Table.Cell>
-                  <Table.Cell rowSpan={2} singleLine>
-                    <Button icon='edit' size='tiny' onClick={() => onClickEdit(index)} />
-                    <Button icon='trash' size='tiny' onClick={() => removeRelease(index)} />
-                    <Button icon size='tiny' onClick={() => moveOlder(index)} disabled={editIndex !== -1}>
-                      <Icon name='angle up' />
-                      Older
-                    </Button>
-                    <Button icon size='tiny' onClick={() => moveNewer(index)} disabled={editIndex !== -1}>
-                      <Icon name='angle down' />
-                      Newer
-                    </Button>
-                  </Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                  <Table.Cell>
-                    {
-                      customerList
-                        .filter((customer) => customerIndexList.find((customerIndex) => customer.index === customerIndex) !== undefined)
-                        .map((customer) => customer.name)
-                        .join(', ')
-                    }
-                  </Table.Cell>
-                </Table.Row>
-              </React.Fragment>
+                customerFound && (
+                  <Tag key={customerFound.index}>{customerFound.name}</Tag>
+                )
+              );
+            })
+            .filter((customerTag) => !!customerTag)
+        ) : dataIndex === keyActions ? (
+          <>
+            <Button onClick={() => onClickEdit(key)}>
+              <EditOutlined />
+            </Button>
+            <Button onClick={() => removeRelease(key)}>
+              <DeleteOutlined />
+            </Button>
+          </>
+        ) : dataIndex === keyDragHandle ? (
+          <MenuOutlined style={{ cursor: "grab" }} />
+        ) : (
+          children
+        )}
+        {/* </td> */}
+      </>
+    );
+  }
+
+  function expandedRowRender(record: any) {
+    const { key: releaseIndex } = record;
+    return (
+      <td colSpan={columns.length + 1}>
+        <ChangePerReleaseTable
+          customerList={customerList}
+          pkgList={pkgList}
+          releaseIndex={releaseIndex}
+          versionIndex={versionIndex}
+          versionList={versionList}
+          onChange={(customerIndexListPerChangeList) =>
+            onChangeCustomerIndexListPerChangeList(
+              releaseIndex,
+              customerIndexListPerChangeList
             )
-          })
-        }
-      </Table.Body>
-    </Table>
-  )
+          }
+        />
+      </td>
+    );
+  }
 }
