@@ -15,7 +15,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "set \"PUBLIC_URL=https://rhm.js.org\" && react-scripts build && npx shx rm -rf docs && npx shx mv build docs",
+    "build-v1": "set \"PUBLIC_URL=https://rhm.js.org/v1\" && react-scripts build && npx shx rm -rf docs/v1 && npx shx mv build docs/v1",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
