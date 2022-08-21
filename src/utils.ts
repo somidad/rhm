@@ -365,7 +365,8 @@ export function publish(
   versionIndex: number,
   lineupList: Enum[],
   pkgList: Pkg[],
-  customerList: Enum[]
+  customerList: Enum[],
+  tagStyle: "comma" | "separate"
 ) {
   if (isVersionListCircular(versionList, versionIndex)) {
     return;
@@ -412,13 +413,16 @@ export function publish(
     .map((relaseHistoryPerCustomerIndexList) => {
       const { customerIndexList, releaseHistory } =
         relaseHistoryPerCustomerIndexList;
-      const customerNameJoined = getEnumNameList(
-        customerList,
-        customerIndexList
-      ).join(", ");
-      return `<${customerNameJoined}>
+      const customerNameList = getEnumNameList(customerList, customerIndexList);
+      const customerNameJoined =
+        tagStyle === "comma"
+          ? `<${customerNameList.join(", ")}>`
+          : customerNameList
+              .map((customerName) => `<${customerName}>`)
+              .join("");
+      return `${customerNameJoined}
 ${indent(releaseHistory)}
-</${customerNameJoined}>`;
+${customerNameJoined.replace(/</g, "</")}`;
     })
     .join("\n");
   return releaseHistory;

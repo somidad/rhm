@@ -5,7 +5,14 @@ import { Button, Col, Collapse, Modal, Row, Space, Tabs, Tag } from "antd";
 import { CopyOutlined, GithubOutlined } from "@ant-design/icons";
 import EnumTable from "./components/EnumTable";
 import PkgTable from "./components/PkgTable";
-import { ChangeV2, CustomerIndexListPerChange, Enum, Pkg, ReleaseV2, VersionV2 } from "./types";
+import {
+  ChangeV2,
+  CustomerIndexListPerChange,
+  Enum,
+  Pkg,
+  ReleaseV2,
+  VersionV2,
+} from "./types";
 import Title from "antd/lib/typography/Title";
 import Link from "antd/lib/typography/Link";
 import VersionTable from "./components/VersionTable";
@@ -21,10 +28,32 @@ import {
 import { uniq, uniqWith } from "lodash";
 import TextArea from "antd/lib/input/TextArea";
 import { publish } from "./utils";
-import { keyChanges, keyReleases, keyVersions, parenError, keyHistory, keyLineups, keyPackages, keyCustomers, titleHistory, titleVersions, titleChanges, titleReleases, titleCustomers, titleCustomer, titleLineups, titleLineup, titlePackages } from "./constants";
+import {
+  keyChanges,
+  keyReleases,
+  keyVersions,
+  parenError,
+  keyHistory,
+  keyLineups,
+  keyPackages,
+  keyCustomers,
+  titleHistory,
+  titleVersions,
+  titleChanges,
+  titleReleases,
+  titleCustomers,
+  titleCustomer,
+  titleLineups,
+  titleLineup,
+  titlePackages,
+  titleOptions,
+  keyOptions,
+} from "./constants";
+import Options, { Options as OptionsType } from "./components/Options";
 const { Panel } = Collapse;
 
 function App() {
+  const [options, setOptions] = useState<OptionsType>({ tagStyle: "separate" });
   const [versionList, setVersionList] = useState<VersionV2[]>(versionListInit);
   const [versionIndex, setVersionIndex] = useState(-1);
   const [lineupList, setLineupList] = useState<Enum[]>(lineupListInit);
@@ -109,7 +138,8 @@ function App() {
       versionIndex,
       lineupList,
       pkgList,
-      customerList
+      customerList,
+      options.tagStyle
     );
     setReleaseHistory(releaseHistory ?? parenError);
     setModalVisible(true);
@@ -119,7 +149,10 @@ function App() {
     setVersionIndex(index);
   }
 
-  type ChangeIndexWithVersionIndex = Omit<CustomerIndexListPerChange, "customerIndexList">;
+  type ChangeIndexWithVersionIndex = Omit<
+    CustomerIndexListPerChange,
+    "customerIndexList"
+  >;
   const usedChangeIndexWithVersionIndexList: ChangeIndexWithVersionIndex[] =
     uniqWith(
       versionList.reduce(
@@ -150,7 +183,8 @@ function App() {
         },
         []
       ),
-      (a, b) => a.versionIndex === b.versionIndex && a.changeIndex === b.changeIndex
+      (a, b) =>
+        a.versionIndex === b.versionIndex && a.changeIndex === b.changeIndex
     );
   const usedLineupIndexList = uniq([
     ...versionList.reduce((lineupIndexListPrev: number[], version) => {
@@ -255,7 +289,9 @@ function App() {
                           versionIndex={versionIndex}
                           versionList={versionList}
                           lineupList={lineupList}
-                          usedChangeIndexWithVersionIndexList={usedChangeIndexWithVersionIndexList}
+                          usedChangeIndexWithVersionIndexList={
+                            usedChangeIndexWithVersionIndexList
+                          }
                           onChange={onChangeChangeList}
                         />
                       </Panel>
@@ -304,6 +340,10 @@ function App() {
                 onChange={setPkgList}
                 usedPkgIndexList={usedPkgIndexList}
               />
+            </Tabs.TabPane>
+            <Tabs.TabPane tab={titleOptions} key={keyOptions}>
+              <Title level={2}>Options</Title>
+              <Options options={options} onChangeOptions={setOptions} />
             </Tabs.TabPane>
           </Tabs>
         </Col>
