@@ -53,7 +53,7 @@ import Options, { Options as OptionsType } from "./components/Options";
 const { Panel } = Collapse;
 
 function App() {
-  const [options, setOptions] = useState<OptionsType>({ tagStyle: "separate" });
+  const [options, setOptions] = useState<OptionsType>({ tagStyle: "comma" });
   const [versionList, setVersionList] = useState<VersionV2[]>(versionListInit);
   const [versionIndex, setVersionIndex] = useState(-1);
   const [lineupList, setLineupList] = useState<Enum[]>(lineupListInit);
