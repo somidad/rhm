@@ -1,20 +1,27 @@
-import { FileOutlined, FolderOpenOutlined, SaveOutlined } from "@ant-design/icons";
+import {
+  FileOutlined,
+  FolderOpenOutlined,
+  SaveOutlined,
+} from "@ant-design/icons";
 import { Input, Menu } from "antd";
 import { createRef, useState } from "react";
 import { Enum, Pkg, VersionV2 } from "../types";
 import { load } from "../utils";
+import { Options } from "./Options";
 
 type Props = {
   customerList: Enum[];
   lineupList: Enum[];
   pkgList: Pkg[];
   versionList: VersionV2[];
+  options: Options;
   onNew: () => void;
   onLoad: (content: {
     customerList: Enum[];
     lineupList: Enum[];
     pkgList: Pkg[];
     versionList: VersionV2[];
+    options?: Options;
   }) => void;
 };
 
@@ -25,6 +32,7 @@ export default function AppMenu({
   lineupList,
   pkgList,
   versionList,
+  options,
   onNew,
   onLoad,
 }: Props) {
@@ -47,7 +55,15 @@ export default function AppMenu({
       return;
     }
     const blob = new Blob(
-      [JSON.stringify({ versionList, lineupList, pkgList, customerList })],
+      [
+        JSON.stringify({
+          versionList,
+          lineupList,
+          pkgList,
+          customerList,
+          options,
+        }),
+      ],
       { type: "application/json" }
     );
     refSave.current.download = `${featureName}.json`;
@@ -67,23 +83,32 @@ export default function AppMenu({
     const { name } = file;
     const indexLast = name.lastIndexOf(".");
     const featureName = name.substring(0, indexLast);
-    const { versionList, lineupList, pkgList, customerList } = load(result);
+    const { versionList, lineupList, pkgList, customerList, options } =
+      load(result);
     setFeatureName(featureName);
-    onLoad({ customerList, lineupList, pkgList, versionList });
+    onLoad({ customerList, lineupList, pkgList, versionList, options });
   };
 
   return (
     <>
       <Menu mode="horizontal" selectable={false}>
         <Menu.Item key="new" onClick={onNew} icon={<FileOutlined />} />
-        <Menu.Item key="load" onClick={() => refLoad.current?.click()} icon={<FolderOpenOutlined />} />
+        <Menu.Item
+          key="load"
+          onClick={() => refLoad.current?.click()}
+          icon={<FolderOpenOutlined />}
+        />
         <Menu.Item key="featureName" disabled>
           <Input
             value={featureName}
             onChange={(e) => setFeatureName(e.target.value)}
           />
         </Menu.Item>
-        <Menu.Item key="save" onClick={() => onClickSave()} icon={<SaveOutlined />} />
+        <Menu.Item
+          key="save"
+          onClick={() => onClickSave()}
+          icon={<SaveOutlined />}
+        />
       </Menu>
       <input
         type="file"

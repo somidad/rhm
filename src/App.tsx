@@ -111,17 +111,20 @@ function App() {
     lineupList,
     pkgList,
     versionList,
+    options,
   }: {
     customerList: Enum[];
     lineupList: Enum[];
     pkgList: Pkg[];
     versionList: VersionV2[];
+    options?: OptionsType;
   }) {
     setVersionIndex(-1);
     setCustomerList(customerList);
     setLineupList(lineupList);
     setPkgList(pkgList);
     setVersionList(versionList);
+    setOptions(options ?? { tagStyle: "comma" });
   }
 
   function onNew() {
@@ -253,6 +256,7 @@ function App() {
         lineupList={lineupList}
         pkgList={pkgList}
         versionList={versionList}
+        options={options}
         onNew={onNew}
         onLoad={onLoad}
       />

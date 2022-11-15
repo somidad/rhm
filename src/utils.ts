@@ -211,7 +211,7 @@ function isVersionListCircular(versionList: VersionV2[], index: number) {
 
 export function load(input: string) {
   const parsed = JSON.parse(input);
-  const { versionList, lineupList, pkgList, customerList } = parsed;
+  const { versionList, lineupList, pkgList, customerList, options } = parsed;
   // Check if it comes from release-history-manager
   if (versionList[0] && versionList[0].versionIndex !== undefined) {
     // Migrate
@@ -357,7 +357,7 @@ export function load(input: string) {
     });
   });
   // TODO
-  return { versionList, lineupList, pkgList, customerList };
+  return { versionList, lineupList, pkgList, customerList, options };
 }
 
 export function publish(
