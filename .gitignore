@@ -23,5 +23,3 @@ yarn-debug.log*
 yarn-error.log*
 
 react-app-env.d.ts
-
-init.ts
