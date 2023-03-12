@@ -30,4 +30,4 @@ jobs:
           git config user.email "sjeon87@gmail.com"
           git config user.name "Seokseong Jeon"
           git commit -m "Publish v2 from ${commit_id}"
-      - run: git push origin master
+      - run: git push origin main
